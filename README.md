@@ -31,7 +31,7 @@ Run `make` in NuttX to link the Zig Object from `hello.o`.
 
 Boot NuttX and enter this at the NuttX Shell...
 
-```bash
+```text
 NuttShell (NSH) NuttX-10.3.0-RC2
 
 nsh> hello_zig
