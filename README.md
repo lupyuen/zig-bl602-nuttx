@@ -138,9 +138,13 @@ But no worries! Let's compile the Zig App ourselves and link into NuttX.
 
 # Compile Zig App
 
-TODO
+Here's how we compile our Zig App for RISC-V BL602...
 
 ```bash
+##  Download our modified Zig App for NuttX
+git clone --recursive https://github.com/lupyuen/zig-bl602-nuttx
+cd zig-bl602-nuttx
+
 ##  Compile the Zig App for BL602 (RV32IMACF with Hardware Floating Point)
 zig build-obj \
     -target riscv32-freestanding-none \
@@ -155,11 +159,41 @@ cp hello_zig_main.o $HOME/nuttx/apps/examples/hello/hello_main.c.home.user.nuttx
 make
 ```
 
-TODO: Why riscv32-freestanding-none
+_Why is the target `riscv32-freestanding-none`?_
 
-TODO: Why sifive_e76
+Zig Targets have the form `<arch><sub>-<os>-<abi>`...
 
-https://gist.github.com/lupyuen/09d64c79e12b30e5eebc7d0a9c3b20a4
+`riscv32`: Because BL602 is a 32-bit RISC-V processor
+
+`freestanding`: Because embedded targets don't need an OS
+
+`none`: Because embedded targets don't specify the ABI
+
+_Why is the CPU `sifive_e76`?_
+
+BL602 is designated as RV32IMACF...
+
+| Designation | Meaning |
+|:---:|:---|
+| __`RV32I`__ | 32-bit RISC-V with Base Integer Instructions
+| __`M`__ | Integer Multiplication + Division
+| __`A`__ | Atomic Instructions
+| __`C`__ | Compressed Instructions
+| __`F`__ | Single-Precision Floating-Point
+
+[(Source)](https://en.wikipedia.org/wiki/RISC-V#ISA_base_and_extensions)
+
+Among all Zig Targets, only `sifive_e76` has the same designation...
+
+```bash
+$ zig targets
+...
+"sifive_e76": [ "a", "c", "f", "m" ],
+```
+
+[(Source)](https://gist.github.com/lupyuen/09d64c79e12b30e5eebc7d0a9c3b20a4)
+
+Thus we use `sifive_e76` as our CPU Target.
 
 # Floating-Point ABI
 
