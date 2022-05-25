@@ -199,16 +199,16 @@ Thus we use `sifive_e76` as our CPU Target.
 
 # Floating-Point ABI
 
-TODO
-
-NuttX Build fails with an error...
+When linking the Compiled Zig App with NuttX, we see this error...
 
 ```text
+$ make
+...
 riscv64-unknown-elf-ld: nuttx/staging/libapps.a(hello_main.c.home.user.nuttx.apps.examples.hello.o): 
 can't link soft-float modules with single-float modules
 ```
 
-NuttX is compiled for __Hardware Floating Point__ (Single-Precision) ABI...
+That's because NuttX is compiled for __Hardware Floating Point__ (Single-Precision) ABI...
 
 ```bash
 $ riscv64-unknown-elf-readelf -h -A $HOME/nuttx/apps/examples/hello/hello_main.c.home.user.nuttx.apps.examples.hello.o
@@ -242,7 +242,7 @@ File Attributes
 
 [(NuttX is compiled with the GCC Flags `-march=rv32imafc -mabi=ilp32f`)](https://gist.github.com/lupyuen/288c980fdef75c334d32e669a921e623)
 
-But Zig Compiler produces an Object File with __Software Floating Point__ ABI...
+Whereas Zig Compiler produces an Object File with __Software Floating Point__ ABI...
 
 ```bash
 $ riscv64-unknown-elf-readelf -h -A hello_zig_main.o
