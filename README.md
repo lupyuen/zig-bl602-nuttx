@@ -100,6 +100,8 @@ _ = printf("Hello, Zig!\n");
 return 0;
 ```
 
+[(Source)](https://github.com/lupyuen/zig-bl602-nuttx/blob/main/hello_zig_main.zig)
+
 # Enable Zig App
 
 To enable the Zig App in NuttX...
