@@ -274,7 +274,9 @@ File Attributes
 
 [(Source)](https://gist.github.com/lupyuen/f04386a0b94ed1fb42a94d671edb1ba7)
 
-GCC won't allow us to link object files with Software Floating-Point and Hardware Floating-Point.
+GCC won't allow us to link object files with Software Floating-Point and Hardware Floating-Point!
+
+# Patch ELF Header
 
 We fix this by modifying the ELF Header...
 
