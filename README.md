@@ -211,7 +211,7 @@ can't link soft-float modules with single-float modules
 NuttX is compiled for __Hardware Floating Point__ (Single-Precision) ABI...
 
 ```bash
-$ riscv64-unknown-elf-readelf -h -A nuttx/apps/examples/ikea_air_quality_sensor/ikea_air_quality_sensor_main.c.home.user.nuttx.apps.examples.ikea_air_quality_sensor.o
+$ riscv64-unknown-elf-readelf -h -A $HOME/nuttx/apps/examples/hello/hello_main.c.home.user.nuttx.apps.examples.hello.o
 ELF Header:
   Magic:   7f 45 4c 46 01 01 01 00 00 00 00 00 00 00 00 00 
   Class:                             ELF32
@@ -224,14 +224,14 @@ ELF Header:
   Version:                           0x1
   Entry point address:               0x0
   Start of program headers:          0 (bytes into file)
-  Start of section headers:          11600 (bytes into file)
+  Start of section headers:          4528 (bytes into file)
   Flags:                             0x3, RVC, single-float ABI
   Size of this header:               52 (bytes)
   Size of program headers:           0 (bytes)
   Number of program headers:         0
   Size of section headers:           40 (bytes)
-  Number of section headers:         28
-  Section header string table index: 27
+  Number of section headers:         26
+  Section header string table index: 25
 Attribute Section: riscv
 File Attributes
   Tag_RISCV_stack_align: 16-bytes
@@ -239,6 +239,8 @@ File Attributes
 ```
 
 [(Source)](https://gist.github.com/lupyuen/5c090dead49eb50751578f28c15cecd5)
+
+[(NuttX is compiled with the GCC Flags `-march=rv32imafc -mabi=ilp32f`)](https://gist.github.com/lupyuen/288c980fdef75c334d32e669a921e623)
 
 But Zig Compiler produces an Object File with __Software Floating Point__ ABI...
 
@@ -291,6 +293,15 @@ riscv64-unknown-elf-readelf -h -A hello_zig_main.o
 riscv64-unknown-elf-readelf -h -A hello_zig_main.o
 ##  Shows "Flags: 0x3, RVC, single-float ABI"
 ##  Which is Hardware Floating Point and will link with NuttX
+
+##  Copy the compiled app to NuttX and overwrite `hello.o`
+##  TODO: Change "$HOME/nuttx" to your NuttX Project Directory
+cp hello_zig_main.o $HOME/nuttx/apps/examples/hello/hello_main.c.home.user.nuttx.apps.examples.hello.o
+
+##  Build NuttX to link the Zig Object from `hello.o`
+make
+
+##  NuttX build should now succeed
 ```
 
 # Hello App
