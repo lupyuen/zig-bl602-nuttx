@@ -159,6 +159,8 @@ cp hello_zig_main.o $HOME/nuttx/apps/examples/hello/hello_main.c.home.user.nuttx
 make
 ```
 
+# Zig Target
+
 _Why is the target `riscv32-freestanding-none`?_
 
 Zig Targets have the form `<arch><sub>-<os>-<abi>`...
