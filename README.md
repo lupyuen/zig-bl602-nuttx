@@ -171,7 +171,7 @@ Zig Targets have the form `<arch><sub>-<os>-<abi>`...
 
 `none`: Because embedded targets don't specify the ABI
 
-_Why is the CPU `sifive_e76`?_
+_Why is the target CPU `sifive_e76`?_
 
 BL602 is designated as RV32IMACF...
 
