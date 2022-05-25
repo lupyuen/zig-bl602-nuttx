@@ -138,7 +138,7 @@ But no worries! Let's compile the Zig App ourselves and link into NuttX.
 
 # Compile Zig App
 
-Here's how we compile our Zig App for RISC-V BL602...
+Here's how we compile our Zig App for RISC-V BL602 and link it with NuttX...
 
 ```bash
 ##  Download our modified Zig App for NuttX
