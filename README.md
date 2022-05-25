@@ -41,6 +41,42 @@ nsh> hello
 Hello, Zig!
 ```
 
+Here's how we made Zig run on BL602 NuttX...
+
+# Zig App for NuttX
+
+Apache NuttX RTOS is bundled with a simple Zig App ... Let's run this on BL602
+
+https://github.com/apache/incubator-nuttx-apps/blob/master/examples/hello_zig/hello_zig_main.zig
+
+```zig
+//  Included Files
+const std = @import("std");
+
+//  Externs
+pub extern fn printf(_format: [*:0]const u8) c_int;
+
+//  hello_zig_main
+pub export fn hello_zig_main(_argc: c_int, _argv: [*]const [*]const u8) c_int {
+    _ = _argc;
+    _ = _argv;
+    _ = printf("Hello, Zig!\n");
+    return 0;
+}
+```
+
+We fixed the last 2 lines to make the Zig compiler happy...
+
+```zig
+//  Previously: printf("Hello, Zig!\n");
+//  Zig needs us to use the returned value from printf()...
+_ = printf("Hello, Zig!\n");
+
+//  Previously this was missing.
+//  Zig needs us to return a value...
+return 0;
+```
+
 # Target ABI
 
 TODO
