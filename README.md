@@ -1,5 +1,7 @@
 # Zig on RISC-V BL602 with Apache NuttX RTOS
 
+[__Follow the updates on Twitter__](https://twitter.com/MisterTechBlog/status/1529261120124354560)
+
 To build the Zig App for NuttX on BL602...
 
 ```bash
