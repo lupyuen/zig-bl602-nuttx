@@ -1,33 +1,42 @@
 # Zig on RISC-V BL602 with Apache NuttX RTOS
 
-TODO: Enable Zip App in NuttX menuconfig
-
-TODO: Run `make` in NuttX
-
 To build the Zig App for NuttX on BL602...
 
 ```bash
+##  TODO: Enable Zip App in NuttX menuconfig
+##  TODO: Run `make` in NuttX
+
+##  Download our modified Zig App for NuttX
 git clone --recursive https://github.com/lupyuen/zig-bl602-nuttx
 cd zig-bl602-nuttx
 
+##  Compile the Zig App for BL602 (RV32IMACF with Hardware Floating Point)
 zig build-obj \
     -target riscv32-freestanding-none \
     -mcpu sifive_e76 \
     hello_zig_main.zig
 
+##  Dump the ABI for the compiled app
 riscv64-unknown-elf-readelf -h -A hello_zig_main.o
 ##  Shows "Flags: 0x1, RVC, soft-float ABI"
+##  Which is Software Floating Point.
+##  This won't link with NuttX because NuttX is compiled with Hardware Floating Point
 
+##  We change Software Floating Point to Hardware Floating Point...
 ##  Edit hello_zig_main.o in a Hex Editor, change byte 0x24 from 0x01 to 0x03
 ##  (See https://en.wikipedia.org/wiki/Executable_and_Linkable_Format#File_header)
 
+##  Dump the ABI for the compiled app
 riscv64-unknown-elf-readelf -h -A hello_zig_main.o
 ##  Shows "Flags: 0x3, RVC, single-float ABI"
+##  Which is Hardware Floating Point and will link with NuttX
 
-cp hello_zig_main.o ../apps/examples/hello/hello_main.c.home.user.nuttx.apps.examples.hello.o
+##  Copy the compiled app to NuttX and overwrite `hello.o`
+##  TODO: Change "$HOME/nuttx" to your NuttX Project Directory
+cp hello_zig_main.o $HOME/nuttx/apps/examples/hello/hello_main.c.home.user.nuttx.apps.examples.hello.o
+
+##  TODO: Run `make` in NuttX to link the Zig Object from `hello.o`.
 ```
-
-Run `make` in NuttX to link the Zig Object from `hello.o`.
 
 Boot NuttX and enter this at the NuttX Shell...
 
