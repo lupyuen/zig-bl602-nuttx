@@ -295,9 +295,13 @@ This won't link with NuttX because NuttX is compiled with Hardware Floating-Poin
 
 We fix this by modifying the ELF Header...
 
-##  We change Software Floating-Point to Hardware Floating-Point...
-##  Edit hello_zig_main.o in a Hex Editor, change byte 0x24 from 0x01 to 0x03
-##  (See https://en.wikipedia.org/wiki/Executable_and_Linkable_Format#File_header)
+-   Edit `hello_zig_main.o` in a Hex Editor
+
+    [(Like VSCode Hex Editor)](https://marketplace.visualstudio.com/items?itemName=ms-vscode.hexeditor)
+
+-   Change byte `0x24` (Flags) from `0x01` (Soft Float) to `0x03` (Hard Float)
+
+    [(See this)](https://en.wikipedia.org/wiki/Executable_and_Linkable_Format#File_header)
 
 We verify that the Object File has been changed to __Hardware Floating-Point__ ABI...
 
