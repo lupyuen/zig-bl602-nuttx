@@ -162,9 +162,7 @@ riscv64-unknown-elf-ld: /home/user/nuttx/nuttx/staging/libapps.a(hello_main.c.ho
 can't link soft-float modules with single-float modules
 ```
 
-NuttX is compiled for Hardware Floating Point, Single-Precision...
-
-https://gist.github.com/lupyuen/5c090dead49eb50751578f28c15cecd5
+NuttX is compiled for __Hardware Floating Point__ (Single-Precision) ABI...
 
 ```bash
 $ riscv64-unknown-elf-readelf -h -A nuttx/apps/examples/ikea_air_quality_sensor/ikea_air_quality_sensor_main.c.home.user.nuttx.apps.examples.ikea_air_quality_sensor.o
@@ -194,9 +192,41 @@ File Attributes
   Tag_RISCV_arch: "rv32i2p0_m2p0_a2p0_f2p0_c2p0"
 ```
 
-But Zig
+[(Source)](https://gist.github.com/lupyuen/5c090dead49eb50751578f28c15cecd5)
 
-TODO
+But Zig Compiler produces an Object File with __Software Floating Point__ ABI...
+
+```bash
+$ riscv64-unknown-elf-readelf -h -A hello_zig_main.o
+ELF Header:
+  Magic:   7f 45 4c 46 01 01 01 00 00 00 00 00 00 00 00 00 
+  Class:                             ELF32
+  Data:                              2's complement, little endian
+  Version:                           1 (current)
+  OS/ABI:                            UNIX - System V
+  ABI Version:                       0
+  Type:                              REL (Relocatable file)
+  Machine:                           RISC-V
+  Version:                           0x1
+  Entry point address:               0x0
+  Start of program headers:          0 (bytes into file)
+  Start of section headers:          11968 (bytes into file)
+  Flags:                             0x1, RVC, soft-float ABI
+  Size of this header:               52 (bytes)
+  Size of program headers:           0 (bytes)
+  Number of program headers:         0
+  Size of section headers:           40 (bytes)
+  Number of section headers:         24
+  Section header string table index: 22
+Attribute Section: riscv
+File Attributes
+  Tag_RISCV_stack_align: 16-bytes
+  Tag_RISCV_arch: "rv32i2p0_m2p0_a2p0_f2p0_c2p0"
+```
+
+[(Source)](https://gist.github.com/lupyuen/f04386a0b94ed1fb42a94d671edb1ba7)
+
+We fix this by modifying the ELF Header...
 
 ```bash
 ##  Dump the ABI for the compiled app
