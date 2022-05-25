@@ -278,39 +278,63 @@ File Attributes
 
 GCC won't allow us to link object files with Software Floating-Point and Hardware Floating-Point!
 
+TODO: Why did the Zig Compiler produce an Object File with Software Floating-Point ABI, when `sifive_e76` supports Hardware Floating-Point?
+
 # Patch ELF Header
 
-We fix this by modifying the ELF Header...
+Zig Compiler generates an Object File with __Software Floating-Point__ ABI...
 
 ```bash
 ##  Dump the ABI for the compiled app
-riscv64-unknown-elf-readelf -h -A hello_zig_main.o
-##  Shows "Flags: 0x1, RVC, soft-float ABI"
-##  Which is Software Floating-Point.
-##  This won't link with NuttX because NuttX is compiled with Hardware Floating-Point
+$ riscv64-unknown-elf-readelf -h -A hello_zig_main.o
+...
+Flags: 0x1, RVC, soft-float ABI
+```
+
+This won't link with NuttX because NuttX is compiled with Hardware Floating-Point.
+
+We fix this by modifying the ELF Header...
 
 ##  We change Software Floating-Point to Hardware Floating-Point...
 ##  Edit hello_zig_main.o in a Hex Editor, change byte 0x24 from 0x01 to 0x03
 ##  (See https://en.wikipedia.org/wiki/Executable_and_Linkable_Format#File_header)
 
-##  Dump the ABI for the compiled app
-riscv64-unknown-elf-readelf -h -A hello_zig_main.o
-##  Shows "Flags: 0x3, RVC, single-float ABI"
-##  Which is Hardware Floating-Point and will link with NuttX
+We verify that the Object File has been changed to __Hardware Floating-Point__ ABI...
 
+```bash
+##  Dump the ABI for the compiled app
+$ riscv64-unknown-elf-readelf -h -A hello_zig_main.o
+...
+Flags: 0x3, RVC, single-float ABI
+```
+
+Which is Hardware Floating-Point and will link with NuttX.
+
+Now we link the modified Object File with NuttX...
+
+```bash
 ##  Copy the compiled app to NuttX and overwrite `hello.o`
 ##  TODO: Change "$HOME/nuttx" to your NuttX Project Directory
 cp hello_zig_main.o $HOME/nuttx/apps/examples/hello/hello_main.c.home.user.nuttx.apps.examples.hello.o
 
 ##  Build NuttX to link the Zig Object from `hello.o`
 make
-
-##  NuttX build should now succeed
 ```
+
+The NuttX Build should now succeed.
 
 TODO: Find the right way to fix the Floating-Point ABI in the Zig Compiler
 
-TODO: Why did the Zig Compiler produce an Object File with Software Floating-Point ABI, when `sifive_e76` supports Hardware Floating-Point?
+# Zig Runs OK!
+
+The NuttX Build succeeds. Zig runs OK on NuttX BL602!
+
+```text
+NuttShell (NSH) NuttX-10.3.0-RC2
+
+nsh> hello_zig
+Hello, Zig!
+```
 
 # Hello App
 
@@ -319,4 +343,13 @@ TODO
 ```text
 riscv64-unknown-elf-ld: /home/user/nuttx/nuttx/staging/libapps.a(builtin_list.c.home.user.nuttx.apps.builtin.o):(.rodata.g_builtins+0xcc): 
 undefined reference to `hello_main'
+```
+
+TODO
+
+```text
+NuttShell (NSH) NuttX-10.3.0-RC2
+
+nsh> hello
+Hello, Zig!
 ```
