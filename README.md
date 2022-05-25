@@ -151,7 +151,8 @@ zig build-obj \
 ##  TODO: Change "$HOME/nuttx" to your NuttX Project Directory
 cp hello_zig_main.o $HOME/nuttx/apps/examples/hello/hello_main.c.home.user.nuttx.apps.examples.hello.o
 
-##  TODO: Run `make` in NuttX to link the Zig Object from `hello.o`.
+##  Build NuttX to link the Zig Object from `hello.o`
+make
 ```
 
 TODO: Why riscv32-freestanding-none
@@ -160,12 +161,14 @@ TODO: Why sifive_e76
 
 https://gist.github.com/lupyuen/09d64c79e12b30e5eebc7d0a9c3b20a4
 
-# Target ABI
+# Floating-Point ABI
 
 TODO
 
+NuttX Build fails with an error...
+
 ```text
-riscv64-unknown-elf-ld: /home/user/nuttx/nuttx/staging/libapps.a(hello_main.c.home.user.nuttx.apps.examples.hello.o): 
+riscv64-unknown-elf-ld: nuttx/staging/libapps.a(hello_main.c.home.user.nuttx.apps.examples.hello.o): 
 can't link soft-float modules with single-float modules
 ```
 
@@ -233,7 +236,7 @@ File Attributes
 
 [(Source)](https://gist.github.com/lupyuen/f04386a0b94ed1fb42a94d671edb1ba7)
 
-GCC won't allow us link object files with Software Floating Point and Hardware Floating Point.
+GCC won't allow us to link object files with Software Floating Point and Hardware Floating Point.
 
 We fix this by modifying the ELF Header...
 
