@@ -7,9 +7,13 @@ To build the Zig App for NuttX on BL602...
 make menuconfig
 
 ##  TODO: Select "Application Configuration > Examples > Hello Zig Example"
+##  Save the configuration and edit menuconfig.
 
-##  Run `make` in NuttX
+##  Build Nuttx
 make
+
+##  NuttX Build fails with Undefined Reference to `hello_zig_main`
+##  That's OK, here's the fix...
 
 ##  Download our modified Zig App for NuttX
 git clone --recursive https://github.com/lupyuen/zig-bl602-nuttx
@@ -40,7 +44,10 @@ riscv64-unknown-elf-readelf -h -A hello_zig_main.o
 ##  TODO: Change "$HOME/nuttx" to your NuttX Project Directory
 cp hello_zig_main.o $HOME/nuttx/apps/examples/hello/hello_main.c.home.user.nuttx.apps.examples.hello.o
 
-##  TODO: Run `make` in NuttX to link the Zig Object from `hello.o`.
+##  Build NuttX to link the Zig Object from `hello.o`
+make
+
+##  NuttX build should now succeed
 ```
 
 Boot NuttX and enter this at the NuttX Shell...
