@@ -7,7 +7,7 @@ To build the Zig App for NuttX on BL602...
 make menuconfig
 
 ##  TODO: Select "Application Configuration > Examples > Hello Zig Example"
-##  Save the configuration and edit menuconfig.
+##  Save the configuration and exit menuconfig.
 
 ##  Build Nuttx
 make
@@ -108,7 +108,7 @@ make menuconfig
 
 Select "Application Configuration > Examples > Hello Zig Example"
 
-Save the configuration and edit menuconfig.
+Save the configuration and exit menuconfig.
 
 # Build Fails on NuttX
 
@@ -303,6 +303,8 @@ make
 
 ##  NuttX build should now succeed
 ```
+
+TODO: Find the right way to fix the Floating-Point ABI in the Zig Compiler
 
 # Hello App
 
