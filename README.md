@@ -44,7 +44,7 @@ riscv64-unknown-elf-readelf -h -A hello_zig_main.o
 
 ##  Copy the compiled app to NuttX and overwrite `hello.o`
 ##  TODO: Change "$HOME/nuttx" to your NuttX Project Directory
-cp hello_zig_main.o $HOME/nuttx/apps/examples/hello/hello_main.c.home.user.nuttx.apps.examples.hello.o
+cp hello_zig_main.o $HOME/nuttx/apps/examples/hello/*hello.o
 
 ##  Build NuttX to link the Zig Object from `hello.o`
 make
@@ -157,7 +157,7 @@ zig build-obj \
 
 ##  Copy the compiled app to NuttX and overwrite `hello.o`
 ##  TODO: Change "$HOME/nuttx" to your NuttX Project Directory
-cp hello_zig_main.o $HOME/nuttx/apps/examples/hello/hello_main.c.home.user.nuttx.apps.examples.hello.o
+cp hello_zig_main.o $HOME/nuttx/apps/examples/hello/*hello.o
 
 ##  Build NuttX to link the Zig Object from `hello.o`
 make
@@ -321,7 +321,7 @@ Now we link the modified Object File with NuttX...
 ```bash
 ##  Copy the compiled app to NuttX and overwrite `hello.o`
 ##  TODO: Change "$HOME/nuttx" to your NuttX Project Directory
-cp hello_zig_main.o $HOME/nuttx/apps/examples/hello/hello_main.c.home.user.nuttx.apps.examples.hello.o
+cp hello_zig_main.o $HOME/nuttx/apps/examples/hello/*hello.o
 
 ##  Build NuttX to link the Zig Object from `hello.o`
 make
