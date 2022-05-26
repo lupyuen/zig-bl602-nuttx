@@ -215,11 +215,13 @@ Because...
 
 -   `baseline_rv32` means RV32IMACFD 
 
-    (D for Double-Precision Hardware Floating-Point)
+    (D for Double-Precision Floating-Point)
 
--   `-d` means remove the Double-Precision Hardware Floating-Point (D)
+-   `-d` means remove the Double-Precision Floating-Point (D)
 
-[(Thanks Matheus!)](https://github.com/lupyuen/zig-bl602-nuttx/issues/1)
+    (But keep the Single-Precision Floating-Point)
+
+[(More about RISC-V Feature Flags. Thanks Matheus!)](https://github.com/lupyuen/zig-bl602-nuttx/issues/1)
 
 # Floating-Point ABI
 
