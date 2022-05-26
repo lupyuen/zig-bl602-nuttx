@@ -201,6 +201,26 @@ $ zig targets
 
 Thus we use `sifive_e76` as our CPU Target.
 
+Alternatively we may use `baseline_rv32-d` as our CPU Target...
+
+```bash
+##  Compile the Zig App for BL602 (RV32IMACF with Hardware Floating-Point)
+zig build-obj \
+    -target riscv32-freestanding-none \
+    -mcpu=baseline_rv32-d \
+    hello_zig_main.zig
+```
+
+Because...
+
+-   `baseline_rv32` means RV32IMACFD 
+
+    (D for Double-Precision Hardware Floating-Point)
+
+-   `-d` means remove the Double-Precision Hardware Floating-Point (D)
+
+[(Thanks Matheus!)](https://github.com/lupyuen/zig-bl602-nuttx/issues/1)
+
 # Floating-Point ABI
 
 When linking the Compiled Zig App with NuttX, we see this error...
@@ -215,8 +235,9 @@ can't link soft-float modules with single-float modules
 That's because NuttX was compiled for __Hardware Floating-Point__ (Single-Precision) ABI...
 
 ```bash
-##  Do this BEFORE overwriting hello.o by hello_zig_main.o
-$ riscv64-unknown-elf-readelf -h -A $HOME/nuttx/apps/examples/hello/hello_main.c.home.user.nuttx.apps.examples.hello.o
+##  Do this BEFORE overwriting hello.o by hello_zig_main.o.
+##  "*hello.o" expands to something like "hello_main.c.home.user.nuttx.apps.examples.hello.o"
+$ riscv64-unknown-elf-readelf -h -A $HOME/nuttx/apps/examples/hello/*hello.o
 ELF Header:
   Magic:   7f 45 4c 46 01 01 01 00 00 00 00 00 00 00 00 00 
   Class:                             ELF32
