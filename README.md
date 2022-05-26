@@ -368,14 +368,30 @@ Hello, Zig!
 
 # Hello App
 
-TODO
+Remember that we overwrote `hello.o` with our Zig Compiled Object File.
+
+NuttX Build will fail unless we provide the `hello_main` function...
 
 ```text
-riscv64-unknown-elf-ld: /home/user/nuttx/nuttx/staging/libapps.a(builtin_list.c.home.user.nuttx.apps.builtin.o):(.rodata.g_builtins+0xcc): 
+riscv64-unknown-elf-ld: nuttx/staging/libapps.a(builtin_list.c.home.user.nuttx.apps.builtin.o):(.rodata.g_builtins+0xcc): 
 undefined reference to `hello_main'
 ```
 
-TODO
+That's why we define `hello_main` in our Zig App...
+
+```zig
+pub export fn hello_main(_argc: c_int, _argv: [*]const [*]const u8) c_int {
+    _ = _argc;
+    _ = _argv;
+    _ = printf("Hello, Zig!\n");
+    return 0;
+}
+```
+
+[(Source)](https://github.com/lupyuen/zig-bl602-nuttx/blob/main/hello_zig_main.zig)
+
+
+Which means that the `hello` app will call our Zig Code too...
 
 ```text
 NuttShell (NSH) NuttX-10.3.0-RC2
