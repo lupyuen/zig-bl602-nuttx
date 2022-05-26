@@ -234,7 +234,7 @@ riscv64-unknown-elf-ld: nuttx/staging/libapps.a(hello_main.c.home.user.nuttx.app
 can't link soft-float modules with single-float modules
 ```
 
-That's because NuttX was compiled for __Hardware Floating-Point__ (Single-Precision) ABI...
+That's because NuttX was compiled for (Single-Precision) __Hardware Floating-Point__ ABI (Application Binary Interface)...
 
 ```bash
 ##  Do this BEFORE overwriting hello.o by hello_zig_main.o.
@@ -302,13 +302,13 @@ File Attributes
 
 [(Source)](https://gist.github.com/lupyuen/f04386a0b94ed1fb42a94d671edb1ba7)
 
-GCC won't allow us to link object files with Software Floating-Point and Hardware Floating-Point!
+GCC won't allow us to link object files with Software Floating-Point and Hardware Floating-Point ABIs!
 
 TODO: Why did the Zig Compiler produce an Object File with Software Floating-Point ABI, when `sifive_e76` supports Hardware Floating-Point?
 
 # Patch ELF Header
 
-Zig Compiler generates an Object File with __Software Floating-Point__ ABI...
+Zig Compiler generates an Object File with __Software Floating-Point__ ABI (Application Binary Interface)...
 
 ```bash
 ##  Dump the ABI for the compiled app
@@ -317,7 +317,7 @@ $ riscv64-unknown-elf-readelf -h -A hello_zig_main.o
 Flags: 0x1, RVC, soft-float ABI
 ```
 
-This won't link with NuttX because NuttX is compiled with Hardware Floating-Point.
+This won't link with NuttX because NuttX is compiled with Hardware Floating-Point ABI.
 
 We fix this by modifying the ELF Header...
 
@@ -338,7 +338,7 @@ $ riscv64-unknown-elf-readelf -h -A hello_zig_main.o
 Flags: 0x3, RVC, single-float ABI
 ```
 
-Which is Hardware Floating-Point and will link with NuttX.
+This is now Hardware Floating-Point ABI and will link with NuttX.
 
 Now we link the modified Object File with NuttX...
 
