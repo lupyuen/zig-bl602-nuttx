@@ -212,9 +212,10 @@ riscv64-unknown-elf-ld: nuttx/staging/libapps.a(hello_main.c.home.user.nuttx.app
 can't link soft-float modules with single-float modules
 ```
 
-That's because NuttX is compiled for __Hardware Floating-Point__ (Single-Precision) ABI...
+That's because NuttX was compiled for __Hardware Floating-Point__ (Single-Precision) ABI...
 
 ```bash
+##  Do this BEFORE overwriting hello.o by hello_zig_main.o
 $ riscv64-unknown-elf-readelf -h -A $HOME/nuttx/apps/examples/hello/hello_main.c.home.user.nuttx.apps.examples.hello.o
 ELF Header:
   Magic:   7f 45 4c 46 01 01 01 00 00 00 00 00 00 00 00 00 
@@ -244,7 +245,7 @@ File Attributes
 
 [(Source)](https://gist.github.com/lupyuen/5c090dead49eb50751578f28c15cecd5)
 
-[(NuttX is compiled with the GCC Flags `-march=rv32imafc -mabi=ilp32f`)](https://gist.github.com/lupyuen/288c980fdef75c334d32e669a921e623)
+[(NuttX was compiled with the GCC Flags `-march=rv32imafc -mabi=ilp32f`)](https://gist.github.com/lupyuen/288c980fdef75c334d32e669a921e623)
 
 Whereas Zig Compiler produces an Object File with __Software Floating-Point__ ABI...
 
