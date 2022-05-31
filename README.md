@@ -1,6 +1,8 @@
 # Zig on RISC-V BL602 with Apache NuttX RTOS
 
-[__Follow the updates on Twitter__](https://twitter.com/MisterTechBlog/status/1529261120124354560)
+Read the article...
+
+-   ["Zig on RISC-V BL602: Quick Peek with Apache NuttX RTOS"](https://lupyuen.github.io/articles/zig)
 
 To build the Zig App for NuttX on BL602...
 
@@ -68,19 +70,20 @@ Here's how we made Zig run on BL602 NuttX...
 
 # Zig App for NuttX
 
-Apache NuttX RTOS is bundled with a simple Zig App ... Let's run this on BL602
-
-https://github.com/apache/incubator-nuttx-apps/blob/master/examples/hello_zig/hello_zig_main.zig
+Apache NuttX RTOS is bundled with a simple Zig App ... Let's run this on BL602: [hello_zig_main.zig](hello_zig_main.zig)
 
 ```zig
-//  Included Files
+//  Import the Zig Standard Library
 const std = @import("std");
 
-//  Externs
+//  Import printf() from C
 pub extern fn printf(_format: [*:0]const u8) c_int;
 
-//  hello_zig_main
-pub export fn hello_zig_main(_argc: c_int, _argv: [*]const [*]const u8) c_int {
+//  Main Function
+pub export fn hello_zig_main(
+    _argc: c_int, 
+    _argv: [*]const [*]const u8
+) c_int {
     _ = _argc;
     _ = _argv;
     _ = printf("Hello, Zig!\n");
@@ -100,7 +103,7 @@ _ = printf("Hello, Zig!\n");
 return 0;
 ```
 
-[(Source)](https://github.com/lupyuen/zig-bl602-nuttx/blob/main/hello_zig_main.zig)
+Original version is here: [hello_zig_main.zig](https://github.com/apache/incubator-nuttx-apps/blob/master/examples/hello_zig/hello_zig_main.zig)
 
 # Enable Zig App
 
@@ -380,7 +383,10 @@ undefined reference to `hello_main'
 That's why we define `hello_main` in our Zig App...
 
 ```zig
-pub export fn hello_main(_argc: c_int, _argv: [*]const [*]const u8) c_int {
+pub export fn hello_main(
+    _argc: c_int, 
+    _argv: [*]const [*]const u8
+) c_int {
     _ = _argc;
     _ = _argv;
     _ = printf("Hello, Zig!\n");
@@ -388,8 +394,7 @@ pub export fn hello_main(_argc: c_int, _argv: [*]const [*]const u8) c_int {
 }
 ```
 
-[(Source)](https://github.com/lupyuen/zig-bl602-nuttx/blob/main/hello_zig_main.zig)
-
+[(Source)](hello_zig_main.zig)
 
 Which means that the `hello` app will call our Zig Code too...
 
