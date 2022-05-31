@@ -27,7 +27,9 @@ const std = @import("std");
 //* Externs
 //****************************************************************************
 
-pub extern fn printf(_format: [*:0]const u8) c_int;
+pub extern fn printf(
+    _format: [*:0]const u8
+) c_int;
 
 //****************************************************************************
 //* hello_zig_main
@@ -42,6 +44,9 @@ pub export fn hello_zig_main(
     return 0;
 }
 
+//****************************************************************************
+//* hello_main
+//****************************************************************************
 pub export fn hello_main(
     _argc: c_int, 
     _argv: [*]const [*]const u8

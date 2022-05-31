@@ -77,7 +77,9 @@ Apache NuttX RTOS is bundled with a simple Zig App ... Let's run this on BL602: 
 const std = @import("std");
 
 //  Import printf() from C
-pub extern fn printf(_format: [*:0]const u8) c_int;
+pub extern fn printf(
+    _format: [*:0]const u8
+) c_int;
 
 //  Main Function
 pub export fn hello_zig_main(
