@@ -200,7 +200,7 @@ BL602 is designated as RV32IMACF...
 
 Among all Zig Targets, only `sifive_e76` has the same designation...
 
-```text
+```bash
 $ zig targets
 ...
 "sifive_e76": [ "a", "c", "f", "m" ],
@@ -236,7 +236,7 @@ Because...
 
 When linking the Compiled Zig App with NuttX, we see this error...
 
-```text
+```bash
 $ make
 ...
 riscv64-unknown-elf-ld: nuttx/staging/libapps.a(hello_main.c.home.user.nuttx.apps.examples.hello.o): 
@@ -245,7 +245,7 @@ can't link soft-float modules with single-float modules
 
 That's because NuttX was compiled for (Single-Precision) __Hardware Floating-Point__ ABI (Application Binary Interface)...
 
-```text
+```bash
 ##  Do this BEFORE overwriting hello.o by hello_zig_main.o.
 ##  "*hello.o" expands to something like "hello_main.c.home.user.nuttx.apps.examples.hello.o"
 $ riscv64-unknown-elf-readelf -h -A $HOME/nuttx/apps/examples/hello/*hello.o
@@ -281,7 +281,7 @@ File Attributes
 
 Whereas Zig Compiler produces an Object File with __Software Floating-Point__ ABI...
 
-```text
+```bash
 $ riscv64-unknown-elf-readelf -h -A hello_zig_main.o
 ELF Header:
   Magic:   7f 45 4c 46 01 01 01 00 00 00 00 00 00 00 00 00 
