@@ -49,6 +49,8 @@ riscv64-unknown-elf-readelf -h -A hello_zig_main.o
 cp hello_zig_main.o $HOME/nuttx/apps/examples/hello/*hello.o
 
 ##  Build NuttX to link the Zig Object from `hello.o`
+##  TODO: Change "$HOME/nuttx" to your NuttX Project Directory
+cd $HOME/nuttx/nuttx
 make
 
 ##  NuttX build should now succeed
@@ -165,6 +167,8 @@ zig build-obj \
 cp hello_zig_main.o $HOME/nuttx/apps/examples/hello/*hello.o
 
 ##  Build NuttX to link the Zig Object from `hello.o`
+##  TODO: Change "$HOME/nuttx" to your NuttX Project Directory
+cd $HOME/nuttx/nuttx
 make
 ```
 
