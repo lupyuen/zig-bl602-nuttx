@@ -131,7 +131,7 @@ make
 
 We see this error...
 
-```bash
+```text
 LD: nuttx
 riscv64-unknown-elf-ld: nuttx/staging/libapps.a(builtin_list.c.home.user.nuttx.apps.builtin.o):(.rodata.g_builtins+0xbc): 
 undefined reference to `hello_zig_main'
@@ -200,7 +200,7 @@ BL602 is designated as RV32IMACF...
 
 Among all Zig Targets, only `sifive_e76` has the same designation...
 
-```bash
+```text
 $ zig targets
 ...
 "sifive_e76": [ "a", "c", "f", "m" ],
@@ -245,7 +245,7 @@ can't link soft-float modules with single-float modules
 
 That's because NuttX was compiled for (Single-Precision) __Hardware Floating-Point__ ABI (Application Binary Interface)...
 
-```bash
+```text
 ##  Do this BEFORE overwriting hello.o by hello_zig_main.o.
 ##  "*hello.o" expands to something like "hello_main.c.home.user.nuttx.apps.examples.hello.o"
 $ riscv64-unknown-elf-readelf -h -A $HOME/nuttx/apps/examples/hello/*hello.o
@@ -281,7 +281,7 @@ File Attributes
 
 Whereas Zig Compiler produces an Object File with __Software Floating-Point__ ABI...
 
-```bash
+```text
 $ riscv64-unknown-elf-readelf -h -A hello_zig_main.o
 ELF Header:
   Magic:   7f 45 4c 46 01 01 01 00 00 00 00 00 00 00 00 00 
@@ -357,6 +357,8 @@ Now we link the modified Object File with NuttX...
 cp hello_zig_main.o $HOME/nuttx/apps/examples/hello/*hello.o
 
 ##  Build NuttX to link the Zig Object from `hello.o`
+##  TODO: Change "$HOME/nuttx" to your NuttX Project Directory
+cd $HOME/nuttx/nuttx
 make
 ```
 
