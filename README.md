@@ -313,7 +313,7 @@ File Attributes
 
 GCC won't allow us to link object files with Software Floating-Point and Hardware Floating-Point ABIs!
 
-TODO: Why did the Zig Compiler produce an Object File with Software Floating-Point ABI, when `sifive_e76` supports Hardware Floating-Point?
+(Why did the Zig Compiler produce an Object File with Software Floating-Point ABI, when `sifive_e76` supports Hardware Floating-Point? [See this](https://www.reddit.com/r/Zig/comments/v2zgvh/comment/iavw5xp/?utm_source=share&utm_medium=web2x&context=3))
 
 # Patch ELF Header
 
@@ -363,8 +363,6 @@ make
 ```
 
 The NuttX Build should now succeed.
-
-TODO: Find the right way to fix the Floating-Point ABI in the Zig Compiler
 
 # Zig Runs OK!
 
