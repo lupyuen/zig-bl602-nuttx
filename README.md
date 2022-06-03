@@ -643,23 +643,23 @@ Zig Compiler shows these errors...
 
 ```text
 In file included from src/sx126x-nuttx.c:3:
-In file included from /home/user/nuttx/nuttx/include/debug.h:39:
-In file included from /home/user/nuttx/nuttx/include/sys/uio.h:45:
-/home/user/nuttx/nuttx/include/sys/types.h:119:9: error: unknown type name '_size_t'
+In file included from nuttx/include/debug.h:39:
+In file included from nuttx/include/sys/uio.h:45:
+nuttx/include/sys/types.h:119:9: error: unknown type name '_size_t'
 typedef _size_t      size_t;
         ^
-/home/user/nuttx/nuttx/include/sys/types.h:120:9: error: unknown type name '_ssize_t'
+nuttx/include/sys/types.h:120:9: error: unknown type name '_ssize_t'
 typedef _ssize_t     ssize_t;
         ^
-/home/user/nuttx/nuttx/include/sys/types.h:121:9: error: unknown type name '_size_t'
+nuttx/include/sys/types.h:121:9: error: unknown type name '_size_t'
 typedef _size_t      rsize_t;
         ^
-/home/user/nuttx/nuttx/include/sys/types.h:174:9: error: unknown type name '_wchar_t'
+nuttx/include/sys/types.h:174:9: error: unknown type name '_wchar_t'
 typedef _wchar_t     wchar_t;
         ^
 In file included from src/sx126x-nuttx.c:4:
-In file included from /home/user/nuttx/nuttx/include/stdio.h:34:
-/home/user/nuttx/nuttx/include/nuttx/fs/fs.h:238:20: error: use of undeclared identifier 'NAME_MAX'
+In file included from nuttx/include/stdio.h:34:
+nuttx/include/nuttx/fs/fs.h:238:20: error: use of undeclared identifier 'NAME_MAX'
   char      parent[NAME_MAX + 1];
                    ^
 ```
