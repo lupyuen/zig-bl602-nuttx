@@ -570,11 +570,61 @@ zig cc \
   -D__NuttX__ \
   -DNDEBUG \
   -DARCH_RISCV  \
+  -pipe   src/radio.c \
+  -o  src/radio.o
+
+zig cc \
+  -target riscv32-freestanding-none \
+  -mcpu=baseline_rv32-d \
+  -c \
+  -fno-common \
+  -Wall \
+  -Wstrict-prototypes \
+  -Wshadow \
+  -Wundef \
+  -Os \
+  -fno-strict-aliasing \
+  -fomit-frame-pointer \
+  -fstack-protector-all \
+  -ffunction-sections \
+  -fdata-sections \
+  -g \
+  -mabi=ilp32f \
+  -mno-relax \
+  -isystem "$HOME/nuttx/nuttx/include" \
+  -D__NuttX__ \
+  -DNDEBUG \
+  -DARCH_RISCV  \
+  -pipe   src/sx126x.c \
+  -o  src/sx126x.o
+
+zig cc \
+  -target riscv32-freestanding-none \
+  -mcpu=baseline_rv32-d \
+  -c \
+  -fno-common \
+  -Wall \
+  -Wstrict-prototypes \
+  -Wshadow \
+  -Wundef \
+  -Os \
+  -fno-strict-aliasing \
+  -fomit-frame-pointer \
+  -fstack-protector-all \
+  -ffunction-sections \
+  -fdata-sections \
+  -g \
+  -mabi=ilp32f \
+  -mno-relax \
+  -isystem "$HOME/nuttx/nuttx/include" \
+  -D__NuttX__ \
+  -DNDEBUG \
+  -DARCH_RISCV  \
   -pipe   src/sx126x-nuttx.c \
   -o  src/sx126x-nuttx.o
 ```
 
-We see these errors...
+Zig Compiler shows these errors...
 
 ```text
 In file included from src/sx126x-nuttx.c:3:
@@ -599,4 +649,46 @@ In file included from /home/user/nuttx/nuttx/include/stdio.h:34:
                    ^
 ```
 
-TODO
+We fix this by including the right header files...
+
+```c
+#if defined(__NuttX__) && defined(__clang__)  //  Workaround for NuttX with zig cc
+#include <arch/types.h>
+#include "../../nuttx/include/limits.h"
+#endif  //  defined(__NuttX__) && defined(__clang__)
+```
+
+Into these source files...
+
+-   [radio.c](https://github.com/lupyuen/lora-sx1262/blob/lorawan/src/radio.c#L23-L26)
+-   [sx126x-nuttx.c](https://github.com/lupyuen/lora-sx1262/blob/lorawan/src/sx126x-nuttx.c#L4-L7)
+-   [sx126x.c](https://github.com/lupyuen/lora-sx1262/blob/lorawan/src/sx126x.c#L23-L26)
+
+[(See the changes)](https://github.com/lupyuen/lora-sx1262/commit/8da7e4d7cc8f1455d750bc51d75c640eea221f41)
+
+Compiled with `zig cc`, the LoRa SX1262 Library runs OK on NuttX yay!
+
+```text
+nsh> lorawan_test
+SX126xIoInit: Compiled with zig cc
+...
+###### =========== MLME-Confirm ============ ######
+STATUS      : OK
+###### ===========   JOINED     ============ ######
+...
+###### =========== MCPS-Confirm ============ ######
+STATUS      : OK
+###### =====   UPLINK FRAME        1   ===== ######
+CLASS       : A
+TX PORT     : 1
+TX DATA     : UNCONFIRMED
+48 69 20 4E 75 74 74 58 00
+DATA RATE   : DR_3
+U/L FREQ    : 923400000
+TX POWER    : 0
+CHANNEL MASK: 0003
+```
+
+[(Source)](https://gist.github.com/lupyuen/ada7f83a96eb36ad1b9fe09da4527003)
+
+TODO: Compile the huge LoRaWAN Library with Zig Compiler
