@@ -903,25 +903,58 @@ TODO: Convert the LoRaWAN App from C to Zig, to show that we can build Complex I
 
 Here's the partially converted Zig App: [lorawan_test_main.zig](lorawan_test_main.zig)
 
+```zig
+//  Import the Zig Standard Library
+const std = @import("std");
+
+//  Import the LoRaWAN Library from C
+const lorawan = @cImport({
+    //  NuttX Header Files
+    @cInclude("arch/types.h");
+    @cInclude("../../nuttx/include/limits.h");
+
+    //  LoRaWAN Header Files
+    @cInclude("../libs/liblorawan/src/apps/LoRaMac/common/LmHandler/LmHandler.h");
+});
+
+//  Main Function that will be called by NuttX
+pub export fn lorawan_test_main(
+    _argc: c_int, 
+    _argv: [*]const [*]const u8
+) c_int {
+    _ = _argc;
+    _ = _argv;
+
+    //  Call the LoRaWAN Library to set system maximum tolerated rx error in milliseconds
+    _ = lorawan.LmHandlerSetSystemMaxRxError( 20 );
+
+    //  TODO: Call the LoRaWAN Library to Join LoRaWAN Network
+    //  and send a Data Packet
+
+    return 0;
+}
+```
+
+To compile the LoRaWAN Zig App...
+
 ```bash
+##  Download our LoRaWAN Zig App for NuttX
+git clone --recursive https://github.com/lupyuen/zig-bl602-nuttx
+cd zig-bl602-nuttx
+
 ##  Compile the Zig App for BL602 (RV32IMACF with Hardware Floating-Point)
 zig build-obj \
   -target riscv32-freestanding-none \
   -mcpu=baseline_rv32-d \
   -isystem "$HOME/nuttx/nuttx/include" \
-  -I . \
   lorawan_test_main.zig
+
+##  Build NuttX to link the Zig Object from `hello.o`
+##  TODO: Change "$HOME/nuttx" to your NuttX Project Directory
+cd $HOME/nuttx/nuttx
+make
 ```
-
-Include the missing header files...
-
-```zig
-const lorawan = @cImport({
-    //  Missing NuttX Header Files
-    @cInclude("arch/types.h");
-    @cInclude("../../nuttx/include/limits.h");
-```
-
-[(Source)](lorawan_test_main.zig)
 
 [lorawan_test_main.zig](lorawan_test_main.zig) compiles OK with Zig Compiler.
+
+TODO: Test the LoRaWAN Zig App
