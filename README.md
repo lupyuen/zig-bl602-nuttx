@@ -364,12 +364,46 @@ make
 
 The NuttX Build should now succeed.
 
-We may also patch the ELF Header via command-line...
+_Is it really OK to change the ABI like this?_
+
+Well technically the __ABI is correctly generated__ by the Zig Compiler...
+
+```bash
+##  Dump the ABI for the compiled Zig app
+$ riscv64-unknown-elf-readelf -h -A hello_zig_main.o
+...
+Flags: 0x1, RVC, soft-float ABI
+Tag_RISCV_arch: "rv32i2p0_m2p0_a2p0_f2p0_c2p0"
+```
+
+The last line translates to __RV32IMACF__, which means that the RISC-V Instruction Set is indeed targeted for __Hardware Floating-Point__. 
+
+We're only editing the __ELF Header__, because it didn't seem to reflect the correct ABI for the Object File.
+
+_Is there a proper fix for this?_
+
+In future the Zig Compiler might allow us to specify the __Floating-Point ABI__ as the target...
+
+```bash
+##  Compile the Zig App for BL602
+##  ("ilp32f" means Hardware Floating-Point ABI)
+zig build-obj \
+  -target riscv32-freestanding-ilp32f \
+  ...
+```
+
+[(See this)](https://github.com/ziglang/zig/issues/9760#issuecomment-991738757)
+
+Stay Tuned!
+
+_Can we patch the ELF Header via Command Line?_
+
+Yep we may patch the ELF Header via __Command Line__...
 
 ```bash
 xxd -c 1 hello_zig_main.o \
-    | sed "s/00000024: 01/00000024: 03/" \
-    | xxd -r -c 1 - hello_zig_main2.o
+  | sed 's/00000024: 01/00000024: 03/' \
+  | xxd -r -c 1 - hello_zig_main2.o
 ```
 
 # Zig Runs OK!
