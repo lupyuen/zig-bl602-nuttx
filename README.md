@@ -574,7 +574,7 @@ zig cc \
   -o  src/sx126x-nuttx.o
 ```
 
-If we add `-isystem "$HOME/bl_iot_sdk/toolchain/riscv/Linux/riscv64-unknown-elf/include"`, we see these errors...
+We see these errors...
 
 ```text
 In file included from src/sx126x-nuttx.c:3:
@@ -597,17 +597,6 @@ In file included from /home/user/nuttx/nuttx/include/stdio.h:34:
 /home/user/nuttx/nuttx/include/nuttx/fs/fs.h:238:20: error: use of undeclared identifier 'NAME_MAX'
   char      parent[NAME_MAX + 1];
                    ^
-In file included from src/sx126x-nuttx.c:15:
-In file included from src/../include/sx126x.h:33:
-In file included from /home/user/bl_iot_sdk/toolchain/riscv/Linux/riscv64-unknown-elf/include/math.h:5:
-In file included from /home/user/bl_iot_sdk/toolchain/riscv/Linux/riscv64-unknown-elf/include/sys/reent.h:15:
-In file included from /home/user/bl_iot_sdk/toolchain/riscv/Linux/riscv64-unknown-elf/include/sys/_types.h:24:
-/home/user/zig-linux-x86_64-0.10.0-dev.2351+b64a1d5ab/lib/include/stddef.h:116:23: error: typedef redefinition with different types ('unsigned int' vs 'int')
-typedef __WINT_TYPE__ wint_t;
-                      ^
-/home/user/nuttx/nuttx/include/sys/types.h:181:13: note: previous definition is here
-typedef int wint_t;
-            ^
 ```
 
 TODO
