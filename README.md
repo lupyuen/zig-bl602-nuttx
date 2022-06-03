@@ -801,7 +801,9 @@ Include the right header files...
 
 LoRaMac.c compiles OK with Zig Compiler.
 
-TODO: Compile other files in the LoRaWAN Library
+TODO: Compile the other files in the LoRaWAN Library
+
+TODO: Test the LoRaWAN Library
 
 # LoRaWAN App for NuttX
 
@@ -880,7 +882,7 @@ zig cc \
   -o  lorawan_test_main.c.home.user.nuttx.apps.examples.lorawan_test.o
 ```
 
-Include the right header files...
+Include the right header files into [lorawan_test_main.c](https://github.com/lupyuen/lorawan_test/blob/main/lorawan_test_main.c#L20-L23)...
 
 ```c
 #if defined(__NuttX__) && defined(__clang__)  //  Workaround for NuttX with zig cc
@@ -889,4 +891,8 @@ Include the right header files...
 #endif  //  defined(__NuttX__) && defined(__clang__)
 ```
 
-lorawan_test_main.c compiles OK with Zig Compiler.
+[(See the changes)](https://github.com/lupyuen/lorawan_test/commit/3d4a451d44cf36b19ef8d900281a2f8f9590de62)
+
+[lorawan_test_main.c](https://github.com/lupyuen/lorawan_test/blob/main/lorawan_test_main.c#L20-L23) compiles OK with Zig Compiler.
+
+TODO: Test the LoRaWAN App
