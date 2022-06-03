@@ -788,9 +788,14 @@ zig cc \
   -DARCH_RISCV  \
   -pipe   src/mac/LoRaMac.c \
   -o  src/mac/LoRaMac.o
+
+##  Link Zig Object Files with NuttX after compiling with `zig cc`
+##  TODO: Change "$HOME/nuttx" to your NuttX Project Directory
+cd $HOME/nuttx/nuttx
+make
 ```
 
-We include the right header files into [LoRaMac.c](https://github.com/lupyuen/LoRaMac-node-nuttx/blob/master/src/mac/LoRaMac.c)...
+We include the right header files into [LoRaMac.c](https://github.com/lupyuen/LoRaMac-node-nuttx/blob/master/src/mac/LoRaMac.c#L33-L36)...
 
 ```c
 #if defined(__NuttX__) && defined(__clang__)  //  Workaround for NuttX with zig cc
@@ -798,6 +803,8 @@ We include the right header files into [LoRaMac.c](https://github.com/lupyuen/Lo
 #include "../../nuttx/include/limits.h"
 #endif  //  defined(__NuttX__) && defined(__clang__)
 ```
+
+[(See the changes)](https://github.com/lupyuen/LoRaMac-node-nuttx/commit/e36b54ea3351fc80f03d13a131527bf6733410ab)
 
 [LoRaMac.c](https://github.com/lupyuen/LoRaMac-node-nuttx/blob/master/src/mac/LoRaMac.c) compiles OK with Zig Compiler.
 
@@ -880,6 +887,11 @@ zig cc \
   -I "$HOME/nuttx/apps/include" \
   -Dmain=lorawan_test_main  lorawan_test_main.c \
   -o  lorawan_test_main.c.home.user.nuttx.apps.examples.lorawan_test.o
+
+##  Link Zig Object Files with NuttX after compiling with `zig cc`
+##  TODO: Change "$HOME/nuttx" to your NuttX Project Directory
+cd $HOME/nuttx/nuttx
+make
 ```
 
 We include the right header files into [lorawan_test_main.c](https://github.com/lupyuen/lorawan_test/blob/main/lorawan_test_main.c#L20-L23)...
