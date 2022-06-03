@@ -452,3 +452,162 @@ NuttShell (NSH) NuttX-10.3.0-RC2
 nsh> hello
 Hello, Zig!
 ```
+
+# Zig Compiler as Drop-In Replacement for GCC
+
+_Will Zig Compiler work as Drop-In Replacement for GCC for compiling NuttX Libraries?_
+
+Let's find out! Here's how NuttX compiles the [LoRa SX1262 Library](https://lupyuen.github.io/articles/sx1262) with GCC...
+
+```bash
+cd $HOME/nuttx/nuttx/libs/libsx1262
+
+riscv64-unknown-elf-gcc \
+  -c \
+  -fno-common \
+  -Wall \
+  -Wstrict-prototypes \
+  -Wshadow \
+  -Wundef \
+  -Os \
+  -fno-strict-aliasing \
+  -fomit-frame-pointer \
+  -fstack-protector-all \
+  -ffunction-sections \
+  -fdata-sections \
+  -g \
+  -march=rv32imafc \
+  -mabi=ilp32f \
+  -mno-relax \
+  -isystem "$HOME/nuttx/nuttx/include" \
+  -D__NuttX__ \
+  -DNDEBUG \
+  -DARCH_RISCV  \
+  -pipe   src/radio.c \
+  -o  src/radio.o
+
+riscv64-unknown-elf-gcc \
+  -c \
+  -fno-common \
+  -Wall \
+  -Wstrict-prototypes \
+  -Wshadow \
+  -Wundef \
+  -Os \
+  -fno-strict-aliasing \
+  -fomit-frame-pointer \
+  -fstack-protector-all \
+  -ffunction-sections \
+  -fdata-sections \
+  -g \
+  -march=rv32imafc \
+  -mabi=ilp32f \
+  -mno-relax \
+  -isystem "$HOME/nuttx/nuttx/include" \
+  -D__NuttX__ \
+  -DNDEBUG \
+  -DARCH_RISCV  \
+  -pipe   src/sx126x.c \
+  -o  src/sx126x.o
+
+riscv64-unknown-elf-gcc \
+  -c \
+  -fno-common \
+  -Wall \
+  -Wstrict-prototypes \
+  -Wshadow \
+  -Wundef \
+  -Os \
+  -fno-strict-aliasing \
+  -fomit-frame-pointer \
+  -fstack-protector-all \
+  -ffunction-sections \
+  -fdata-sections \
+  -g \
+  -march=rv32imafc \
+  -mabi=ilp32f \
+  -mno-relax \
+  -isystem "$HOME/nuttx/nuttx/include" \
+  -D__NuttX__ \
+  -DNDEBUG \
+  -DARCH_RISCV  \
+  -pipe   src/sx126x-nuttx.c \
+  -o  src/sx126x-nuttx.o
+```
+
+We make these changes...
+
+-   Change `riscv64-unknown-elf-gcc` to `zig cc`
+
+-   Add the target `-target riscv32-freestanding-none -mcpu=baseline_rv32-d`
+
+-   Remove `-march=rv32imafc`
+
+And we run this...
+
+```bash
+cd $HOME/nuttx/nuttx/libs/libsx1262
+
+zig cc \
+  -target riscv32-freestanding-none \
+  -mcpu=baseline_rv32-d \
+  -c \
+  -fno-common \
+  -Wall \
+  -Wstrict-prototypes \
+  -Wshadow \
+  -Wundef \
+  -Os \
+  -fno-strict-aliasing \
+  -fomit-frame-pointer \
+  -fstack-protector-all \
+  -ffunction-sections \
+  -fdata-sections \
+  -g \
+  -mabi=ilp32f \
+  -mno-relax \
+  -isystem "$HOME/nuttx/nuttx/include" \
+  -D__NuttX__ \
+  -DNDEBUG \
+  -DARCH_RISCV  \
+  -pipe   src/sx126x-nuttx.c \
+  -o  src/sx126x-nuttx.o
+```
+
+If we add `-isystem "$HOME/bl_iot_sdk/toolchain/riscv/Linux/riscv64-unknown-elf/include"`, we see these errors...
+
+```text
+In file included from src/sx126x-nuttx.c:3:
+In file included from /home/user/nuttx/nuttx/include/debug.h:39:
+In file included from /home/user/nuttx/nuttx/include/sys/uio.h:45:
+/home/user/nuttx/nuttx/include/sys/types.h:119:9: error: unknown type name '_size_t'
+typedef _size_t      size_t;
+        ^
+/home/user/nuttx/nuttx/include/sys/types.h:120:9: error: unknown type name '_ssize_t'
+typedef _ssize_t     ssize_t;
+        ^
+/home/user/nuttx/nuttx/include/sys/types.h:121:9: error: unknown type name '_size_t'
+typedef _size_t      rsize_t;
+        ^
+/home/user/nuttx/nuttx/include/sys/types.h:174:9: error: unknown type name '_wchar_t'
+typedef _wchar_t     wchar_t;
+        ^
+In file included from src/sx126x-nuttx.c:4:
+In file included from /home/user/nuttx/nuttx/include/stdio.h:34:
+/home/user/nuttx/nuttx/include/nuttx/fs/fs.h:238:20: error: use of undeclared identifier 'NAME_MAX'
+  char      parent[NAME_MAX + 1];
+                   ^
+In file included from src/sx126x-nuttx.c:15:
+In file included from src/../include/sx126x.h:33:
+In file included from /home/user/bl_iot_sdk/toolchain/riscv/Linux/riscv64-unknown-elf/include/math.h:5:
+In file included from /home/user/bl_iot_sdk/toolchain/riscv/Linux/riscv64-unknown-elf/include/sys/reent.h:15:
+In file included from /home/user/bl_iot_sdk/toolchain/riscv/Linux/riscv64-unknown-elf/include/sys/_types.h:24:
+/home/user/zig-linux-x86_64-0.10.0-dev.2351+b64a1d5ab/lib/include/stddef.h:116:23: error: typedef redefinition with different types ('unsigned int' vs 'int')
+typedef __WINT_TYPE__ wint_t;
+                      ^
+/home/user/nuttx/nuttx/include/sys/types.h:181:13: note: previous definition is here
+typedef int wint_t;
+            ^
+```
+
+TODO
