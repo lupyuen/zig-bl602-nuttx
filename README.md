@@ -721,4 +721,172 @@ CHANNEL MASK: 0003
 
 [(Source)](https://gist.github.com/lupyuen/ada7f83a96eb36ad1b9fe09da4527003)
 
+# LoRaWAN Library for NuttX
+
 TODO: Compile the huge [LoRaWAN Library](https://lupyuen.github.io/articles/lorawan3) with Zig Compiler
+
+NuttX compiles the LoRaWAN Library like this...
+
+```bash
+##  LoRaWAN Source Directory
+cd $HOME/nuttx/nuttx/libs/liblorawan
+
+##  Compile mac/LoRaMac.c with GCC
+riscv64-unknown-elf-gcc \
+  -c \
+  -fno-common \
+  -Wall \
+  -Wstrict-prototypes \
+  -Wshadow \
+  -Wundef \
+  -Os \
+  -fno-strict-aliasing \
+  -fomit-frame-pointer \
+  -fstack-protector-all \
+  -ffunction-sections \
+  -fdata-sections \
+  -g \
+  -march=rv32imafc \
+  -mabi=ilp32f \
+  -mno-relax \
+  -isystem "$HOME/nuttx/nuttx/include" \
+  -D__NuttX__ \
+  -DNDEBUG \
+  -DARCH_RISCV  \
+  -pipe   src/mac/LoRaMac.c \
+  -o  src/mac/LoRaMac.o
+```
+
+Change to Zig Compiler...
+
+```bash
+##  LoRaWAN Source Directory
+cd $HOME/nuttx/nuttx/libs/liblorawan
+
+##  Compile mac/LoRaMac.c with zig cc
+zig cc \
+  -target riscv32-freestanding-none \
+  -mcpu=baseline_rv32-d \
+  -c \
+  -fno-common \
+  -Wall \
+  -Wstrict-prototypes \
+  -Wshadow \
+  -Wundef \
+  -Os \
+  -fno-strict-aliasing \
+  -fomit-frame-pointer \
+  -fstack-protector-all \
+  -ffunction-sections \
+  -fdata-sections \
+  -g \
+  -mabi=ilp32f \
+  -mno-relax \
+  -isystem "$HOME/nuttx/nuttx/include" \
+  -D__NuttX__ \
+  -DNDEBUG \
+  -DARCH_RISCV  \
+  -pipe   src/mac/LoRaMac.c \
+  -o  src/mac/LoRaMac.o
+```
+
+Include the right header files...
+
+```c
+#if defined(__NuttX__) && defined(__clang__)  //  Workaround for NuttX with zig cc
+#include <arch/types.h>
+#include "../../nuttx/include/limits.h"
+#endif  //  defined(__NuttX__) && defined(__clang__)
+```
+
+LoRaMac.c compiles OK with Zig Compiler.
+
+TODO: Compile other files in the LoRaWAN Library
+
+# LoRaWAN App for NuttX
+
+TODO: Compile the LoRaWAN App with Zig Compiler
+
+NuttX compiles the LoRaWAN App like this...
+
+```bash
+##  App Source Directory
+cd $HOME/nuttx/apps/examples/lorawan_test/lorawan_test_main.c
+
+##  Compile lorawan_test_main.c with GCC
+riscv64-unknown-elf-gcc \
+  -c \
+  -fno-common \
+  -Wall \
+  -Wstrict-prototypes \
+  -Wshadow \
+  -Wundef \
+  -Os \
+  -fno-strict-aliasing \
+  -fomit-frame-pointer \
+  -fstack-protector-all \
+  -ffunction-sections \
+  -fdata-sections \
+  -g \
+  -march=rv32imafc \
+  -mabi=ilp32f \
+  -mno-relax \
+  -isystem "$HOME/nuttx/nuttx/include" \
+  -D__NuttX__ \
+  -DNDEBUG \
+  -DARCH_RISCV  \
+  -pipe \
+  -I "$HOME/nuttx/apps/graphics/lvgl" \
+  -I "$HOME/nuttx/apps/graphics/lvgl/lvgl" \
+  -I "$HOME/nuttx/apps/include" \
+  -Dmain=lorawan_test_main  lorawan_test_main.c \
+  -o  lorawan_test_main.c.home.user.nuttx.apps.examples.lorawan_test.o
+```
+
+Change to Zig Compiler...
+
+```bash
+##  App Source Directory
+cd $HOME/nuttx/apps/examples/lorawan_test
+
+##  Compile lorawan_test_main.c with zig cc
+zig cc \
+  -target riscv32-freestanding-none \
+  -mcpu=baseline_rv32-d \
+  -c \
+  -fno-common \
+  -Wall \
+  -Wstrict-prototypes \
+  -Wshadow \
+  -Wundef \
+  -Os \
+  -fno-strict-aliasing \
+  -fomit-frame-pointer \
+  -fstack-protector-all \
+  -ffunction-sections \
+  -fdata-sections \
+  -g \
+  -mabi=ilp32f \
+  -mno-relax \
+  -isystem "$HOME/nuttx/nuttx/include" \
+  -D__NuttX__ \
+  -DNDEBUG \
+  -DARCH_RISCV  \
+  -pipe \
+  -I "$HOME/nuttx/apps/graphics/lvgl" \
+  -I "$HOME/nuttx/apps/graphics/lvgl/lvgl" \
+  -I "$HOME/nuttx/apps/include" \
+  -Dmain=lorawan_test_main  lorawan_test_main.c \
+  -o  lorawan_test_main.c.home.user.nuttx.apps.examples.lorawan_test.o
+```
+
+Include the right header files...
+
+```c
+#if defined(__NuttX__) && defined(__clang__)  //  Workaround for NuttX with zig cc
+#include <arch/types.h>
+#include "../../nuttx/include/limits.h"
+#endif  //  defined(__NuttX__) && defined(__clang__)
+```
+
+lorawan_test_main.c compiles OK with Zig Compiler.
