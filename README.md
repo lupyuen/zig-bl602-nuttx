@@ -364,6 +364,14 @@ make
 
 The NuttX Build should now succeed.
 
+We may also patch the ELF Header via command-line...
+
+```bash
+xxd -c 1 hello_zig_main.o \
+    | sed "s/00000024: 01/00000024: 03/" \
+    | xxd -r -c 1 - hello_zig_main2.o
+```
+
 # Zig Runs OK!
 
 The NuttX Build succeeds. Zig runs OK on NuttX BL602!
