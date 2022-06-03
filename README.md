@@ -896,3 +896,23 @@ Include the right header files into [lorawan_test_main.c](https://github.com/lup
 [lorawan_test_main.c](https://github.com/lupyuen/lorawan_test/blob/main/lorawan_test_main.c#L20-L23) compiles OK with Zig Compiler.
 
 TODO: Test the LoRaWAN App
+
+# Convert LoRaWAN App to Zig
+
+TODO: Convert the LoRaWAN App from C to Zig, to show that we can build Complex IoT Apps in Zig
+
+Here's the converted Zig App: [lorawan_test_main.zig](lorawan_test_main.zig)
+
+```bash
+##  Compile the Zig App for BL602 (RV32IMACF with Hardware Floating-Point)
+zig build-obj \
+  -target riscv32-freestanding-none \
+  -mcpu=baseline_rv32-d \
+  -isystem "$HOME/nuttx/nuttx/include" \
+  -I . \
+  lorawan_test_main.zig
+```
+
+Include the missing header files: [nuttx-zig.h](nuttx-zig.h)
+
+[lorawan_test_main.zig](lorawan_test_main.zig) compiles OK with Zig Compiler.
