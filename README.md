@@ -913,6 +913,15 @@ zig build-obj \
   lorawan_test_main.zig
 ```
 
-Include the missing header files: [nuttx-zig.h](nuttx-zig.h)
+Include the missing header files...
+
+```zig
+const lorawan = @cImport({
+    //  Missing NuttX Header Files
+    @cInclude("arch/types.h");
+    @cInclude("../../nuttx/include/limits.h");
+```
+
+[(Source)](lorawan_test_main.zig)
 
 [lorawan_test_main.zig](lorawan_test_main.zig) compiles OK with Zig Compiler.

@@ -1,6 +1,10 @@
 const std = @import("std");
 const lorawan = @cImport({
-    @cInclude("nuttx-zig.h");
+    //  Missing NuttX Header Files
+    @cInclude("arch/types.h");
+    @cInclude("../../nuttx/include/limits.h");
+
+    //  LoRaWAN Header Files
     @cInclude("../libs/liblorawan/src/apps/LoRaMac/common/LmHandler/LmHandler.h");
 });
 
