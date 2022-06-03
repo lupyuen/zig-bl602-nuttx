@@ -455,7 +455,7 @@ Hello, Zig!
 
 # Zig Compiler as Drop-In Replacement for GCC
 
-_Will Zig Compiler work as Drop-In Replacement for GCC for compiling NuttX Libraries?_
+_Will Zig Compiler work as [Drop-In Replacement for GCC](https://lupyuen.github.io/articles/zig#why-zig) for compiling NuttX Libraries?_
 
 Let's test it on the [LoRa SX1262 Library](https://lupyuen.github.io/articles/sx1262) for Apache NuttX RTOS!
 
