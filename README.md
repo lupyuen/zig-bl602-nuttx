@@ -901,7 +901,7 @@ TODO: Test the LoRaWAN App
 
 TODO: Convert the LoRaWAN App from C to Zig, to show that we can build Complex IoT Apps in Zig
 
-Here's the converted Zig App: [lorawan_test_main.zig](lorawan_test_main.zig)
+Here's the partially converted Zig App: [lorawan_test_main.zig](lorawan_test_main.zig)
 
 ```bash
 ##  Compile the Zig App for BL602 (RV32IMACF with Hardware Floating-Point)
