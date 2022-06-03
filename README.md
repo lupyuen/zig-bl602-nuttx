@@ -457,11 +457,15 @@ Hello, Zig!
 
 _Will Zig Compiler work as Drop-In Replacement for GCC for compiling NuttX Libraries?_
 
-Let's find out! Here's how NuttX compiles the [LoRa SX1262 Library](https://lupyuen.github.io/articles/sx1262) with GCC...
+Let's test it on the [LoRa SX1262 Library](https://lupyuen.github.io/articles/sx1262) for Apache NuttX RTOS!
+
+Here's how NuttX compiles the [LoRa SX1262 Library](https://lupyuen.github.io/articles/sx1262) with GCC...
 
 ```bash
+##  LoRa SX1262 Source Directory
 cd $HOME/nuttx/nuttx/libs/libsx1262
 
+##  Compile radio.c with GCC
 riscv64-unknown-elf-gcc \
   -c \
   -fno-common \
@@ -486,6 +490,7 @@ riscv64-unknown-elf-gcc \
   -pipe   src/radio.c \
   -o  src/radio.o
 
+##  Compile sx126x.c with GCC
 riscv64-unknown-elf-gcc \
   -c \
   -fno-common \
@@ -510,6 +515,7 @@ riscv64-unknown-elf-gcc \
   -pipe   src/sx126x.c \
   -o  src/sx126x.o
 
+##  Compile sx126x-nuttx.c with GCC
 riscv64-unknown-elf-gcc \
   -c \
   -fno-common \
@@ -546,8 +552,10 @@ We make these changes...
 And we run this...
 
 ```bash
+##  LoRa SX1262 Source Directory
 cd $HOME/nuttx/nuttx/libs/libsx1262
 
+##  Compile radio.c with zig cc
 zig cc \
   -target riscv32-freestanding-none \
   -mcpu=baseline_rv32-d \
@@ -573,6 +581,7 @@ zig cc \
   -pipe   src/radio.c \
   -o  src/radio.o
 
+##  Compile sx126x.c with zig cc
 zig cc \
   -target riscv32-freestanding-none \
   -mcpu=baseline_rv32-d \
@@ -598,6 +607,7 @@ zig cc \
   -pipe   src/sx126x.c \
   -o  src/sx126x.o
 
+##  Compile sx126x-nuttx.c with zig cc
 zig cc \
   -target riscv32-freestanding-none \
   -mcpu=baseline_rv32-d \
@@ -622,6 +632,11 @@ zig cc \
   -DARCH_RISCV  \
   -pipe   src/sx126x-nuttx.c \
   -o  src/sx126x-nuttx.o
+
+##  Link Zig Object Files with NuttX after compiling with `zig cc`
+##  TODO: Change "$HOME/nuttx" to your NuttX Project Directory
+cd $HOME/nuttx/nuttx
+make
 ```
 
 Zig Compiler shows these errors...
@@ -691,4 +706,4 @@ CHANNEL MASK: 0003
 
 [(Source)](https://gist.github.com/lupyuen/ada7f83a96eb36ad1b9fe09da4527003)
 
-TODO: Compile the huge LoRaWAN Library with Zig Compiler
+TODO: Compile the huge [LoRaWAN Library](https://lupyuen.github.io/articles/lorawan3) with Zig Compiler
