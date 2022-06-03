@@ -723,7 +723,7 @@ CHANNEL MASK: 0003
 
 # LoRaWAN Library for NuttX
 
-TODO: Compile the huge [LoRaWAN Library](https://lupyuen.github.io/articles/lorawan3) with Zig Compiler
+Let's compile the huge [LoRaWAN Library](https://lupyuen.github.io/articles/lorawan3) with Zig Compiler.
 
 NuttX compiles the LoRaWAN Library like this...
 
@@ -757,7 +757,7 @@ riscv64-unknown-elf-gcc \
   -o  src/mac/LoRaMac.o
 ```
 
-Change to Zig Compiler...
+We switch to the Zig Compiler...
 
 ```bash
 ##  LoRaWAN Source Directory
@@ -790,7 +790,7 @@ zig cc \
   -o  src/mac/LoRaMac.o
 ```
 
-Include the right header files...
+We include the right header files into [LoRaMac.c](https://github.com/lupyuen/LoRaMac-node-nuttx/blob/master/src/mac/LoRaMac.c)...
 
 ```c
 #if defined(__NuttX__) && defined(__clang__)  //  Workaround for NuttX with zig cc
@@ -799,7 +799,7 @@ Include the right header files...
 #endif  //  defined(__NuttX__) && defined(__clang__)
 ```
 
-LoRaMac.c compiles OK with Zig Compiler.
+[LoRaMac.c](https://github.com/lupyuen/LoRaMac-node-nuttx/blob/master/src/mac/LoRaMac.c) compiles OK with Zig Compiler.
 
 TODO: Compile the other files in the LoRaWAN Library
 
@@ -807,7 +807,7 @@ TODO: Test the LoRaWAN Library
 
 # LoRaWAN App for NuttX
 
-TODO: Compile the LoRaWAN App with Zig Compiler
+Now we compile the LoRaWAN App with Zig Compiler.
 
 NuttX compiles the LoRaWAN App like this...
 
@@ -845,7 +845,7 @@ riscv64-unknown-elf-gcc \
   -o  lorawan_test_main.c.home.user.nuttx.apps.examples.lorawan_test.o
 ```
 
-Change to Zig Compiler...
+We switch to Zig Compiler...
 
 ```bash
 ##  App Source Directory
@@ -882,7 +882,7 @@ zig cc \
   -o  lorawan_test_main.c.home.user.nuttx.apps.examples.lorawan_test.o
 ```
 
-Include the right header files into [lorawan_test_main.c](https://github.com/lupyuen/lorawan_test/blob/main/lorawan_test_main.c#L20-L23)...
+We include the right header files into [lorawan_test_main.c](https://github.com/lupyuen/lorawan_test/blob/main/lorawan_test_main.c#L20-L23)...
 
 ```c
 #if defined(__NuttX__) && defined(__clang__)  //  Workaround for NuttX with zig cc
@@ -899,7 +899,7 @@ TODO: Test the LoRaWAN App
 
 # Convert LoRaWAN App to Zig
 
-TODO: Convert the LoRaWAN App from C to Zig, to show that we can build Complex IoT Apps in Zig
+Finally we convert the LoRaWAN App from C to Zig, to show that we can build Complex IoT Apps in Zig.
 
 Here's the partially converted Zig App: [lorawan_test_main.zig](lorawan_test_main.zig)
 
