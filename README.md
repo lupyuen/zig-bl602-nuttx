@@ -681,6 +681,21 @@ Into these source files...
 
 [(See the changes)](https://github.com/lupyuen/lora-sx1262/commit/8da7e4d7cc8f1455d750bc51d75c640eea221f41)
 
+We insert this code to tell us (at runtime) whether it was compiled with Zig Compiler or GCC...
+
+```c
+void SX126xIoInit( void ) {
+#ifdef __clang__
+#warning Compiled with zig cc
+    puts("SX126xIoInit: Compiled with zig cc");
+#else
+#warning Compiled with gcc
+    puts("SX126xIoInit: Compiled with gcc");
+#endif  //  __clang__
+```
+
+[(Source)](https://github.com/lupyuen/lora-sx1262/blob/lorawan/src/sx126x-nuttx.c#L119-L127)
+
 Compiled with `zig cc`, the LoRa SX1262 Library runs OK on NuttX yay!
 
 ```text
