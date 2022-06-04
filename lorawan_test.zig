@@ -393,9 +393,9 @@ fn OnTxPeriodicityChanged(periodicity: u32) void {
     }
 
     // Update timer periodicity
-    // TODO: TimerStop( &TxTimer );
-    // TODO: TimerSetValue( &TxTimer, TxPeriodicity );
-    // TODO: TimerStart( &TxTimer );
+    lorawan.TimerStop( &TxTimer );
+    lorawan.TimerSetValue( &TxTimer, TxPeriodicity );
+    lorawan.TimerStart( &TxTimer );
 }
 
 // static void OnTxFrameCtrlChanged( LmHandlerMsgTypes_t isTxConfirmed )
@@ -645,8 +645,8 @@ var IsFileTransferDone: bool = false;  // bool
 /// Received file computed CRC32
 var FileRxCrc: u32 = 0;  // uint32_t
 
-// User application data
-// TODO: static uint8_t AppDataBuffer[LORAWAN_APP_DATA_BUFFER_MAX_SIZE];
+/// User application data
+var AppDataBuffer: [LORAWAN_APP_DATA_BUFFER_MAX_SIZE]u8 = undefined;  //  uint8_t
 
 /// Timer to handle the application data transmission duty cycle
 var TxTimer: lorawan.TimerEvent_t = lorawan.TimerEvent_t{};
