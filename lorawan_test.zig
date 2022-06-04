@@ -26,11 +26,11 @@ const lorawan = @cImport({
 // TODO: #define LORAWAN_DEFAULT_CLASS                       CLASS_A
 
 /// Defines the application data transmission duty cycle. 40s, value in [ms].
-const APP_TX_DUTYCYCLE = 40000;
+const APP_TX_DUTYCYCLE: c_int = 40000;
 
 /// Defines a random delay for application data transmission duty cycle. 5s,
 /// value in [ms].
-const APP_TX_DUTYCYCLE_RND = 5000;
+const APP_TX_DUTYCYCLE_RND: c_int = 5000;
 
 /// LoRaWAN Adaptive Data Rate
 /// \remark Please note that when ADR is enabled the end-device should be static
@@ -69,7 +69,13 @@ pub export fn lorawan_test_main(
     // init_entropy_pool();
 
     // Compute the interval between transmissions based on Duty Cycle
-    // TODO: TxPeriodicity = APP_TX_DUTYCYCLE + lorawan.randr( -APP_TX_DUTYCYCLE_RND, APP_TX_DUTYCYCLE_RND );
+    TxPeriodicity = @bitCast(u32,  //  Cast to u32 because randr() can be negative
+        APP_TX_DUTYCYCLE +
+        lorawan.randr(
+            -APP_TX_DUTYCYCLE_RND,
+            APP_TX_DUTYCYCLE_RND
+        )
+    );
 
     // const Version_t appVersion    = { .Value = FIRMWARE_VERSION };
     // const Version_t gitHubVersion = { .Value = GITHUB_VERSION };
