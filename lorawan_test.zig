@@ -49,7 +49,7 @@ const APP_TX_DUTYCYCLE_RND: c_int = 5000;
 
 /// LoRaWAN Adaptive Data Rate
 /// \remark Please note that when ADR is enabled the end-device should be static
-const LORAWAN_ADR_STATE = false; // TODO: lorawan.LORAMAC_HANDLER_ADR_OFF;
+const LORAWAN_ADR_STATE = false;  // TODO: lorawan.LORAMAC_HANDLER_ADR_OFF;
 
 /// Default datarate
 /// \remark Please note that LORAWAN_DEFAULT_DATARATE is used only when ADR is disabled 
@@ -75,6 +75,7 @@ pub export fn lorawan_test_main(
 ) c_int {
     _ = _argc;
     _ = _argv;
+    TxTimer = std.mem.zeroes(lorawan.TimerEvent_t);  // TODO: Added this
 
     // TODO: Call the LoRaWAN Library to Join LoRaWAN Network
     // and send a Data Packet
@@ -84,7 +85,7 @@ pub export fn lorawan_test_main(
     // init_entropy_pool();
 
     // Compute the interval between transmissions based on Duty Cycle
-    TxPeriodicity = @bitCast(u32,  //  Cast to u32 because randr() can be negative
+    TxPeriodicity = @bitCast(u32,  // Cast to u32 because randr() can be negative
         APP_TX_DUTYCYCLE +
         lorawan.randr(
             -APP_TX_DUTYCYCLE_RND,
@@ -109,7 +110,7 @@ pub export fn lorawan_test_main(
     //     while (true) {}
     // }
     _ = &LmHandlerParams;////
-    // _ = &LmhpComplianceParams;////
+    _ = &LmhpComplianceParams;////
     // _ = LmHandlerCallbacks;////
 
     // Set system maximum tolerated rx error in milliseconds
@@ -419,7 +420,7 @@ export fn OnTxPeriodicityChanged(periodicity: u32) void {
 
     if( TxPeriodicity == 0 ) {
         // Revert to application default periodicity
-        TxPeriodicity = @bitCast(u32,  //  Cast to u32 because randr() can be negative
+        TxPeriodicity = @bitCast(u32,  // Cast to u32 because randr() can be negative
             APP_TX_DUTYCYCLE +
             lorawan.randr(
                 -APP_TX_DUTYCYCLE_RND,
@@ -434,15 +435,13 @@ export fn OnTxPeriodicityChanged(periodicity: u32) void {
     lorawan.TimerStart( &TxTimer );
 }
 
-// static void OnTxFrameCtrlChanged( LmHandlerMsgTypes_t isTxConfirmed )
-// {
-//     LmHandlerParams.IsTxConfirmed = isTxConfirmed;
-// }
+export fn OnTxFrameCtrlChanged(isTxConfirmed: lorawan.LmHandlerMsgTypes_t) void {
+    LmHandlerParams.IsTxConfirmed = isTxConfirmed;
+}
 
-// static void OnPingSlotPeriodicityChanged( uint8_t pingSlotPeriodicity )
-// {
-//     LmHandlerParams.PingSlotPeriodicity = pingSlotPeriodicity;
-// }
+export fn OnPingSlotPeriodicityChanged(pingSlotPeriodicity: u8) void {
+    LmHandlerParams.PingSlotPeriodicity = pingSlotPeriodicity;
+}
 
 ///////////////////////////////////////////////////////////////////////////////
 //  Event Queue
@@ -592,7 +591,7 @@ export fn OnTxPeriodicityChanged(periodicity: u32) void {
 ///////////////////////////////////////////////////////////////////////////////
 //  Constants
 
-/// TODO
+/// TODO: Handler Callbacks
 const LmHandlerCallbacks = lorawan.LmHandlerCallbacks_t {
 //     .GetBatteryLevel = BoardGetBatteryLevel,
 //     .GetTemperature = NULL,
@@ -610,7 +609,21 @@ const LmHandlerCallbacks = lorawan.LmHandlerCallbacks_t {
 //     .OnSysTimeUpdate = OnSysTimeUpdate,
 };
 
-const LmHandlerParams = lorawan.LmHandlerParams_t {
+/// Compliance Parameters
+const LmhpComplianceParams = lorawan.LmhpComplianceParams_t {
+    .FwVersion = lorawan.Version_t{
+        .Value = lorawan.FIRMWARE_VERSION,
+    },
+    .OnTxPeriodicityChanged       = OnTxPeriodicityChanged,
+    .OnTxFrameCtrlChanged         = OnTxFrameCtrlChanged,
+    .OnPingSlotPeriodicityChanged = OnPingSlotPeriodicityChanged,
+};
+
+///////////////////////////////////////////////////////////////////////////////
+//  Variables
+
+//// Handler Parameters
+var LmHandlerParams: lorawan.LmHandlerParams_t = lorawan.LmHandlerParams_t {
     .Region              = ACTIVE_REGION,
     .AdrEnable           = LORAWAN_ADR_STATE,
     .IsTxConfirmed       = LORAWAN_DEFAULT_CONFIRMED_MSG_STATE,
@@ -618,20 +631,9 @@ const LmHandlerParams = lorawan.LmHandlerParams_t {
     .PublicNetworkEnable = true, // TODO: lorawan.LORAWAN_PUBLIC_NETWORK,
     .DutyCycleEnabled    = LORAWAN_DUTYCYCLE_ON,
     .DataBufferMaxSize   = LORAWAN_APP_DATA_BUFFER_MAX_SIZE,
-    .DataBuffer          = @ptrCast([*c]u8, @alignCast(std.meta.alignment(u8), &AppDataBuffer)), // TODO
+    .DataBuffer          = @ptrCast([*c]u8, @alignCast(std.meta.alignment(u8), &AppDataBuffer)), // TODO: Clean up
     .PingSlotPeriodicity = lorawan.REGION_COMMON_DEFAULT_PING_SLOT_PERIODICITY,
 };
-
-/// TODO
-const LmhpComplianceParams = lorawan.LmhpComplianceParams_t {
-    //  .FwVersion.Value = FIRMWARE_VERSION,
-    .OnTxPeriodicityChanged = OnTxPeriodicityChanged,
-    //  .OnTxFrameCtrlChanged = OnTxFrameCtrlChanged,
-    //  .OnPingSlotPeriodicityChanged = OnPingSlotPeriodicityChanged,
-};
-
-///////////////////////////////////////////////////////////////////////////////
-//  Variables
 
 /// Defines the maximum size for the buffer receiving the fragmentation result.
 /// \remark By default FragDecoder.h defines:
@@ -686,7 +688,7 @@ var AppDataBuffer: [LORAWAN_APP_DATA_BUFFER_MAX_SIZE]u8 =
     std.mem.zeroes([LORAWAN_APP_DATA_BUFFER_MAX_SIZE]u8);
 
 /// Timer to handle the application data transmission duty cycle
-var TxTimer: lorawan.TimerEvent_t = undefined; // TODO: Init the timer
+var TxTimer: lorawan.TimerEvent_t = undefined;  // Init the timer in Main Function
 
 // TODO: Zig Compiler crashes with:
 //   TODO buf_write_value_bytes maybe typethread 11512 panic:
