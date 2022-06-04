@@ -261,12 +261,10 @@ export fn OnMacMlmeRequest(
     mlmeReq: *MlmeReq_t, 
     nextTxIn: lorawan.TimerTime_t
 ) void {
-    _ = status;
-    _ = mlmeReq;
-    _ = nextTxIn;
-    ////TODO: lorawan.DisplayMacMlmeRequestUpdate(status, mlmeReq, nextTxIn);
+    DisplayMacMlmeRequestUpdate(status, mlmeReq, nextTxIn);
 }
 
+extern fn DisplayMacMlmeRequestUpdate(status: lorawan.LoRaMacStatus_t, mlmeReq: *MlmeReq_t, nextTxIn: lorawan.TimerTime_t) void;
 const MlmeReq_t = opaque {};
 
 // static void OnJoinRequest( LmHandlerJoinParams_t* params )
