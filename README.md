@@ -705,6 +705,9 @@ SX126xIoInit: Compiled with zig cc
 ###### =========== MLME-Confirm ============ ######
 STATUS      : OK
 ###### ===========   JOINED     ============ ######
+OTAA
+DevAddr     :  000E268C
+DATA RATE   : DR_2
 ...
 ###### =========== MCPS-Confirm ============ ######
 STATUS      : OK
@@ -719,7 +722,7 @@ TX POWER    : 0
 CHANNEL MASK: 0003
 ```
 
-[(Source)](https://gist.github.com/lupyuen/ada7f83a96eb36ad1b9fe09da4527003)
+[(See the complete log)](https://gist.github.com/lupyuen/ada7f83a96eb36ad1b9fe09da4527003)
 
 # LoRaWAN Library for NuttX
 
@@ -886,7 +889,7 @@ zig cc \
   -I "$HOME/nuttx/apps/graphics/lvgl/lvgl" \
   -I "$HOME/nuttx/apps/include" \
   -Dmain=lorawan_test_main  lorawan_test_main.c \
-  -o  lorawan_test_main.c.home.user.nuttx.apps.examples.lorawan_test.o
+  -o  *lorawan_test.o
 
 ##  Link Zig Object Files with NuttX after compiling with `zig cc`
 ##  TODO: Change "$HOME/nuttx" to your NuttX Project Directory
@@ -907,7 +910,33 @@ We include the right header files into [lorawan_test_main.c](https://github.com/
 
 [lorawan_test_main.c](https://github.com/lupyuen/lorawan_test/blob/main/lorawan_test_main.c#L20-L23) compiles OK with Zig Compiler.
 
-TODO: Test the LoRaWAN App
+Compiled with `zig cc`, the LoRaWAN App runs OK on NuttX yay!
+
+```text
+nsh> lorawan_test
+lorawan_test_main: Compiled with zig cc
+...
+###### =========== MLME-Confirm ============ ######
+STATUS      : OK
+###### ===========   JOINED     ============ ######
+OTAA
+DevAddr     :  00DC5ED5
+DATA RATE   : DR_2
+...
+###### =========== MCPS-Confirm ============ ######
+STATUS      : OK
+###### =====   UPLINK FRAME        1   ===== ######
+CLASS       : A
+TX PORT     : 1
+TX DATA     : UNCONFIRMED
+48 69 20 4E 75 74 74 58 00
+DATA RATE   : DR_3
+U/L FREQ    : 923400000
+TX POWER    : 0
+CHANNEL MASK: 0003
+```
+
+[(See the complete log)](https://gist.github.com/lupyuen/477982242d897771d7a5780c8a9b0910)
 
 # Auto-Translate LoRaWAN App to Zig
 
@@ -1030,7 +1059,9 @@ make
 
 [lorawan_test.zig](lorawan_test.zig) compiles OK with Zig Compiler.
 
-TODO: Test the LoRaWAN Zig App
+TODO: Convert the entire LoRaWAN App from C to Zig: [lorawan_test.zig](lorawan_test.zig)
+
+TODO: Test the LoRaWAN Zig App: [lorawan_test.zig](lorawan_test.zig)
 
 # Refer to Auto-Translated Zig Code
 
