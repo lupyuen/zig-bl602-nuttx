@@ -1030,7 +1030,11 @@ make
 
 [lorawan_test.zig](lorawan_test.zig) compiles OK with Zig Compiler.
 
-Some parts can get tricky to convert, like this C code...
+TODO: Test the LoRaWAN Zig App
+
+# Refer to Auto-Translated Zig Code
+
+Some parts can get tricky to convert from C to Zig, like this C code...
 
 ```c
 //  Original C code...
@@ -1063,5 +1067,3 @@ var TxPeriodicity: u32 = @bitCast(u32,
     )
 );
 ```
-
-TODO: Test the LoRaWAN Zig App

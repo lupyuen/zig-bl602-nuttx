@@ -32,13 +32,13 @@ const lorawan = @cImport({
 ///////////////////////////////////////////////////////////////////////////////
 //  Constants
 
-// #ifndef ACTIVE_REGION
+// TODO: #ifndef ACTIVE_REGION
 // #warning "No active region defined, LORAMAC_REGION_AS923 will be used as default."
-// TODO: #define ACTIVE_REGION LORAMAC_REGION_AS923
+const ACTIVE_REGION = lorawan.LORAMAC_REGION_AS923;
 // #endif
 
 /// LoRaWAN default end-device class
-// TODO: #define LORAWAN_DEFAULT_CLASS                       CLASS_A
+const LORAWAN_DEFAULT_CLASS = lorawan.CLASS_A;
 
 /// Defines the application data transmission duty cycle. 40s, value in [ms].
 const APP_TX_DUTYCYCLE: c_int = 40000;
@@ -49,14 +49,14 @@ const APP_TX_DUTYCYCLE_RND: c_int = 5000;
 
 /// LoRaWAN Adaptive Data Rate
 /// \remark Please note that when ADR is enabled the end-device should be static
-// TODO: #define LORAWAN_ADR_STATE                           LORAMAC_HANDLER_ADR_OFF
+const LORAWAN_ADR_STATE = false; // TODO: lorawan.LORAMAC_HANDLER_ADR_OFF;
 
 /// Default datarate
 /// \remark Please note that LORAWAN_DEFAULT_DATARATE is used only when ADR is disabled 
-// TODO: #define LORAWAN_DEFAULT_DATARATE                    DR_3
+const LORAWAN_DEFAULT_DATARATE = lorawan.DR_3;
 
-/// LoRaWAN confirmed messages
-// TODO: #define LORAWAN_DEFAULT_CONFIRMED_MSG_STATE         LORAMAC_HANDLER_UNCONFIRMED_MSG
+/// LoRaWAN confirmed messages (unconfirmed)
+const LORAWAN_DEFAULT_CONFIRMED_MSG_STATE = lorawan.LORAMAC_HANDLER_UNCONFIRMED_MSG;
 
 /// User application data buffer size
 const LORAWAN_APP_DATA_BUFFER_MAX_SIZE = 242;
@@ -92,10 +92,7 @@ pub export fn lorawan_test_main(
         )
     );
 
-    // const Version_t appVersion    = { .Value = FIRMWARE_VERSION };
-    // const Version_t gitHubVersion = { .Value = GITHUB_VERSION };
-    // DisplayAppInfo( "lorawan_test", &appVersion, &gitHubVersion );
-
+    // Show the Firmware and GitHub Versions
     const appVersion = lorawan.Version_t {
         .Value = lorawan.FIRMWARE_VERSION,
     };
@@ -105,11 +102,15 @@ pub export fn lorawan_test_main(
     lorawan.DisplayAppInfo("lorawan_test", &appVersion, &gitHubVersion);
 
     // Init LoRaWAN
-    // if ( LmHandlerInit( &LmHandlerCallbacks, &LmHandlerParams ) != LORAMAC_HANDLER_SUCCESS ) {
-        // printf( "LoRaMac wasn't properly initialized\n" );
-        // Fatal error, endless loop.
-        // while ( 1 ) {}
+    // if (lorawan.LmHandlerInit(&LmHandlerCallbacks, &LmHandlerParams)
+    //     != lorawan.LORAMAC_HANDLER_SUCCESS) {
+    //     _ = lorawan.printf("LoRaMac wasn't properly initialized\n");
+    //     // Fatal error, endless loop.
+    //     while (true) {}
     // }
+    _ = &LmHandlerParams;////
+    // _ = &LmhpComplianceParams;////
+    // _ = LmHandlerCallbacks;////
 
     // Set system maximum tolerated rx error in milliseconds
     _ = lorawan.LmHandlerSetSystemMaxRxError( 20 );
@@ -239,10 +240,13 @@ pub export fn lorawan_test_main(
 //     DisplayMacMcpsRequestUpdate( status, mcpsReq, nextTxIn );
 // }
 
-// static void OnMacMlmeRequest( LoRaMacStatus_t status, MlmeReq_t *mlmeReq, TimerTime_t nextTxIn )
-// {
-//     DisplayMacMlmeRequestUpdate( status, mlmeReq, nextTxIn );
-// }
+fn OnMacMlmeRequest(
+    status: lorawan.LoRaMacStatus_t,
+    mlmeReq: [*c]lorawan.MlmeReq_t, 
+    nextTxIn: lorawan.TimerTime_t
+) void {
+    lorawan.DisplayMacMlmeRequestUpdate(status, mlmeReq, nextTxIn);
+}
 
 // static void OnJoinRequest( LmHandlerJoinParams_t* params )
 // {
@@ -410,12 +414,18 @@ pub export fn lorawan_test_main(
 // }
 // #endif
 
-fn OnTxPeriodicityChanged(periodicity: u32) void {
+export fn OnTxPeriodicityChanged(periodicity: u32) void {
     TxPeriodicity = periodicity;
 
     if( TxPeriodicity == 0 ) {
         // Revert to application default periodicity
-        TxPeriodicity = APP_TX_DUTYCYCLE + lorawan.randr( -APP_TX_DUTYCYCLE_RND, APP_TX_DUTYCYCLE_RND );
+        TxPeriodicity = @bitCast(u32,  //  Cast to u32 because randr() can be negative
+            APP_TX_DUTYCYCLE +
+            lorawan.randr(
+                -APP_TX_DUTYCYCLE_RND,
+                APP_TX_DUTYCYCLE_RND
+            )
+        );
     }
 
     // Update timer periodicity
@@ -582,8 +592,8 @@ fn OnTxPeriodicityChanged(periodicity: u32) void {
 ///////////////////////////////////////////////////////////////////////////////
 //  Constants
 
-// static LmHandlerCallbacks_t LmHandlerCallbacks =
-// {
+/// TODO
+const LmHandlerCallbacks = lorawan.LmHandlerCallbacks_t {
 //     .GetBatteryLevel = BoardGetBatteryLevel,
 //     .GetTemperature = NULL,
 //     .GetRandomSeed = BoardGetRandomSeed,
@@ -591,28 +601,28 @@ fn OnTxPeriodicityChanged(periodicity: u32) void {
 //     .OnNvmDataChange = OnNvmDataChange,
 //     .OnNetworkParametersChange = OnNetworkParametersChange,
 //     .OnMacMcpsRequest = OnMacMcpsRequest,
-//     .OnMacMlmeRequest = OnMacMlmeRequest,
+    .OnMacMlmeRequest = OnMacMlmeRequest,
 //     .OnJoinRequest = OnJoinRequest,
 //     .OnTxData = OnTxData,
 //     .OnRxData = OnRxData,
 //     .OnClassChange= OnClassChange,
 //     .OnBeaconStatusChange = OnBeaconStatusChange,
 //     .OnSysTimeUpdate = OnSysTimeUpdate,
-// };
+};
 
-// static LmHandlerParams_t LmHandlerParams =
-// {
-//     .Region = ACTIVE_REGION,
-//     .AdrEnable = LORAWAN_ADR_STATE,
-//     .IsTxConfirmed = LORAWAN_DEFAULT_CONFIRMED_MSG_STATE,
-//     .TxDatarate = LORAWAN_DEFAULT_DATARATE,
-//     .PublicNetworkEnable = LORAWAN_PUBLIC_NETWORK,
-//     .DutyCycleEnabled = LORAWAN_DUTYCYCLE_ON,
-//     .DataBufferMaxSize = LORAWAN_APP_DATA_BUFFER_MAX_SIZE,
-//     .DataBuffer = AppDataBuffer,
-//     .PingSlotPeriodicity = REGION_COMMON_DEFAULT_PING_SLOT_PERIODICITY,
-// };
+const LmHandlerParams = lorawan.LmHandlerParams_t {
+    .Region              = ACTIVE_REGION,
+    .AdrEnable           = LORAWAN_ADR_STATE,
+    .IsTxConfirmed       = LORAWAN_DEFAULT_CONFIRMED_MSG_STATE,
+    .TxDatarate          = LORAWAN_DEFAULT_DATARATE,
+    .PublicNetworkEnable = true, // TODO: lorawan.LORAWAN_PUBLIC_NETWORK,
+    .DutyCycleEnabled    = LORAWAN_DUTYCYCLE_ON,
+    .DataBufferMaxSize   = LORAWAN_APP_DATA_BUFFER_MAX_SIZE,
+    .DataBuffer          = @ptrCast([*c]u8, @alignCast(std.meta.alignment(u8), &AppDataBuffer)), // TODO
+    .PingSlotPeriodicity = lorawan.REGION_COMMON_DEFAULT_PING_SLOT_PERIODICITY,
+};
 
+/// TODO
 const LmhpComplianceParams = lorawan.LmhpComplianceParams_t {
     //  .FwVersion.Value = FIRMWARE_VERSION,
     .OnTxPeriodicityChanged = OnTxPeriodicityChanged,
@@ -672,10 +682,12 @@ var IsFileTransferDone: bool = false;  // bool
 var FileRxCrc: u32 = 0;  // uint32_t
 
 /// User application data
-var AppDataBuffer: [LORAWAN_APP_DATA_BUFFER_MAX_SIZE]u8 = undefined;  //  uint8_t
+var AppDataBuffer: [LORAWAN_APP_DATA_BUFFER_MAX_SIZE]u8 = 
+    std.mem.zeroes([LORAWAN_APP_DATA_BUFFER_MAX_SIZE]u8);
 
 /// Timer to handle the application data transmission duty cycle
-var TxTimer: lorawan.TimerEvent_t = lorawan.TimerEvent_t {};
+var TxTimer: lorawan.TimerEvent_t = 
+    std.mem.zeroes(lorawan.TimerEvent_t);
 
 ///////////////////////////////////////////////////////////////////////////////
 //  Types
