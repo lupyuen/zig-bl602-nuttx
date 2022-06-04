@@ -33,12 +33,10 @@ const lorawan = @cImport({
 // TODO: #define APP_TX_DUTYCYCLE_RND                        5000
 
 /// LoRaWAN Adaptive Data Rate
-//  *
 /// \remark Please note that when ADR is enabled the end-device should be static
 // TODO: #define LORAWAN_ADR_STATE                           LORAMAC_HANDLER_ADR_OFF
 
 /// Default datarate
-//  *
 /// \remark Please note that LORAWAN_DEFAULT_DATARATE is used only when ADR is disabled 
 // TODO: #define LORAWAN_DEFAULT_DATARATE                    DR_3
 
@@ -49,9 +47,11 @@ const lorawan = @cImport({
 // TODO: #define LORAWAN_APP_DATA_BUFFER_MAX_SIZE            242
 
 /// LoRaWAN ETSI duty cycle control enable/disable
-//  *
 /// \remark Please note that ETSI mandates duty cycled transmissions. Use only for test purposes
 // TODO: #define LORAWAN_DUTYCYCLE_ON                        true
+
+///////////////////////////////////////////////////////////////////////////////
+//  Main Function
 
 /// Main Function that will be called by NuttX
 pub export fn lorawan_test_main(
@@ -598,13 +598,10 @@ const LmhpComplianceParams = lorawan.LmhpComplianceParams_t {
 //  Variables
 
 /// Defines the maximum size for the buffer receiving the fragmentation result.
-//  *
 /// \remark By default FragDecoder.h defines:
 ///         \ref FRAG_MAX_NB   21
 ///         \ref FRAG_MAX_SIZE 50
-//  *
 ///         FileSize = FRAG_MAX_NB * FRAG_MAX_SIZE
-//  *
 ///         If bigger file size is to be received or is fragmented differently
 ///         one must update those parameters.
 // TODO: #define UNFRAGMENTED_DATA_SIZE                     ( 21 * 50 )
@@ -629,7 +626,6 @@ const LmhpComplianceParams = lorawan.LmhpComplianceParams_t {
 // };
 
 /// Indicates if LoRaMacProcess call is pending.
-/// 
 /// \warning If variable is equal to 0 then the MCU can be set in low power mode
 var IsMacProcessPending: u8 = 0;  // uint8_t
 
@@ -646,5 +642,20 @@ var IsMcSessionStarted: bool = false;  // bool
 /// Indicates if the file transfer is done
 var IsFileTransferDone: bool = false;  // bool
 
-///  Received file computed CRC32
+/// Received file computed CRC32
 var FileRxCrc: u32 = 0;  // uint32_t
+
+// User application data
+// TODO: static uint8_t AppDataBuffer[LORAWAN_APP_DATA_BUFFER_MAX_SIZE];
+
+// Timer to handle the application data transmission duty cycle
+// TODO: static TimerEvent_t TxTimer;
+
+///////////////////////////////////////////////////////////////////////////////
+//  Types
+
+// typedef enum
+// {
+//     LORAMAC_HANDLER_TX_ON_TIMER,
+//     LORAMAC_HANDLER_TX_ON_EVENT,
+// }LmHandlerTxEvents_t;
