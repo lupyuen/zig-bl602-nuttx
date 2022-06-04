@@ -364,6 +364,16 @@ export fn OnMacMlmeRequest(
 // }
 // #endif
 
+/// TODO
+export fn BoardGetBatteryLevel() u8 {
+    return 0;
+}
+
+/// TODO
+export fn BoardGetRandomSeed() u32 {
+    return 22;
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 //  Compliance Handlers
 
