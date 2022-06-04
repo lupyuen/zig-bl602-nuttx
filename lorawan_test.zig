@@ -14,6 +14,45 @@ const lorawan = @cImport({
     @cInclude("../libs/liblorawan/src/apps/LoRaMac/common/LmHandler/LmHandler.h");
 });
 
+///////////////////////////////////////////////////////////////////////////////
+//  Constants
+
+// #ifndef ACTIVE_REGION
+// #warning "No active region defined, LORAMAC_REGION_AS923 will be used as default."
+// TODO: #define ACTIVE_REGION LORAMAC_REGION_AS923
+// #endif
+
+/// LoRaWAN default end-device class
+// TODO: #define LORAWAN_DEFAULT_CLASS                       CLASS_A
+
+/// Defines the application data transmission duty cycle. 40s, value in [ms].
+// TODO: #define APP_TX_DUTYCYCLE                            40000
+
+/// Defines a random delay for application data transmission duty cycle. 5s,
+/// value in [ms].
+// TODO: #define APP_TX_DUTYCYCLE_RND                        5000
+
+/// LoRaWAN Adaptive Data Rate
+//  *
+/// \remark Please note that when ADR is enabled the end-device should be static
+// TODO: #define LORAWAN_ADR_STATE                           LORAMAC_HANDLER_ADR_OFF
+
+/// Default datarate
+//  *
+/// \remark Please note that LORAWAN_DEFAULT_DATARATE is used only when ADR is disabled 
+// TODO: #define LORAWAN_DEFAULT_DATARATE                    DR_3
+
+/// LoRaWAN confirmed messages
+// TODO: #define LORAWAN_DEFAULT_CONFIRMED_MSG_STATE         LORAMAC_HANDLER_UNCONFIRMED_MSG
+
+/// User application data buffer size
+// TODO: #define LORAWAN_APP_DATA_BUFFER_MAX_SIZE            242
+
+/// LoRaWAN ETSI duty cycle control enable/disable
+//  *
+/// \remark Please note that ETSI mandates duty cycled transmissions. Use only for test purposes
+// TODO: #define LORAWAN_DUTYCYCLE_ON                        true
+
 /// Main Function that will be called by NuttX
 pub export fn lorawan_test_main(
     _argc: c_int, 
@@ -70,9 +109,7 @@ pub export fn lorawan_test_main(
     return 0;
 }
 
-// /*!
-//  * Prepare the payload of a Data Packet transmit it
-//  */
+/// Prepare the payload of a Data Packet transmit it
 // static void PrepareTxFrame( void )
 // {
 //     //  If we haven't joined the LoRaWAN Network, try again later
@@ -143,9 +180,7 @@ pub export fn lorawan_test_main(
 ///////////////////////////////////////////////////////////////////////////////
 //  Event Handlers
 
-// /*!
-//  * Function executed on TxTimer event
-//  */
+/// Function executed on TxTimer event
 // static void OnTxTimerEvent( struct ble_npl_event *event )
 // {
 //     printf("OnTxTimerEvent: timeout in %ld ms, event=%p\n", TxPeriodicity, event);
@@ -519,7 +554,7 @@ fn OnTxPeriodicityChanged(periodicity: u32) void {
 // }
 
 ///////////////////////////////////////////////////////////////////////////////
-//  Global Constants
+//  Constants
 
 // static LmHandlerCallbacks_t LmHandlerCallbacks =
 // {
@@ -560,25 +595,21 @@ const LmhpComplianceParams = lorawan.LmhpComplianceParams_t {
 };
 
 ///////////////////////////////////////////////////////////////////////////////
-//  Global Variables
+//  Variables
 
-// /*!
-//  * Defines the maximum size for the buffer receiving the fragmentation result.
+/// Defines the maximum size for the buffer receiving the fragmentation result.
 //  *
-//  * \remark By default FragDecoder.h defines:
-//  *         \ref FRAG_MAX_NB   21
-//  *         \ref FRAG_MAX_SIZE 50
+/// \remark By default FragDecoder.h defines:
+///         \ref FRAG_MAX_NB   21
+///         \ref FRAG_MAX_SIZE 50
 //  *
-//  *         FileSize = FRAG_MAX_NB * FRAG_MAX_SIZE
+///         FileSize = FRAG_MAX_NB * FRAG_MAX_SIZE
 //  *
-//  *         If bigger file size is to be received or is fragmented differently
-//  *         one must update those parameters.
-//  */
+///         If bigger file size is to be received or is fragmented differently
+///         one must update those parameters.
 // TODO: #define UNFRAGMENTED_DATA_SIZE                     ( 21 * 50 )
 
-// /*
-//  * Un-fragmented data storage.
-//  */
+/// Un-fragmented data storage.
 // TODO: static uint8_t UnfragmentedData[UNFRAGMENTED_DATA_SIZE];
 
 // TODO: static LmhpFragmentationParams_t FragmentationParams =
@@ -597,33 +628,23 @@ const LmhpComplianceParams = lorawan.LmhpComplianceParams_t {
 //     .OnDone = OnFragDone
 // };
 
-// /*!
-//  * Indicates if LoRaMacProcess call is pending.
-//  * 
-//  * \warning If variable is equal to 0 then the MCU can be set in low power mode
-//  */
+/// Indicates if LoRaMacProcess call is pending.
+/// 
+/// \warning If variable is equal to 0 then the MCU can be set in low power mode
 var IsMacProcessPending: u8 = 0;  // uint8_t
 
 var IsTxFramePending: u8 = 0;  //  uint8_t
 
 var TxPeriodicity: u32 = 0;  // uint32_t
 
-// /*
-//  * Indicates if the system time has been synchronized
-//  */
-var IsClockSynched: bool = false;
+/// Indicates if the system time has been synchronized
+var IsClockSynched: bool = false;  // bool
 
-// /*
-//  * MC Session Started
-//  */
-var IsMcSessionStarted: bool = false;
+/// MC Session Started
+var IsMcSessionStarted: bool = false;  // bool
 
-// /*
-//  * Indicates if the file transfer is done
-//  */
-var IsFileTransferDone: bool = false;
+/// Indicates if the file transfer is done
+var IsFileTransferDone: bool = false;  // bool
 
-// /*
-//  *  Received file computed CRC32
-//  */
+///  Received file computed CRC32
 var FileRxCrc: u32 = 0;  // uint32_t
