@@ -1067,3 +1067,33 @@ var TxPeriodicity: u32 = @bitCast(u32,
     )
 );
 ```
+
+# Opaque Type Error
+
+If we uncomment this line from [lorawan_test.zig](lorawan_test.zig)...
+
+```zig
+    _ = &LmHandlerCallbacks;
+```
+
+We'll get this Opaque Type Error...
+
+```text
+zig-cache/o/d4d456612514c342a153a8d34fbf5970/cimport.zig:1353:5: error: opaque types have unknown size and therefore cannot be directly embedded in unions
+    Fields: struct_sInfoFields,
+    ^
+zig-cache/o/d4d456612514c342a153a8d34fbf5970/cimport.zig:1563:5: note: while checking this field
+    PingSlot: PingSlotInfo_t,
+    ^
+zig-cache/o/d4d456612514c342a153a8d34fbf5970/cimport.zig:1579:5: note: while checking this field
+    PingSlotInfo: MlmeReqPingSlotInfo_t,
+    ^
+zig-cache/o/d4d456612514c342a153a8d34fbf5970/cimport.zig:1585:5: note: while checking this field
+    Req: union_uMlmeParam,
+    ^
+zig-cache/o/d4d456612514c342a153a8d34fbf5970/cimport.zig:2277:5: note: while checking this field
+    OnMacMlmeRequest: ?fn (LoRaMacStatus_t, [*c]MlmeReq_t, TimerTime_t) callconv(.C) void,
+    ^
+```
+
+TODO: Fix this
