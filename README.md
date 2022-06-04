@@ -1029,4 +1029,38 @@ make
 
 [lorawan_test.zig](lorawan_test.zig) compiles OK with Zig Compiler.
 
+Some parts can get tricky to convert, like this C code...
+
+```c
+//  Original C code...
+#define APP_TX_DUTYCYCLE     40000
+#define APP_TX_DUTYCYCLE_RND  5000
+
+uint32_t TxPeriodicity = 
+    APP_TX_DUTYCYCLE +
+    randr( 
+        -APP_TX_DUTYCYCLE_RND, 
+        APP_TX_DUTYCYCLE_RND
+    );
+```
+
+Which has conflicting signed and unsigned types.
+
+We get help by referring to the auto-translated Zig Code: [translated/lorawan_test_main.zig](translated/lorawan_test_main.zig)
+
+```zig
+//  Converted from C to Zig...
+const APP_TX_DUTYCYCLE:     c_int = 40000;
+const APP_TX_DUTYCYCLE_RND: c_int = 5000;
+
+//  Cast to u32 because randr() can be negative
+var TxPeriodicity: u32 = @bitCast(u32,
+    APP_TX_DUTYCYCLE +
+    lorawan.randr(
+        -APP_TX_DUTYCYCLE_RND,
+        APP_TX_DUTYCYCLE_RND
+    )
+);
+```
+
 TODO: Test the LoRaWAN Zig App
