@@ -6,12 +6,27 @@ const std = @import("std");
 
 /// Import the LoRaWAN Library from C
 const lorawan = @cImport({
-    //  NuttX Header Files
+    // NuttX Header Files
     @cInclude("arch/types.h");
     @cInclude("../../nuttx/include/limits.h");
 
-    //  LoRaWAN Header Files
+    // LoRaWAN Header Files
+    @cInclude("firmwareVersion.h");
+    @cInclude("../libs/liblorawan/src/apps/LoRaMac/common/githubVersion.h");
+    @cInclude("../libs/liblorawan/src/boards/utilities.h");
+    @cInclude("../libs/liblorawan/src/mac/region/RegionCommon.h");
+    @cInclude("../libs/liblorawan/src/apps/LoRaMac/common/Commissioning.h");
     @cInclude("../libs/liblorawan/src/apps/LoRaMac/common/LmHandler/LmHandler.h");
+    @cInclude("../libs/liblorawan/src/apps/LoRaMac/common/LmHandler/packages/LmhpCompliance.h");
+    @cInclude("../libs/liblorawan/src/apps/LoRaMac/common/LmHandler/packages/LmhpClockSync.h");
+    @cInclude("../libs/liblorawan/src/apps/LoRaMac/common/LmHandler/packages/LmhpRemoteMcastSetup.h");
+    @cInclude("../libs/liblorawan/src/apps/LoRaMac/common/LmHandler/packages/LmhpFragmentation.h");
+    @cInclude("../libs/liblorawan/src/apps/LoRaMac/common/LmHandlerMsgDisplay.h");
+
+    // TODO: #ifdef CONFIG_LIBBL602_ADC
+    // @cInclude("../libs/libbl602_adc/bl602_adc.h");
+    // @cInclude("../libs/libbl602_adc/bl602_glb.h");
+    // #endif  //  CONFIG_LIBBL602_ADC
 });
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -80,6 +95,14 @@ pub export fn lorawan_test_main(
     // const Version_t appVersion    = { .Value = FIRMWARE_VERSION };
     // const Version_t gitHubVersion = { .Value = GITHUB_VERSION };
     // DisplayAppInfo( "lorawan_test", &appVersion, &gitHubVersion );
+
+    const appVersion = lorawan.Version_t {
+        .Value = lorawan.FIRMWARE_VERSION,
+    };
+    const gitHubVersion = lorawan.Version_t {
+        .Value = lorawan.GITHUB_VERSION,
+    };
+    lorawan.DisplayAppInfo("lorawan_test", &appVersion, &gitHubVersion);
 
     // Init LoRaWAN
     // if ( LmHandlerInit( &LmHandlerCallbacks, &LmHandlerParams ) != LORAMAC_HANDLER_SUCCESS ) {
@@ -652,7 +675,7 @@ var FileRxCrc: u32 = 0;  // uint32_t
 var AppDataBuffer: [LORAWAN_APP_DATA_BUFFER_MAX_SIZE]u8 = undefined;  //  uint8_t
 
 /// Timer to handle the application data transmission duty cycle
-var TxTimer: lorawan.TimerEvent_t = lorawan.TimerEvent_t{};
+var TxTimer: lorawan.TimerEvent_t = lorawan.TimerEvent_t {};
 
 ///////////////////////////////////////////////////////////////////////////////
 //  Types

@@ -1013,6 +1013,7 @@ zig build-obj \
   -target riscv32-freestanding-none \
   -mcpu=baseline_rv32-d \
   -isystem "$HOME/nuttx/nuttx/include" \
+  -I "$HOME/nuttx/apps/examples/lorawan_test" \
   lorawan_test.zig
 
 ##  TODO: Patch the ELF Header of `lorawan_test.o` from Soft-Float ABI to Hard-Float ABI
