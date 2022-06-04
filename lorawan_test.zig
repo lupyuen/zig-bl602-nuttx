@@ -602,28 +602,28 @@ const LmhpComplianceParams = lorawan.LmhpComplianceParams_t {
 //  * 
 //  * \warning If variable is equal to 0 then the MCU can be set in low power mode
 //  */
-// TODO: static volatile uint8_t IsMacProcessPending = 0;
+var IsMacProcessPending: u8 = 0;  // uint8_t
 
-// TODO: static volatile uint8_t IsTxFramePending = 0;
+var IsTxFramePending: u8 = 0;  //  uint8_t
 
-var TxPeriodicity: u32 = 0;
+var TxPeriodicity: u32 = 0;  // uint32_t
 
 // /*
 //  * Indicates if the system time has been synchronized
 //  */
-// TODO: static volatile bool IsClockSynched = false;
+var IsClockSynched: bool = false;
 
 // /*
 //  * MC Session Started
 //  */
-// TODO: static volatile bool IsMcSessionStarted = false;
+var IsMcSessionStarted: bool = false;
 
 // /*
 //  * Indicates if the file transfer is done
 //  */
-// TODO: static volatile bool IsFileTransferDone = false;
+var IsFileTransferDone: bool = false;
 
 // /*
 //  *  Received file computed CRC32
 //  */
-// TODO: static volatile uint32_t FileRxCrc = 0;
+var FileRxCrc: u32 = 0;  // uint32_t
