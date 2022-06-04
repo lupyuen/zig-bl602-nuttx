@@ -686,11 +686,13 @@ var AppDataBuffer: [LORAWAN_APP_DATA_BUFFER_MAX_SIZE]u8 =
     std.mem.zeroes([LORAWAN_APP_DATA_BUFFER_MAX_SIZE]u8);
 
 /// Timer to handle the application data transmission duty cycle
-/// Zig Compiler crashes with:
-///   TODO buf_write_value_bytes maybe typethread 11512 panic:
-///   Unable to dump stack trace: debug info stripped
-var TxTimer: lorawan.TimerEvent_t = 
-    std.mem.zeroes(lorawan.TimerEvent_t);
+var TxTimer: lorawan.TimerEvent_t = undefined; // TODO: Init the timer
+
+// TODO: Zig Compiler crashes with:
+//   TODO buf_write_value_bytes maybe typethread 11512 panic:
+//   Unable to dump stack trace: debug info stripped
+// var TxTimer: lorawan.TimerEvent_t = 
+//     std.mem.zeroes(lorawan.TimerEvent_t);
 
 ///////////////////////////////////////////////////////////////////////////////
 //  Types
