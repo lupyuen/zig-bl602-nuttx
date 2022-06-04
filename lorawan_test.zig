@@ -112,13 +112,13 @@ pub export fn lorawan_test_main(
     };
     lorawan.DisplayAppInfo("zig lorawan_test", &appVersion, &gitHubVersion);
 
-    // TODO: Init LoRaWAN
-    // if (lorawan.LmHandlerInit(&LmHandlerCallbacks, &LmHandlerParams)
-    //     != lorawan.LORAMAC_HANDLER_SUCCESS) {
-    //     _ = lorawan.printf("LoRaMac wasn't properly initialized\n");
-    //     // Fatal error, endless loop.
-    //     while (true) {}
-    // }
+    // Init LoRaWAN
+    if (lorawan.LmHandlerInit(&LmHandlerCallbacks, &LmHandlerParams)
+        != lorawan.LORAMAC_HANDLER_SUCCESS) {
+        _ = lorawan.printf("LoRaMac wasn't properly initialized\n");
+        // Fatal error, endless loop.
+        while (true) {}
+    }
     _ = &LmHandlerParams;////
     _ = &LmhpComplianceParams;////
     _ = &LmHandlerCallbacks;////
