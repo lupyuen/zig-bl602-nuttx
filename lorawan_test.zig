@@ -264,28 +264,6 @@ export fn OnMacMlmeRequest(
     DisplayMacMlmeRequestUpdate(status, mlmeReq, nextTxIn);
 }
 
-/// Adapted from https://github.com/lupyuen/zig-bl602-nuttx/blob/main/translated/lorawan_test_main.zig#L2818-L2833
-pub const LmHandlerCallbacks_t = extern struct {
-    GetBatteryLevel: ?fn () callconv(.C) u8,
-    GetTemperature: ?fn () callconv(.C) f32,
-    GetRandomSeed: ?fn () callconv(.C) u32,
-    OnMacProcess: ?fn () callconv(.C) void,
-    OnNvmDataChange: ?fn (lorawan.LmHandlerNvmContextStates_t, u16) callconv(.C) void,
-    OnNetworkParametersChange: ?fn ([*c]lorawan.CommissioningParams_t) callconv(.C) void,
-    OnMacMcpsRequest: ?fn (lorawan.LoRaMacStatus_t, [*c]lorawan.McpsReq_t, lorawan.TimerTime_t) callconv(.C) void,
-    /// Changed `[*c]lorawan.MlmeReq_t` to `*MlmeReq_t`
-    OnMacMlmeRequest: ?fn (lorawan.LoRaMacStatus_t, *MlmeReq_t, lorawan.TimerTime_t) callconv(.C) void,
-    OnJoinRequest: ?fn ([*c]lorawan.LmHandlerJoinParams_t) callconv(.C) void,
-    OnTxData: ?fn ([*c]lorawan.LmHandlerTxParams_t) callconv(.C) void,
-    OnRxData: ?fn ([*c]lorawan.LmHandlerAppData_t, [*c]lorawan.LmHandlerRxParams_t) callconv(.C) void,
-    OnClassChange: ?fn (lorawan.DeviceClass_t) callconv(.C) void,
-    OnBeaconStatusChange: ?fn ([*c]lorawan.LoRaMacHandlerBeaconParams_t) callconv(.C) void,
-    OnSysTimeUpdate: ?fn (bool, i32) callconv(.C) void,
-};
-/// Changed `[*c]lorawan.MlmeReq_t` to `*MlmeReq_t`
-extern fn DisplayMacMlmeRequestUpdate(status: lorawan.LoRaMacStatus_t, mlmeReq: *MlmeReq_t, nextTxIn: lorawan.TimerTime_t) void;
-const MlmeReq_t = opaque {};
-
 // static void OnJoinRequest( LmHandlerJoinParams_t* params )
 // {
 //     puts("OnJoinRequest");
@@ -613,22 +591,22 @@ pub fn OnFragDone(status: i32, size: u32) callconv(.C) void {
 ///////////////////////////////////////////////////////////////////////////////
 //  Variables
 
-/// TODO: Handler Callbacks
+/// Handler Callbacks. Changed `lorawan.LmHandlerCallbacks_t` to `LmHandlerCallbacks_t`
 var LmHandlerCallbacks: LmHandlerCallbacks_t = LmHandlerCallbacks_t {
-//     .GetBatteryLevel = BoardGetBatteryLevel,
-//     .GetTemperature = NULL,
-//     .GetRandomSeed = BoardGetRandomSeed,
-//     .OnMacProcess = OnMacProcessNotify,
-//     .OnNvmDataChange = OnNvmDataChange,
-//     .OnNetworkParametersChange = OnNetworkParametersChange,
-//     .OnMacMcpsRequest = OnMacMcpsRequest,
-    .OnMacMlmeRequest = OnMacMlmeRequest,
-//     .OnJoinRequest = OnJoinRequest,
-//     .OnTxData = OnTxData,
-//     .OnRxData = OnRxData,
-//     .OnClassChange= OnClassChange,
-//     .OnBeaconStatusChange = OnBeaconStatusChange,
-//     .OnSysTimeUpdate = OnSysTimeUpdate,
+    .GetBatteryLevel           = BoardGetBatteryLevel,
+    .GetTemperature            = lorawan.NULL,
+    .GetRandomSeed             = BoardGetRandomSeed,
+    .OnMacProcess              = OnMacProcessNotify,
+    .OnNvmDataChange           = OnNvmDataChange,
+    .OnNetworkParametersChange = OnNetworkParametersChange,
+    .OnMacMcpsRequest          = OnMacMcpsRequest,
+    .OnMacMlmeRequest          = OnMacMlmeRequest,
+    .OnJoinRequest             = OnJoinRequest,
+    .OnTxData                  = OnTxData,
+    .OnRxData                  = OnRxData,
+    .OnClassChange             = OnClassChange,
+    .OnBeaconStatusChange      = OnBeaconStatusChange,
+    .OnSysTimeUpdate           = OnSysTimeUpdate,
 };
 
 //// Handler Parameters
@@ -709,6 +687,30 @@ var TxTimer: lorawan.TimerEvent_t = undefined;  // Init the timer in Main Functi
 
 ///////////////////////////////////////////////////////////////////////////////
 //  Types
+
+/// Handler Callbacks. Adapted from https://github.com/lupyuen/zig-bl602-nuttx/blob/main/translated/lorawan_test_main.zig#L2818-L2833
+pub const LmHandlerCallbacks_t = extern struct {
+    GetBatteryLevel: ?fn () callconv(.C) u8,
+    GetTemperature: ?fn () callconv(.C) f32,
+    GetRandomSeed: ?fn () callconv(.C) u32,
+    OnMacProcess: ?fn () callconv(.C) void,
+    OnNvmDataChange: ?fn (lorawan.LmHandlerNvmContextStates_t, u16) callconv(.C) void,
+    OnNetworkParametersChange: ?fn ([*c]lorawan.CommissioningParams_t) callconv(.C) void,
+    OnMacMcpsRequest: ?fn (lorawan.LoRaMacStatus_t, [*c]lorawan.McpsReq_t, lorawan.TimerTime_t) callconv(.C) void,
+    /// Changed `[*c]lorawan.MlmeReq_t` to `*MlmeReq_t`
+    OnMacMlmeRequest: ?fn (lorawan.LoRaMacStatus_t, *MlmeReq_t, lorawan.TimerTime_t) callconv(.C) void,
+    OnJoinRequest: ?fn ([*c]lorawan.LmHandlerJoinParams_t) callconv(.C) void,
+    OnTxData: ?fn ([*c]lorawan.LmHandlerTxParams_t) callconv(.C) void,
+    OnRxData: ?fn ([*c]lorawan.LmHandlerAppData_t, [*c]lorawan.LmHandlerRxParams_t) callconv(.C) void,
+    OnClassChange: ?fn (lorawan.DeviceClass_t) callconv(.C) void,
+    OnBeaconStatusChange: ?fn ([*c]lorawan.LoRaMacHandlerBeaconParams_t) callconv(.C) void,
+    OnSysTimeUpdate: ?fn (bool, i32) callconv(.C) void,
+};
+
+/// Changed `[*c]lorawan.MlmeReq_t` to `*MlmeReq_t`
+extern fn DisplayMacMlmeRequestUpdate(status: lorawan.LoRaMacStatus_t, mlmeReq: *MlmeReq_t, nextTxIn: lorawan.TimerTime_t) void;
+
+const MlmeReq_t = opaque {};
 
 // typedef enum
 // {
