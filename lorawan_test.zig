@@ -9,6 +9,7 @@ const lorawan = @cImport({
     // NuttX Header Files
     @cInclude("arch/types.h");
     @cInclude("../../nuttx/include/limits.h");
+    @cInclude("stdio.h");
 
     // LoRaWAN Header Files
     @cInclude("firmwareVersion.h");
@@ -65,6 +66,15 @@ const LORAWAN_APP_DATA_BUFFER_MAX_SIZE = 242;
 /// \remark Please note that ETSI mandates duty cycled transmissions. Use only for test purposes
 const LORAWAN_DUTYCYCLE_ON = true;
 
+/// Defines the maximum size for the buffer receiving the fragmentation result.
+/// \remark By default FragDecoder.h defines:
+///         \ref FRAG_MAX_NB   21
+///         \ref FRAG_MAX_SIZE 50
+///         FileSize = FRAG_MAX_NB * FRAG_MAX_SIZE
+///         If bigger file size is to be received or is fragmented differently
+///         one must update those parameters.
+const UNFRAGMENTED_DATA_SIZE = 21 * 50;
+
 ///////////////////////////////////////////////////////////////////////////////
 //  Main Function
 
@@ -102,7 +112,7 @@ pub export fn lorawan_test_main(
     };
     lorawan.DisplayAppInfo("lorawan_test", &appVersion, &gitHubVersion);
 
-    // Init LoRaWAN
+    // TODO: Init LoRaWAN
     // if (lorawan.LmHandlerInit(&LmHandlerCallbacks, &LmHandlerParams)
     //     != lorawan.LORAMAC_HANDLER_SUCCESS) {
     //     _ = lorawan.printf("LoRaMac wasn't properly initialized\n");
@@ -111,31 +121,35 @@ pub export fn lorawan_test_main(
     // }
     _ = &LmHandlerParams;////
     _ = &LmhpComplianceParams;////
-    // _ = LmHandlerCallbacks;////
+    //_ = &LmHandlerCallbacks;////
 
     // Set system maximum tolerated rx error in milliseconds
-    _ = lorawan.LmHandlerSetSystemMaxRxError( 20 );
+    _ = lorawan.LmHandlerSetSystemMaxRxError(20);
 
     // The LoRa-Alliance Compliance protocol package should always be initialized and activated.
-    // LmHandlerPackageRegister( PACKAGE_ID_COMPLIANCE, &LmhpComplianceParams );
-    // LmHandlerPackageRegister( PACKAGE_ID_CLOCK_SYNC, NULL );
-    // LmHandlerPackageRegister( PACKAGE_ID_REMOTE_MCAST_SETUP, NULL );
-    // LmHandlerPackageRegister( PACKAGE_ID_FRAGMENTATION, &FragmentationParams );
+    _ = lorawan.LmHandlerPackageRegister(lorawan.PACKAGE_ID_COMPLIANCE,         &LmhpComplianceParams);
+    _ = lorawan.LmHandlerPackageRegister(lorawan.PACKAGE_ID_CLOCK_SYNC,         lorawan.NULL);
+    _ = lorawan.LmHandlerPackageRegister(lorawan.PACKAGE_ID_REMOTE_MCAST_SETUP, lorawan.NULL);
+    _ = lorawan.LmHandlerPackageRegister(lorawan.PACKAGE_ID_FRAGMENTATION,      &FragmentationParams);
 
-    // IsClockSynched     = false;
-    // IsFileTransferDone = false;
+    // Init the Clock Sync and File Transfer status
+    IsClockSynched     = false;
+    IsFileTransferDone = false;
 
     // Join the LoRaWAN Network
-    // LmHandlerJoin( );
+    lorawan.LmHandlerJoin( );
 
     // Set the Transmit Timer
-    // StartTxProcess( LORAMAC_HANDLER_TX_ON_TIMER );
+    // TODO: StartTxProcess( LORAMAC_HANDLER_TX_ON_TIMER );
 
     // Handle LoRaWAN Events
-    // handle_event_queue(NULL);  //  Never returns
+    // TODO: handle_event_queue(NULL);  //  Never returns
 
     return 0;
 }
+
+///////////////////////////////////////////////////////////////////////////////
+//  Transmit Data
 
 /// Prepare the payload of a Data Packet transmit it
 // static void PrepareTxFrame( void )
@@ -241,13 +255,14 @@ pub export fn lorawan_test_main(
 //     DisplayMacMcpsRequestUpdate( status, mcpsReq, nextTxIn );
 // }
 
-fn OnMacMlmeRequest(
-    status: lorawan.LoRaMacStatus_t,
-    mlmeReq: [*c]lorawan.MlmeReq_t, 
-    nextTxIn: lorawan.TimerTime_t
-) void {
-    lorawan.DisplayMacMlmeRequestUpdate(status, mlmeReq, nextTxIn);
-}
+// TODO
+// export fn OnMacMlmeRequest(
+//     status: lorawan.LoRaMacStatus_t,
+//     mlmeReq: [*c]lorawan.MlmeReq_t, 
+//     nextTxIn: lorawan.TimerTime_t
+// ) void {
+//     lorawan.DisplayMacMlmeRequestUpdate(status, mlmeReq, nextTxIn);
+// }
 
 // static void OnJoinRequest( LmHandlerJoinParams_t* params )
 // {
@@ -349,71 +364,8 @@ fn OnMacMlmeRequest(
 // }
 // #endif
 
-// #if( FRAG_DECODER_FILE_HANDLING_NEW_API == 1 )
-// static int8_t FragDecoderWrite( uint32_t addr, uint8_t *data, uint32_t size )
-// {
-//     if( size >= UNFRAGMENTED_DATA_SIZE )
-//     {
-//         return -1; // Fail
-//     }
-//     for(uint32_t i = 0; i < size; i++ )
-//     {
-//         UnfragmentedData[addr + i] = data[i];
-//     }
-//     return 0; // Success
-// }
-
-// static int8_t FragDecoderRead( uint32_t addr, uint8_t *data, uint32_t size )
-// {
-//     if( size >= UNFRAGMENTED_DATA_SIZE )
-//     {
-//         return -1; // Fail
-//     }
-//     for(uint32_t i = 0; i < size; i++ )
-//     {
-//         data[i] = UnfragmentedData[addr + i];
-//     }
-//     return 0; // Success
-// }
-// #endif
-
-// static void OnFragProgress( uint16_t fragCounter, uint16_t fragNb, uint8_t fragSize, uint16_t fragNbLost )
-// {
-//     printf( "\n###### =========== FRAG_DECODER ============ ######\n" );
-//     printf( "######               PROGRESS                ######\n");
-//     printf( "###### ===================================== ######\n");
-//     printf( "RECEIVED    : %5d / %5d Fragments\n", fragCounter, fragNb );
-//     printf( "              %5d / %5d Bytes\n", fragCounter * fragSize, fragNb * fragSize );
-//     printf( "LOST        :       %7d Fragments\n\n", fragNbLost );
-// }
-
-// #if( FRAG_DECODER_FILE_HANDLING_NEW_API == 1 )
-// static void OnFragDone( int32_t status, uint32_t size )
-// {
-//     FileRxCrc = Crc32( UnfragmentedData, size );
-//     IsFileTransferDone = true;
-
-//     printf( "\n###### =========== FRAG_DECODER ============ ######\n" );
-//     printf( "######               FINISHED                ######\n");
-//     printf( "###### ===================================== ######\n");
-//     printf( "STATUS      : %ld\n", status );
-//     printf( "CRC         : %08lX\n\n", FileRxCrc );
-// }
-// #else
-// static void OnFragDone( int32_t status, uint8_t *file, uint32_t size )
-// {
-//     FileRxCrc = Crc32( file, size );
-//     IsFileTransferDone = true;
-//     // Switch LED 3 OFF
-//     GpioWrite( &Led3, 0 );
-
-//     printf( "\n###### =========== FRAG_DECODER ============ ######\n" );
-//     printf( "######               FINISHED                ######\n");
-//     printf( "###### ===================================== ######\n");
-//     printf( "STATUS      : %ld\n", status );
-//     printf( "CRC         : %08lX\n\n", FileRxCrc );
-// }
-// #endif
+///////////////////////////////////////////////////////////////////////////////
+//  Compliance Handlers
 
 export fn OnTxPeriodicityChanged(periodicity: u32) void {
     TxPeriodicity = periodicity;
@@ -441,6 +393,54 @@ export fn OnTxFrameCtrlChanged(isTxConfirmed: lorawan.LmHandlerMsgTypes_t) void 
 
 export fn OnPingSlotPeriodicityChanged(pingSlotPeriodicity: u8) void {
     LmHandlerParams.PingSlotPeriodicity = pingSlotPeriodicity;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+//  Fragment Handlers
+
+export fn FragDecoderWrite(addr: u32, data: [*c]u8, size: u32) i8 {
+    if (size >= @bitCast(c_uint, @as(c_int, 21) * @as(c_int, 50))) {
+        return @bitCast(i8, @truncate(i8, -@as(c_int, 1)));
+    }
+    {
+        var i: u32 = 0;
+        while (i < size) : (i +%= 1) {
+            UnfragmentedData[addr +% i] = data[i];
+        }
+    }
+    return 0;
+}
+
+export fn FragDecoderRead(addr: u32, data: [*c]u8, size: u32) i8 {
+    if (size >= @bitCast(c_uint, @as(c_int, 21) * @as(c_int, 50))) {
+        return @bitCast(i8, @truncate(i8, -@as(c_int, 1)));
+    }
+    {
+        var i: u32 = 0;
+        while (i < size) : (i +%= 1) {
+            data[i] = UnfragmentedData[addr +% i];
+        }
+    }
+    return 0;
+}
+
+export fn OnFragProgress(fragCounter: u16, fragNb: u16, fragSize: u8, fragNbLost: u16) void {
+    _ = lorawan.printf("\n###### =========== FRAG_DECODER ============ ######\n");
+    _ = lorawan.printf("######               PROGRESS                ######\n");
+    _ = lorawan.printf("###### ===================================== ######\n");
+    _ = lorawan.printf("RECEIVED    : %5d / %5d Fragments\n", @bitCast(c_int, @as(c_uint, fragCounter)), @bitCast(c_int, @as(c_uint, fragNb)));
+    _ = lorawan.printf("              %5d / %5d Bytes\n", @bitCast(c_int, @as(c_uint, fragCounter)) * @bitCast(c_int, @as(c_uint, fragSize)), @bitCast(c_int, @as(c_uint, fragNb)) * @bitCast(c_int, @as(c_uint, fragSize)));
+    _ = lorawan.printf("LOST        :       %7d Fragments\n\n", @bitCast(c_int, @as(c_uint, fragNbLost)));
+}
+
+pub fn OnFragDone(status: i32, size: u32) callconv(.C) void {
+    FileRxCrc = lorawan.Crc32(@ptrCast([*c]u8, @alignCast(@import("std").meta.alignment(u8), &UnfragmentedData)), @bitCast(u16, @truncate(c_ushort, size)));
+    IsFileTransferDone = @as(c_int, 1) != 0;
+    _ = lorawan.printf("\n###### =========== FRAG_DECODER ============ ######\n");
+    _ = lorawan.printf("######               FINISHED                ######\n");
+    _ = lorawan.printf("###### ===================================== ######\n");
+    _ = lorawan.printf("STATUS      : %ld\n", status);
+    _ = lorawan.printf("CRC         : %08lX\n\n", FileRxCrc);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -589,10 +589,10 @@ export fn OnPingSlotPeriodicityChanged(pingSlotPeriodicity: u8) void {
 // }
 
 ///////////////////////////////////////////////////////////////////////////////
-//  Constants
+//  Variables
 
 /// TODO: Handler Callbacks
-const LmHandlerCallbacks = lorawan.LmHandlerCallbacks_t {
+var LmHandlerCallbacks: lorawan.LmHandlerCallbacks_t = lorawan.LmHandlerCallbacks_t {
 //     .GetBatteryLevel = BoardGetBatteryLevel,
 //     .GetTemperature = NULL,
 //     .GetRandomSeed = BoardGetRandomSeed,
@@ -600,7 +600,7 @@ const LmHandlerCallbacks = lorawan.LmHandlerCallbacks_t {
 //     .OnNvmDataChange = OnNvmDataChange,
 //     .OnNetworkParametersChange = OnNetworkParametersChange,
 //     .OnMacMcpsRequest = OnMacMcpsRequest,
-    .OnMacMlmeRequest = OnMacMlmeRequest,
+////    .OnMacMlmeRequest = OnMacMlmeRequest,
 //     .OnJoinRequest = OnJoinRequest,
 //     .OnTxData = OnTxData,
 //     .OnRxData = OnRxData,
@@ -608,19 +608,6 @@ const LmHandlerCallbacks = lorawan.LmHandlerCallbacks_t {
 //     .OnBeaconStatusChange = OnBeaconStatusChange,
 //     .OnSysTimeUpdate = OnSysTimeUpdate,
 };
-
-/// Compliance Parameters
-const LmhpComplianceParams = lorawan.LmhpComplianceParams_t {
-    .FwVersion = lorawan.Version_t{
-        .Value = lorawan.FIRMWARE_VERSION,
-    },
-    .OnTxPeriodicityChanged       = OnTxPeriodicityChanged,
-    .OnTxFrameCtrlChanged         = OnTxFrameCtrlChanged,
-    .OnPingSlotPeriodicityChanged = OnPingSlotPeriodicityChanged,
-};
-
-///////////////////////////////////////////////////////////////////////////////
-//  Variables
 
 //// Handler Parameters
 var LmHandlerParams: lorawan.LmHandlerParams_t = lorawan.LmHandlerParams_t {
@@ -635,33 +622,30 @@ var LmHandlerParams: lorawan.LmHandlerParams_t = lorawan.LmHandlerParams_t {
     .PingSlotPeriodicity = lorawan.REGION_COMMON_DEFAULT_PING_SLOT_PERIODICITY,
 };
 
-/// Defines the maximum size for the buffer receiving the fragmentation result.
-/// \remark By default FragDecoder.h defines:
-///         \ref FRAG_MAX_NB   21
-///         \ref FRAG_MAX_SIZE 50
-///         FileSize = FRAG_MAX_NB * FRAG_MAX_SIZE
-///         If bigger file size is to be received or is fragmented differently
-///         one must update those parameters.
-// TODO: #define UNFRAGMENTED_DATA_SIZE                     ( 21 * 50 )
+/// Compliance Parameters
+var LmhpComplianceParams: lorawan.LmhpComplianceParams_t = lorawan.LmhpComplianceParams_t {
+    .FwVersion = lorawan.Version_t{
+        .Value = lorawan.FIRMWARE_VERSION,
+    },
+    .OnTxPeriodicityChanged       = OnTxPeriodicityChanged,
+    .OnTxFrameCtrlChanged         = OnTxFrameCtrlChanged,
+    .OnPingSlotPeriodicityChanged = OnPingSlotPeriodicityChanged,
+};
 
-/// Un-fragmented data storage.
-// TODO: static uint8_t UnfragmentedData[UNFRAGMENTED_DATA_SIZE];
-
-// TODO: static LmhpFragmentationParams_t FragmentationParams =
-// {
-// #if( FRAG_DECODER_FILE_HANDLING_NEW_API == 1 )
-//     .DecoderCallbacks = 
-//     {
-//         .FragDecoderWrite = FragDecoderWrite,
-//         .FragDecoderRead = FragDecoderRead,
-//     },
+//// Fragmentation Parameters (Unused)
+var FragmentationParams: lorawan.LmhpFragmentationParams_t = lorawan.LmhpFragmentationParams_t {
+// TODO: #if( FRAG_DECODER_FILE_HANDLING_NEW_API == 1 )
+    .DecoderCallbacks = lorawan.FragDecoderCallbacks_t{
+        .FragDecoderWrite = FragDecoderWrite,
+        .FragDecoderRead  = FragDecoderRead,
+    },
 // #else
 //     .Buffer = UnfragmentedData,
 //     .BufferSize = UNFRAGMENTED_DATA_SIZE,
 // #endif
-//     .OnProgress = OnFragProgress,
-//     .OnDone = OnFragDone
-// };
+    .OnProgress = OnFragProgress,
+    .OnDone     = OnFragDone,
+};
 
 /// Indicates if LoRaMacProcess call is pending.
 /// \warning If variable is equal to 0 then the MCU can be set in low power mode
@@ -686,6 +670,10 @@ var FileRxCrc: u32 = 0;  // uint32_t
 /// User application data
 var AppDataBuffer: [LORAWAN_APP_DATA_BUFFER_MAX_SIZE]u8 = 
     std.mem.zeroes([LORAWAN_APP_DATA_BUFFER_MAX_SIZE]u8);
+
+/// Un-fragmented data storage (Unused)
+var UnfragmentedData: [UNFRAGMENTED_DATA_SIZE]u8 = 
+    std.mem.zeroes([UNFRAGMENTED_DATA_SIZE]u8);
 
 /// Timer to handle the application data transmission duty cycle
 var TxTimer: lorawan.TimerEvent_t = undefined;  // Init the timer in Main Function
