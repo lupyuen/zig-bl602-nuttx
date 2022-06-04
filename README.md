@@ -913,7 +913,7 @@ TODO: Test the LoRaWAN App
 
 Finally we convert the LoRaWAN App from C to Zig, to show that we can build Complex IoT Apps in Zig.
 
-Here's the partially converted Zig App: [lorawan_test_main.zig](lorawan_test_main.zig)
+Here's the partially converted Zig App: [lorawan_test.zig](lorawan_test.zig)
 
 ```zig
 //  Import the Zig Standard Library
@@ -959,7 +959,13 @@ zig build-obj \
   -target riscv32-freestanding-none \
   -mcpu=baseline_rv32-d \
   -isystem "$HOME/nuttx/nuttx/include" \
-  lorawan_test_main.zig
+  lorawan_test.zig
+
+##  TODO: Patch the ELF Header of `lorawan_test.o` from Soft-Float ABI to Hard-Float ABI
+
+##  Copy the compiled app to NuttX and overwrite `lorawan_test.o`
+##  TODO: Change "$HOME/nuttx" to your NuttX Project Directory
+cp lorawan_test.o $HOME/nuttx/apps/examples/lorawan_test/*lorawan_test.o
 
 ##  Build NuttX to link the Zig Object from `hello.o`
 ##  TODO: Change "$HOME/nuttx" to your NuttX Project Directory
@@ -967,6 +973,6 @@ cd $HOME/nuttx/nuttx
 make
 ```
 
-[lorawan_test_main.zig](lorawan_test_main.zig) compiles OK with Zig Compiler.
+[lorawan_test.zig](lorawan_test.zig) compiles OK with Zig Compiler.
 
 TODO: Test the LoRaWAN Zig App
