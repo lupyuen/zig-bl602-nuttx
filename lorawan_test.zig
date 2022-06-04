@@ -26,11 +26,11 @@ const lorawan = @cImport({
 // TODO: #define LORAWAN_DEFAULT_CLASS                       CLASS_A
 
 /// Defines the application data transmission duty cycle. 40s, value in [ms].
-// TODO: #define APP_TX_DUTYCYCLE                            40000
+const APP_TX_DUTYCYCLE = 40000;
 
 /// Defines a random delay for application data transmission duty cycle. 5s,
 /// value in [ms].
-// TODO: #define APP_TX_DUTYCYCLE_RND                        5000
+const APP_TX_DUTYCYCLE_RND = 5000;
 
 /// LoRaWAN Adaptive Data Rate
 /// \remark Please note that when ADR is enabled the end-device should be static
@@ -48,7 +48,7 @@ const LORAWAN_APP_DATA_BUFFER_MAX_SIZE = 242;
 
 /// LoRaWAN ETSI duty cycle control enable/disable
 /// \remark Please note that ETSI mandates duty cycled transmissions. Use only for test purposes
-// TODO: #define LORAWAN_DUTYCYCLE_ON                        true
+const LORAWAN_DUTYCYCLE_ON = true;
 
 ///////////////////////////////////////////////////////////////////////////////
 //  Main Function
@@ -61,9 +61,6 @@ pub export fn lorawan_test_main(
     _ = _argc;
     _ = _argv;
 
-    // Call the LoRaWAN Library to set system maximum tolerated rx error in milliseconds
-    _ = lorawan.LmHandlerSetSystemMaxRxError( 20 );
-
     // TODO: Call the LoRaWAN Library to Join LoRaWAN Network
     // and send a Data Packet
 
@@ -72,7 +69,7 @@ pub export fn lorawan_test_main(
     // init_entropy_pool();
 
     // Compute the interval between transmissions based on Duty Cycle
-    // TxPeriodicity = APP_TX_DUTYCYCLE + randr( -APP_TX_DUTYCYCLE_RND, APP_TX_DUTYCYCLE_RND );
+    // TODO: TxPeriodicity = APP_TX_DUTYCYCLE + lorawan.randr( -APP_TX_DUTYCYCLE_RND, APP_TX_DUTYCYCLE_RND );
 
     // const Version_t appVersion    = { .Value = FIRMWARE_VERSION };
     // const Version_t gitHubVersion = { .Value = GITHUB_VERSION };
@@ -86,7 +83,7 @@ pub export fn lorawan_test_main(
     // }
 
     // Set system maximum tolerated rx error in milliseconds
-    // LmHandlerSetSystemMaxRxError( 20 );
+    _ = lorawan.LmHandlerSetSystemMaxRxError( 20 );
 
     // The LoRa-Alliance Compliance protocol package should always be initialized and activated.
     // LmHandlerPackageRegister( PACKAGE_ID_COMPLIANCE, &LmhpComplianceParams );
@@ -389,7 +386,7 @@ fn OnTxPeriodicityChanged(periodicity: u32) void {
 
     if( TxPeriodicity == 0 ) {
         // Revert to application default periodicity
-        // TODO: TxPeriodicity = APP_TX_DUTYCYCLE + randr( -APP_TX_DUTYCYCLE_RND, APP_TX_DUTYCYCLE_RND );
+        TxPeriodicity = APP_TX_DUTYCYCLE + lorawan.randr( -APP_TX_DUTYCYCLE_RND, APP_TX_DUTYCYCLE_RND );
     }
 
     // Update timer periodicity

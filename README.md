@@ -909,6 +909,60 @@ We include the right header files into [lorawan_test_main.c](https://github.com/
 
 TODO: Test the LoRaWAN App
 
+# Auto-Translate LoRaWAN App to Zig
+
+The Zig Compiler can auto-translate C code to Zig. [(See this)](https://ziglang.org/documentation/master/#C-Translation-CLI)
+
+Here's how we auto-translate our LoRaWAN App [lorawan_test_main.c](https://github.com/lupyuen/lorawan_test/blob/main/lorawan_test_main.c) from C to Zig...
+
+-   Change `zig cc` to `zig translate-c`
+
+-   Surround the C Flags by `-cflags` ... `--`
+
+Like this...
+
+```bash
+##  App Source Directory
+cd $HOME/nuttx/apps/examples/lorawan_test
+
+##  Auto-translate lorawan_test_main.c from C to Zig
+zig translate-c \
+  -target riscv32-freestanding-none \
+  -mcpu=baseline_rv32-d \
+  -cflags \
+    -fno-common \
+    -Wall \
+    -Wstrict-prototypes \
+    -Wshadow \
+    -Wundef \
+    -Os \
+    -fno-strict-aliasing \
+    -fomit-frame-pointer \
+    -fstack-protector-all \
+    -ffunction-sections \
+    -fdata-sections \
+    -g \
+    -mabi=ilp32f \
+    -mno-relax \
+  -- \
+  -isystem "$HOME/nuttx/nuttx/include" \
+  -D__NuttX__ \
+  -DNDEBUG \
+  -DARCH_RISCV  \
+  -I "$HOME/nuttx/apps/graphics/lvgl" \
+  -I "$HOME/nuttx/apps/graphics/lvgl/lvgl" \
+  -I "$HOME/nuttx/apps/include" \
+  -Dmain=lorawan_test_main  \
+  lorawan_test_main.c \
+  >lorawan_test_main.zig
+```
+
+Here's the original C code: [lorawan_test_main.c](https://github.com/lupyuen/lorawan_test/blob/main/lorawan_test_main.c)
+
+And the auto-translation from C to Zig: [translated/lorawan_test_main.zig](translated/lorawan_test_main.zig)
+
+We'll refer to this auto-translated Zig Code when we manually convert our LoRaWAN App [lorawan_test_main.c](https://github.com/lupyuen/lorawan_test/blob/main/lorawan_test_main.c) from C to Zig in the next section...
+
 # Convert LoRaWAN App to Zig
 
 Finally we convert the LoRaWAN App from C to Zig, to show that we can build Complex IoT Apps in Zig.
