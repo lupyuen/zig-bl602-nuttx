@@ -110,7 +110,7 @@ pub export fn lorawan_test_main(
     const gitHubVersion = lorawan.Version_t {
         .Value = lorawan.GITHUB_VERSION,
     };
-    lorawan.DisplayAppInfo("lorawan_test", &appVersion, &gitHubVersion);
+    lorawan.DisplayAppInfo("zig lorawan_test", &appVersion, &gitHubVersion);
 
     // TODO: Init LoRaWAN
     // if (lorawan.LmHandlerInit(&LmHandlerCallbacks, &LmHandlerParams)
