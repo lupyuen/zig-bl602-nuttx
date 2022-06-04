@@ -256,15 +256,18 @@ pub export fn lorawan_test_main(
 // }
 
 // TODO
-// export fn OnMacMlmeRequest(
-//     status: lorawan.LoRaMacStatus_t,
-//     mlmeReq: [*c]MlmeReq_t, 
-//     nextTxIn: lorawan.TimerTime_t
-// ) void {
-//     lorawan.DisplayMacMlmeRequestUpdate(status, mlmeReq, nextTxIn);
-// }
+export fn OnMacMlmeRequest(
+    status: lorawan.LoRaMacStatus_t,
+    mlmeReq: *MlmeReq_t, 
+    nextTxIn: lorawan.TimerTime_t
+) void {
+    _ = status;
+    _ = mlmeReq;
+    _ = nextTxIn;
+    ////TODO: lorawan.DisplayMacMlmeRequestUpdate(status, mlmeReq, nextTxIn);
+}
 
-// const MlmeReq_t = opaque {};
+const MlmeReq_t = opaque {};
 
 // static void OnJoinRequest( LmHandlerJoinParams_t* params )
 // {
