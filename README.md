@@ -1131,6 +1131,8 @@ Opaque Type Error is explained here...
 
 -   ["Extend a C/C++ Project with Zig"](https://zig.news/kristoff/extend-a-c-c-project-with-zig-55di)
 
+-   ["Translation failures"](https://ziglang.org/documentation/master/#Translation-failures)
+
 Let's trace through our Opaque Type Error...
 
 ```zig
