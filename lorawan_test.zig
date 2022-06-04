@@ -235,27 +235,28 @@ pub export fn lorawan_test_main(
 //     TimerStart( &TxTimer );
 // }
 
-// static void OnMacProcessNotify( void )
-// {
-//     IsMacProcessPending = 1;
-// }
+export fn OnMacProcessNotify() void {
+    IsMacProcessPending = 1;
+}
 
-// static void OnNvmDataChange( LmHandlerNvmContextStates_t state, uint16_t size )
-// {
-//     DisplayNvmDataChange( state, size );
-// }
+export fn OnNvmDataChange(arg_state: lorawan.LmHandlerNvmContextStates_t, arg_size: u16) void {
+    var state = arg_state;
+    var size = arg_size;
+    lorawan.DisplayNvmDataChange(state, size);
+}
 
-// static void OnNetworkParametersChange( CommissioningParams_t* params )
-// {
-//     DisplayNetworkParametersUpdate( params );
-// }
+export fn OnNetworkParametersChange(arg_params: [*c]lorawan.CommissioningParams_t) void {
+    var params = arg_params;
+    lorawan.DisplayNetworkParametersUpdate(params);
+}
 
-// static void OnMacMcpsRequest( LoRaMacStatus_t status, McpsReq_t *mcpsReq, TimerTime_t nextTxIn )
-// {
-//     DisplayMacMcpsRequestUpdate( status, mcpsReq, nextTxIn );
-// }
+export fn OnMacMcpsRequest(arg_status: lorawan.LoRaMacStatus_t, arg_mcpsReq: [*c]lorawan.McpsReq_t, arg_nextTxIn: lorawan.TimerTime_t) void {
+    var status = arg_status;
+    var mcpsReq = arg_mcpsReq;
+    var nextTxIn = arg_nextTxIn;
+    lorawan.DisplayMacMcpsRequestUpdate(status, mcpsReq, nextTxIn);
+}
 
-/// Changed `[*c]lorawan.MlmeReq_t` to `*MlmeReq_t`
 export fn OnMacMlmeRequest(
     status: lorawan.LoRaMacStatus_t,
     mlmeReq: *MlmeReq_t, 
@@ -264,105 +265,106 @@ export fn OnMacMlmeRequest(
     DisplayMacMlmeRequestUpdate(status, mlmeReq, nextTxIn);
 }
 
-// static void OnJoinRequest( LmHandlerJoinParams_t* params )
-// {
-//     puts("OnJoinRequest");
-//     DisplayJoinRequestUpdate( params );
-//     if( params->Status == LORAMAC_HANDLER_ERROR )
-//     {
-//         LmHandlerJoin( );
-//     }
-//     else
-//     {
-//         LmHandlerRequestClass( LORAWAN_DEFAULT_CLASS );
-//     }
-// }
+export fn OnJoinRequest(arg_params: [*c]lorawan.LmHandlerJoinParams_t) void {
+    var params = arg_params;
+    _ = lorawan.puts("OnJoinRequest");
+    lorawan.DisplayJoinRequestUpdate(params);
+    if (params.*.Status == lorawan.LORAMAC_HANDLER_ERROR) {
+        lorawan.LmHandlerJoin();
+    } else {
+        _ = lorawan.LmHandlerRequestClass(@bitCast(c_uint, lorawan.CLASS_A));
+    }
+}
 
-// static void OnTxData( LmHandlerTxParams_t* params )
-// {
-//     puts("OnTxData");
-//     DisplayTxUpdate( params );
-// }
+export fn OnTxData(arg_params: [*c]lorawan.LmHandlerTxParams_t) void {
+    var params = arg_params;
+    _ = lorawan.puts("OnTxData");
+    lorawan.DisplayTxUpdate(params);
+}
 
-// static void OnRxData( LmHandlerAppData_t* appData, LmHandlerRxParams_t* params )
-// {
-//     puts("OnRxData");
-//     DisplayRxUpdate( appData, params );
-// }
+export fn OnRxData(arg_appData: [*c]lorawan.LmHandlerAppData_t, arg_params: [*c]lorawan.LmHandlerRxParams_t) void {
+    var appData = arg_appData;
+    var params = arg_params;
+    _ = lorawan.puts("OnRxData");
+    lorawan.DisplayRxUpdate(appData, params);
+}
 
-// static void OnClassChange( DeviceClass_t deviceClass )
-// {
-//     puts("OnClassChange");
-//     DisplayClassUpdate( deviceClass );
+/// TODO
+export fn OnClassChange(arg_deviceClass: lorawan.DeviceClass_t) void {
+    var deviceClass = arg_deviceClass;
+    _ = lorawan.puts("OnClassChange");
+    lorawan.DisplayClassUpdate(deviceClass);
+    while (true) {
+        switch (deviceClass) {
+            else => {
+                {
+                    IsMcSessionStarted = @as(c_int, 0) != 0;
+                    break;
+                }
+            },
+            @bitCast(c_uint, @as(c_int, 1)) => {
+                {
+                    var appData: lorawan.LmHandlerAppData_t = lorawan.LmHandlerAppData_t{
+                        .Port = @bitCast(u8, @truncate(i8, @as(c_int, 0))),
+                        .BufferSize = @bitCast(u8, @truncate(i8, @as(c_int, 0))),
+                        .Buffer = null,
+                    };
+                    _ = lorawan.LmHandlerSend(&appData, @bitCast(c_uint, lorawan.LORAMAC_HANDLER_UNCONFIRMED_MSG));
+                    IsMcSessionStarted = @as(c_int, 1) != 0;
+                    break;
+                }
+            },
+            @bitCast(c_uint, @as(c_int, 2)) => {
+                {
+                    IsMcSessionStarted = @as(c_int, 1) != 0;
+                    break;
+                }
+            },
+        }
+        break;
+    }
+}
 
-//     switch( deviceClass )
-//     {
-//         default:
-//         case CLASS_A:
-//         {
-//             IsMcSessionStarted = false;
-//             break;
-//         }
-//         case CLASS_B:
-//         {
-//             // Inform the server as soon as possible that the end-device has switched to ClassB
-//             LmHandlerAppData_t appData =
-//             {
-//                 .Buffer = NULL,
-//                 .BufferSize = 0,
-//                 .Port = 0,
-//             };
-//             LmHandlerSend( &appData, LORAMAC_HANDLER_UNCONFIRMED_MSG );
-//             IsMcSessionStarted = true;
-//             break;
-//         }
-//         case CLASS_C:
-//         {
-//             IsMcSessionStarted = true;
-//             break;
-//         }
-//     }
-// }
+/// TODO
+export fn OnBeaconStatusChange(arg_params: [*c]lorawan.LoRaMacHandlerBeaconParams_t) void {
+    var params = arg_params;
+    while (true) {
+        switch (params.*.State) {
+            @bitCast(c_uint, @as(c_int, 2)) => {
+                {
+                    _ = lorawan.puts("OnBeaconStatusChange: LORAMAC_HANDLER_BEACON_RX");
+                    break;
+                }
+            },
+            @bitCast(c_uint, @as(c_int, 1)) => {
+                {
+                    _ = lorawan.puts("OnBeaconStatusChange: LORAMAC_HANDLER_BEACON_LOST");
+                    break;
+                }
+            },
+            @bitCast(c_uint, @as(c_int, 3)) => {
+                {
+                    _ = lorawan.puts("OnBeaconStatusChange: LORAMAC_HANDLER_BEACON_NRX");
+                    break;
+                }
+            },
+            else => {
+                {
+                    break;
+                }
+            },
+        }
+        break;
+    }
+    lorawan.DisplayBeaconUpdate(params);
+}
 
-// static void OnBeaconStatusChange( LoRaMacHandlerBeaconParams_t* params )
-// {
-//     switch( params->State )
-//     {
-//         case LORAMAC_HANDLER_BEACON_RX:
-//         {
-//             puts("OnBeaconStatusChange: LORAMAC_HANDLER_BEACON_RX");
-//             break;
-//         }
-//         case LORAMAC_HANDLER_BEACON_LOST:
-//         {
-//             puts("OnBeaconStatusChange: LORAMAC_HANDLER_BEACON_LOST");
-//             break;
-//         }
-//         case LORAMAC_HANDLER_BEACON_NRX:
-//         {
-//             puts("OnBeaconStatusChange: LORAMAC_HANDLER_BEACON_NRX");
-//             break;
-//         }
-//         default:
-//         {
-//             break;
-//         }
-//     }
-
-//     DisplayBeaconUpdate( params );
-// }
-
-// #if( LMH_SYS_TIME_UPDATE_NEW_API == 1 )
-// static void OnSysTimeUpdate( bool isSynchronized, int32_t timeCorrection )
-// {
-//     IsClockSynched = isSynchronized;
-// }
-// #else
-// static void OnSysTimeUpdate( void )
-// {
-//     IsClockSynched = true;
-// }
-// #endif
+export fn OnSysTimeUpdate(arg_isSynchronized: bool, arg_timeCorrection: i32) void {
+    var isSynchronized = arg_isSynchronized;
+    var timeCorrection = arg_timeCorrection;
+    _ = timeCorrection;
+    IsClockSynched = isSynchronized;
+}
 
 /// TODO
 export fn BoardGetBatteryLevel() u8 {
@@ -443,7 +445,7 @@ export fn OnFragProgress(fragCounter: u16, fragNb: u16, fragSize: u8, fragNbLost
     _ = lorawan.printf("LOST        :       %7d Fragments\n\n", @bitCast(c_int, @as(c_uint, fragNbLost)));
 }
 
-pub fn OnFragDone(status: i32, size: u32) callconv(.C) void {
+export fn OnFragDone(status: i32, size: u32) void {
     FileRxCrc = lorawan.Crc32(@ptrCast([*c]u8, @alignCast(@import("std").meta.alignment(u8), &UnfragmentedData)), @bitCast(u16, @truncate(c_ushort, size)));
     IsFileTransferDone = @as(c_int, 1) != 0;
     _ = lorawan.printf("\n###### =========== FRAG_DECODER ============ ######\n");
@@ -604,7 +606,7 @@ pub fn OnFragDone(status: i32, size: u32) callconv(.C) void {
 /// Handler Callbacks. Changed `lorawan.LmHandlerCallbacks_t` to `LmHandlerCallbacks_t`
 var LmHandlerCallbacks: LmHandlerCallbacks_t = LmHandlerCallbacks_t {
     .GetBatteryLevel           = BoardGetBatteryLevel,
-    .GetTemperature            = lorawan.NULL,
+    .GetTemperature            = undefined,
     .GetRandomSeed             = BoardGetRandomSeed,
     .OnMacProcess              = OnMacProcessNotify,
     .OnNvmDataChange           = OnNvmDataChange,
