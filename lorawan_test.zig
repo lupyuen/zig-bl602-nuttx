@@ -678,11 +678,12 @@ var UnfragmentedData: [UNFRAGMENTED_DATA_SIZE]u8 =
 /// Timer to handle the application data transmission duty cycle
 var TxTimer: lorawan.TimerEvent_t = undefined;  // Init the timer in Main Function
 
-// TODO: Zig Compiler crashes with:
-//   TODO buf_write_value_bytes maybe typethread 11512 panic:
-//   Unable to dump stack trace: debug info stripped
+// TODO: If we init TxTimer...
 // var TxTimer: lorawan.TimerEvent_t = 
 //     std.mem.zeroes(lorawan.TimerEvent_t);
+// Zig Compiler crashes with...
+//   TODO buf_write_value_bytes maybe typethread 11512 panic:
+//   Unable to dump stack trace: debug info stripped
 
 ///////////////////////////////////////////////////////////////////////////////
 //  Types
