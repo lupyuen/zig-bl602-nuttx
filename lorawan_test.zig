@@ -44,7 +44,7 @@ const lorawan = @cImport({
 // TODO: #define LORAWAN_DEFAULT_CONFIRMED_MSG_STATE         LORAMAC_HANDLER_UNCONFIRMED_MSG
 
 /// User application data buffer size
-// TODO: #define LORAWAN_APP_DATA_BUFFER_MAX_SIZE            242
+const LORAWAN_APP_DATA_BUFFER_MAX_SIZE = 242;
 
 /// LoRaWAN ETSI duty cycle control enable/disable
 /// \remark Please note that ETSI mandates duty cycled transmissions. Use only for test purposes
@@ -648,8 +648,8 @@ var FileRxCrc: u32 = 0;  // uint32_t
 // User application data
 // TODO: static uint8_t AppDataBuffer[LORAWAN_APP_DATA_BUFFER_MAX_SIZE];
 
-// Timer to handle the application data transmission duty cycle
-// TODO: static TimerEvent_t TxTimer;
+/// Timer to handle the application data transmission duty cycle
+var TxTimer: lorawan.TimerEvent_t = lorawan.TimerEvent_t{};
 
 ///////////////////////////////////////////////////////////////////////////////
 //  Types
