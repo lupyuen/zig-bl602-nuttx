@@ -1127,4 +1127,104 @@ zig-cache/o/d4d456612514c342a153a8d34fbf5970/cimport.zig:2277:5: note: while che
     ^
 ```
 
-TODO: Fix this
+Opaque Type Error is explained here...
+
+-   ["Extend a C/C++ Project with Zig"](https://zig.news/kristoff/extend-a-c-c-project-with-zig-55di)
+
+Let's trace through our Opaque Type Error...
+
+```zig
+export fn OnMacMlmeRequest(
+    status: lorawan.LoRaMacStatus_t,
+    mlmeReq: [*c]lorawan.MlmeReq_t, 
+    nextTxIn: lorawan.TimerTime_t
+) void {
+    lorawan.DisplayMacMlmeRequestUpdate(status, mlmeReq, nextTxIn);
+}
+```
+
+`OnMacMlmeRequest` has a parameter of type `MlmeReq_t`, defined as...
+
+```zig
+pub const MlmeReq_t = struct_sMlmeReq;
+
+pub const struct_sMlmeReq = extern struct {
+    Type: Mlme_t,
+    Req: union_uMlmeParam,
+    ReqReturn: RequestReturnParam_t,
+};
+```
+
+Which contains an `union_uMlmeParam`...
+
+```zig
+pub const union_uMlmeParam = extern union {
+    Join: MlmeReqJoin_t,
+    TxCw: MlmeReqTxCw_t,
+    PingSlotInfo: MlmeReqPingSlotInfo_t,
+    DeriveMcKEKey: MlmeReqDeriveMcKEKey_t,
+    DeriveMcSessionKeyPair: MlmeReqDeriveMcSessionKeyPair_t,
+};
+```
+
+Which contains an `MlmeReqPingSlotInfo_t`...
+
+```zig
+pub const MlmeReqPingSlotInfo_t = struct_sMlmeReqPingSlotInfo;
+
+pub const struct_sMlmeReqPingSlotInfo = extern struct {
+    PingSlot: PingSlotInfo_t,
+};
+```
+
+Which contains a `PingSlotInfo_t`...
+
+```zig
+pub const PingSlotInfo_t = union_uPingSlotInfo;
+
+pub const union_uPingSlotInfo = extern union {
+    Value: u8,
+    Fields: struct_sInfoFields,
+};
+```
+
+Which contains a `struct_sInfoFields`...
+
+```zig
+pub const struct_sInfoFields = opaque {};
+```
+
+But the fields of `struct_sInfoFields` are not known by the Zig Compiler!
+
+If we refer to the original C code...
+
+```c
+typedef union uPingSlotInfo
+{
+    /*!
+     * Parameter for byte access
+     */
+    uint8_t Value;
+    /*!
+     * Structure containing the parameters for the PingSlotInfoReq
+     */
+    struct sInfoFields
+    {
+        /*!
+         * Periodicity = 0: ping slot every second
+         * Periodicity = 7: ping slot every 128 seconds
+         */
+        uint8_t Periodicity     : 3;
+        /*!
+         * RFU
+         */
+        uint8_t RFU             : 5;
+    }Fields;
+}PingSlotInfo_t;
+```
+
+[(Source)](https://github.com/lupyuen/LoRaMac-node-nuttx/blob/master/src/mac/LoRaMac.h#L312-L333)
+
+We see that `sInfoFields` contains Bit Fields, that the Zig Compiler is unable to translate.
+
+TODO: Convert `MlmeReq_t` to an opaque type, since we won't be accessing the fields anyway

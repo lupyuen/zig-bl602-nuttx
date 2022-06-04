@@ -258,11 +258,13 @@ pub export fn lorawan_test_main(
 // TODO
 // export fn OnMacMlmeRequest(
 //     status: lorawan.LoRaMacStatus_t,
-//     mlmeReq: [*c]lorawan.MlmeReq_t, 
+//     mlmeReq: [*c]MlmeReq_t, 
 //     nextTxIn: lorawan.TimerTime_t
 // ) void {
 //     lorawan.DisplayMacMlmeRequestUpdate(status, mlmeReq, nextTxIn);
 // }
+
+// const MlmeReq_t = opaque {};
 
 // static void OnJoinRequest( LmHandlerJoinParams_t* params )
 // {
