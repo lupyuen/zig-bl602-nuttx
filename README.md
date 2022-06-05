@@ -811,7 +811,7 @@ We include the right header files into [LoRaMac.c](https://github.com/lupyuen/Lo
 
 [LoRaMac.c](https://github.com/lupyuen/LoRaMac-node-nuttx/blob/master/src/mac/LoRaMac.c) compiles OK with Zig Compiler.
 
-TODO: Compile the other files in the LoRaWAN Library
+TODO: Compile the other files in the LoRaWAN Library with `build.zig`
 
 TODO: Test the LoRaWAN Library
 
@@ -1057,13 +1057,17 @@ zig build-obj \
   -I "$HOME/nuttx/apps/examples/lorawan_test" \
   lorawan_test.zig
 
-##  TODO: Patch the ELF Header of `lorawan_test.o` from Soft-Float ABI to Hard-Float ABI
+##  Patch the ELF Header of `lorawan_test.o` from Soft-Float ABI to Hard-Float ABI
+xxd -c 1 lorawan_test.o \
+  | sed 's/00000024: 01/00000024: 03/' \
+  | xxd -r -c 1 - lorawan_test2.o
+cp lorawan_test2.o lorawan_test.o
 
 ##  Copy the compiled app to NuttX and overwrite `lorawan_test.o`
 ##  TODO: Change "$HOME/nuttx" to your NuttX Project Directory
 cp lorawan_test.o $HOME/nuttx/apps/examples/lorawan_test/*lorawan_test.o
 
-##  Build NuttX to link the Zig Object from `hello.o`
+##  Build NuttX to link the Zig Object from `lorawan_test.o`
 ##  TODO: Change "$HOME/nuttx" to your NuttX Project Directory
 cd $HOME/nuttx/nuttx
 make
