@@ -11,7 +11,7 @@ const c = @cImport({
     @cDefine("NDEBUG",     "");
     @cDefine("ARCH_RISCV", "");
 
-    // TODO: Workaround for "Unable to translate macro: undefined identifier `LL`"
+    // Workaround for "Unable to translate macro: undefined identifier `LL`"
     @cDefine("LL", "");
     @cDefine("__int_c_join(a, b)", "a");  //  Bypass zig/lib/include/stdint.h
 
@@ -160,7 +160,7 @@ pub export fn lorawan_test_main(
 
 /// Prepare the payload of a Data Packet transmit it
 fn PrepareTxFrame() void {
-    //  If we haven't joined the LoRaWAN Network, try again later
+    // If we haven't joined the LoRaWAN Network, try again later
     if (c.LmHandlerIsBusy()) {
         _ = puts("PrepareTxFrame: Busy");
         return;
@@ -173,19 +173,21 @@ fn PrepareTxFrame() void {
         @as(c_int, @sizeOf(@TypeOf(msg))),
     );
 
-    //  TODO: Compose the transmit request
+    // Compose the transmit request
     assert(@sizeOf(@TypeOf(msg)) <= @sizeOf(@TypeOf(AppDataBuffer)));
+    // TODO: Change to `mem.copy(u8, dest[0..byte_count], source[0..byte_count]);`
     _ = c.memcpy(
         @ptrCast(?*anyopaque, @ptrCast([*c]u8, @alignCast(std.meta.alignment(u8), &AppDataBuffer))), 
         @ptrCast(?*const anyopaque, @ptrCast([*c]const u8, @alignCast(std.meta.alignment(u8), &msg))), 
-        @sizeOf(@TypeOf(msg)));
+        @sizeOf(@TypeOf(msg))
+    );
     var appData = c.LmHandlerAppData_t {
         .Buffer     = @ptrCast([*c]u8, @alignCast(std.meta.alignment(u8), &AppDataBuffer)),
         .BufferSize = @sizeOf(@TypeOf(msg)),
         .Port       = 1,
     };
 
-    //  Validate the message size and check if it can be transmitted
+    // Validate the message size and check if it can be transmitted
     var txInfo: c.LoRaMacTxInfo_t = undefined;
     const status = c.LoRaMacQueryTxPossible(appData.BufferSize, &txInfo);
     _ = printf("PrepareTxFrame: status=%d, maxSize=%d, currentSize=%d\n", 
@@ -195,7 +197,7 @@ fn PrepareTxFrame() void {
     );
     assert(status == c.LORAMAC_STATUS_OK);
 
-    //  Transmit the message
+    // Transmit the message
     const sendStatus = c.LmHandlerSend(&appData, LmHandlerParams.IsTxConfirmed);
     assert(sendStatus == c.LORAMAC_HANDLER_SUCCESS);
     _ = puts("PrepareTxFrame: Transmit OK");
