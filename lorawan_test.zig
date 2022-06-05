@@ -223,7 +223,7 @@ fn UplinkProcess() void {
 //  Event Handlers
 
 /// Function executed on TxTimer event
-export fn OnTxTimerEvent(event: u8) void {
+export fn OnTxTimerEvent(event: [*c]lorawan.struct_ble_npl_event) void {
     _ = printf("OnTxTimerEvent: timeout in %ld ms, event=%p\n", TxPeriodicity, event);
     lorawan.TimerStop(&TxTimer);
     IsTxFramePending = 1;
