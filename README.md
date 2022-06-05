@@ -1039,6 +1039,8 @@ cd zig-bl602-nuttx
 
 ##  Compile the Zig App for BL602 (RV32IMACF with Hardware Floating-Point)
 zig build-obj \
+  -lc \
+  --verbose-cimport \
   -target riscv32-freestanding-none \
   -mcpu=baseline_rv32-d \
   -isystem "$HOME/nuttx/nuttx/include" \
