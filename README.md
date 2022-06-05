@@ -817,9 +817,9 @@ TODO: Test the LoRaWAN Library
 
 # LoRaWAN App for NuttX
 
-Now we compile the LoRaWAN App with Zig Compiler.
+Now we compile the LoRaWAN App [lorawan_test_main.c](https://github.com/lupyuen/lorawan_test/blob/main/lorawan_test_main.c) with Zig Compiler.
 
-NuttX compiles the LoRaWAN App like this...
+NuttX compiles the LoRaWAN App [lorawan_test_main.c](https://github.com/lupyuen/lorawan_test/blob/main/lorawan_test_main.c) like this...
 
 ```bash
 ##  App Source Directory
@@ -908,8 +908,6 @@ We include the right header files into [lorawan_test_main.c](https://github.com/
 
 [(See the changes)](https://github.com/lupyuen/lorawan_test/commit/3d4a451d44cf36b19ef8d900281a2f8f9590de62)
 
-[lorawan_test_main.c](https://github.com/lupyuen/lorawan_test/blob/main/lorawan_test_main.c#L20-L23) compiles OK with Zig Compiler.
-
 Compiled with `zig cc`, the LoRaWAN App runs OK on NuttX yay!
 
 ```text
@@ -994,9 +992,11 @@ We'll refer to this auto-translated Zig Code when we manually convert our LoRaWA
 
 # Convert LoRaWAN App to Zig
 
-Finally we convert the LoRaWAN App from C to Zig, to show that we can build Complex IoT Apps in Zig.
+Finally we convert the LoRaWAN App [lorawan_test_main.c](https://github.com/lupyuen/lorawan_test/blob/main/lorawan_test_main.c) from C to Zig, to show that we can build Complex IoT Apps in Zig.
 
-Here's the converted LoRaWAN Zig App: [lorawan_test.zig](lorawan_test.zig)
+Here's the original C code: [lorawan_test_main.c](https://github.com/lupyuen/lorawan_test/blob/main/lorawan_test_main.c)
+
+And our converted LoRaWAN Zig App: [lorawan_test.zig](lorawan_test.zig)
 
 ```zig
 /// Import the LoRaWAN Library from C
@@ -1041,7 +1041,7 @@ pub export fn lorawan_test_main(
     //  and send a Data Packet
 ```
 
-To compile the LoRaWAN Zig App...
+To compile the LoRaWAN Zig App [lorawan_test.zig](lorawan_test.zig)...
 
 ```bash
 ##  Download our LoRaWAN Zig App for NuttX
@@ -1073,7 +1073,7 @@ cd $HOME/nuttx/nuttx
 make
 ```
 
-[lorawan_test.zig](lorawan_test.zig) compiles OK with Zig Compiler.
+Our LoRaWAN Zig App [lorawan_test.zig](lorawan_test.zig) compiles OK with Zig Compiler after making the following fixes...
 
 # Refer to Auto-Translated Zig Code
 
@@ -1092,7 +1092,9 @@ uint32_t TxPeriodicity =
     );
 ```
 
-Which has conflicting signed and unsigned types.
+[(Source)](https://github.com/lupyuen/lorawan_test/blob/main/lorawan_test_main.c#L283-L286)
+
+Which has conflicting signed (`randr`) and unsigned (`APP_TX_DUTYCYCLE`) types.
 
 We get help by referring to the auto-translated Zig Code: [translated/lorawan_test_main.zig](translated/lorawan_test_main.zig)
 
@@ -1111,9 +1113,11 @@ var TxPeriodicity: u32 = @bitCast(u32,
 );
 ```
 
+Which resolves the conflicting types by casting the signed result to become unsigned.
+
 # Opaque Type Error
 
-If we uncomment this line from our LoRaWAN Zig App [lorawan_test.zig](lorawan_test.zig)...
+When we reference `LmHandlerCallbacks` in our LoRaWAN Zig App [lorawan_test.zig](lorawan_test.zig)...
 
 ```zig
     _ = &LmHandlerCallbacks;
@@ -1157,7 +1161,7 @@ export fn OnMacMlmeRequest(
 }
 ```
 
-`OnMacMlmeRequest` has a parameter of type `MlmeReq_t`, defined as...
+Our function `OnMacMlmeRequest` has a parameter of type `MlmeReq_t`, auto-imported by Zig Compiler as...
 
 ```zig
 pub const MlmeReq_t = struct_sMlmeReq;
@@ -1169,7 +1173,7 @@ pub const struct_sMlmeReq = extern struct {
 };
 ```
 
-Which contains an `union_uMlmeParam`...
+Which contains another auto-imported type `union_uMlmeParam`...
 
 ```zig
 pub const union_uMlmeParam = extern union {
@@ -1243,13 +1247,13 @@ We see that `sInfoFields` contains Bit Fields, that the Zig Compiler is unable t
 
 # Fix Opaque Type
 
-Earlier we saw that this fails to compile in [lorawan_test.zig](lorawan_test.zig)...
+Earlier we saw that this fails to compile in our LoRaWAN Zig App [lorawan_test.zig](lorawan_test.zig)...
 
 ```zig
     _ = &LmHandlerCallbacks;
 ```
 
-Because `LmHandlerCallbacks` references `MlmeReq_t`, which contains Bit Fields and can't be translated by the Zig Compiler.
+That's because `LmHandlerCallbacks` references the auto-imported type `MlmeReq_t`, which contains Bit Fields and can't be translated by the Zig Compiler.
 
 Let's convert `MlmeReq_t` to an Opaque Type, since we won't be accessing the fields anyway...
 
@@ -1286,7 +1290,7 @@ pub const LmHandlerCallbacks_t = extern struct {
 
 [(Source)](https://github.com/lupyuen/zig-bl602-nuttx/blob/main/lorawan_test.zig#L675-L693)
 
-We change all `MlmeReq_t` references from...
+We change all auto-imported `MlmeReq_t` references from...
 
 ```zig
 [*c]c.MlmeReq_t
@@ -1298,7 +1302,7 @@ To our Opaque Type...
 *MlmeReq_t
 ```
 
-We also change all `LmHandlerCallbacks_t` references from...
+We also change all auto-imported `LmHandlerCallbacks_t` references from...
 
 ```zig
 [*c]c.LmHandlerCallbacks_t
@@ -1344,11 +1348,11 @@ pub const __INT64_C_SUFFIX__ = @compileError("unable to translate macro: undefin
 // (no file):178:9
 ```
 
-According to the Zig Docs, this means that the Zig Compiler couldn't translate a C Macro...
+According to the Zig Docs, this means that the Zig Compiler failed to translate a C Macro...
 
 -   ["C Macros"](https://ziglang.org/documentation/master/#C-Macros)
 
-So we define LL ourselves...
+So we define `LL` ourselves...
 
 ```zig
 /// Import the LoRaWAN Library from C
@@ -1357,7 +1361,7 @@ const c = @cImport({
     @cDefine("LL", "");
 ```
 
-(LL is the "long long" suffix?)
+(LL is the "long long" suffix for C Constants? Which is probably not needed when we import C Types and Functions into Zig)
 
 Then Zig Compiler emits this error...
 
@@ -1374,7 +1378,7 @@ Which refers to this line in `stdint.h`...
 #define __int_c_join(a, b) a ## b
 ```
 
-(Strange that Zig Compiler doesn't understand the `##` Concatenation Operator)
+(It fails because is `LL` is now blank)
 
 We redefine the `__int_c_join` Macro without the `##` Concatenation Operator...
 
