@@ -672,7 +672,8 @@ var TxTimer: lorawan.TimerEvent_t = undefined;  // Init the timer in Main Functi
 ///////////////////////////////////////////////////////////////////////////////
 //  Types
 
-/// Handler Callbacks. Adapted from https://github.com/lupyuen/zig-bl602-nuttx/blob/main/translated/lorawan_test_main.zig#L2818-L2833
+/// Handler Callbacks. Adapted from 
+/// https://github.com/lupyuen/zig-bl602-nuttx/blob/main/translated/lorawan_test_main.zig#L2818-L2833
 pub const LmHandlerCallbacks_t = extern struct {
     GetBatteryLevel: ?fn () callconv(.C) u8,
     GetTemperature: ?fn () callconv(.C) f32,
