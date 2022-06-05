@@ -1229,4 +1229,23 @@ typedef union uPingSlotInfo
 
 We see that `sInfoFields` contains Bit Fields, that the Zig Compiler is unable to translate.
 
-TODO: Convert `MlmeReq_t` to an opaque type, since we won't be accessing the fields anyway
+# Fix Opaque Type
+
+Earlier we saw that this fails to compile in [lorawan_test.zig](lorawan_test.zig)...
+
+```zig
+    _ = &LmHandlerCallbacks;
+```
+
+Because `LmHandlerCallbacks` references `MlmeReq_t`, which contains Bit Fields and can't be translated by the Zig Compiler.
+
+Let's convert `MlmeReq_t` to an Opaque Type, since we won't be accessing the fields anyway...
+
+```zig
+/// We use an Opaque Type to represent MLME Request, because it contains Bit Fields that can't be converted by Zig
+const MlmeReq_t = opaque {};
+```
+
+We convert `LmHandlerCallbacks` to use our converted `MlmeReq_t`...
+
+```zig
