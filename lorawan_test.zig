@@ -237,21 +237,15 @@ export fn OnMacProcessNotify() void {
     IsMacProcessPending = 1;
 }
 
-export fn OnNvmDataChange(arg_state: lorawan.LmHandlerNvmContextStates_t, arg_size: u16) void {
-    var state = arg_state;
-    var size = arg_size;
+export fn OnNvmDataChange(state: lorawan.LmHandlerNvmContextStates_t, size: u16) void {
     lorawan.DisplayNvmDataChange(state, size);
 }
 
-export fn OnNetworkParametersChange(arg_params: [*c]lorawan.CommissioningParams_t) void {
-    var params = arg_params;
+export fn OnNetworkParametersChange(params: [*c]lorawan.CommissioningParams_t) void {
     lorawan.DisplayNetworkParametersUpdate(params);
 }
 
-export fn OnMacMcpsRequest(arg_status: lorawan.LoRaMacStatus_t, arg_mcpsReq: [*c]lorawan.McpsReq_t, arg_nextTxIn: lorawan.TimerTime_t) void {
-    var status = arg_status;
-    var mcpsReq = arg_mcpsReq;
-    var nextTxIn = arg_nextTxIn;
+export fn OnMacMcpsRequest(status: lorawan.LoRaMacStatus_t, mcpsReq: [*c]lorawan.McpsReq_t, nextTxIn: lorawan.TimerTime_t) void {
     lorawan.DisplayMacMcpsRequestUpdate(status, mcpsReq, nextTxIn);
 }
 
@@ -263,8 +257,7 @@ export fn OnMacMlmeRequest(
     DisplayMacMlmeRequestUpdate(status, mlmeReq, nextTxIn);
 }
 
-export fn OnJoinRequest(arg_params: [*c]lorawan.LmHandlerJoinParams_t) void {
-    var params = arg_params;
+export fn OnJoinRequest(params: [*c]lorawan.LmHandlerJoinParams_t) void {
     _ = puts("OnJoinRequest");
     lorawan.DisplayJoinRequestUpdate(params);
     if (params.*.Status == lorawan.LORAMAC_HANDLER_ERROR) {
@@ -274,92 +267,65 @@ export fn OnJoinRequest(arg_params: [*c]lorawan.LmHandlerJoinParams_t) void {
     }
 }
 
-export fn OnTxData(arg_params: [*c]lorawan.LmHandlerTxParams_t) void {
-    var params = arg_params;
+export fn OnTxData(params: [*c]lorawan.LmHandlerTxParams_t) void {
     _ = puts("OnTxData");
     lorawan.DisplayTxUpdate(params);
 }
 
-export fn OnRxData(arg_appData: [*c]lorawan.LmHandlerAppData_t, arg_params: [*c]lorawan.LmHandlerRxParams_t) void {
-    var appData = arg_appData;
-    var params = arg_params;
+export fn OnRxData(appData: [*c]lorawan.LmHandlerAppData_t, params: [*c]lorawan.LmHandlerRxParams_t) void {
     _ = puts("OnRxData");
     lorawan.DisplayRxUpdate(appData, params);
 }
 
-/// TODO
-export fn OnClassChange(arg_deviceClass: lorawan.DeviceClass_t) void {
-    var deviceClass = arg_deviceClass;
+export fn OnClassChange(deviceClass: lorawan.DeviceClass_t) void {
     _ = puts("OnClassChange");
     lorawan.DisplayClassUpdate(deviceClass);
-    while (true) {
-        switch (deviceClass) {
-            else => {
-                {
-                    IsMcSessionStarted = @as(c_int, 0) != 0;
-                    break;
-                }
-            },
-            @bitCast(c_uint, @as(c_int, 1)) => {
-                {
-                    var appData: lorawan.LmHandlerAppData_t = lorawan.LmHandlerAppData_t{
-                        .Port = @bitCast(u8, @truncate(i8, @as(c_int, 0))),
-                        .BufferSize = @bitCast(u8, @truncate(i8, @as(c_int, 0))),
-                        .Buffer = null,
-                    };
-                    _ = lorawan.LmHandlerSend(&appData, @bitCast(c_uint, lorawan.LORAMAC_HANDLER_UNCONFIRMED_MSG));
-                    IsMcSessionStarted = @as(c_int, 1) != 0;
-                    break;
-                }
-            },
-            @bitCast(c_uint, @as(c_int, 2)) => {
-                {
-                    IsMcSessionStarted = @as(c_int, 1) != 0;
-                    break;
-                }
-            },
+
+    switch (deviceClass) {
+        lorawan.CLASS_A => {
+            IsMcSessionStarted = false;
+        },
+        // Inform the server as soon as possible that the end-device has switched to ClassB
+        lorawan.CLASS_B => {
+            var appData: lorawan.LmHandlerAppData_t = lorawan.LmHandlerAppData_t {
+                .Buffer     = null,
+                .BufferSize = 0,
+                .Port       = 0,
+            };
+            _ = lorawan.LmHandlerSend(
+                &appData,
+                lorawan.LORAMAC_HANDLER_UNCONFIRMED_MSG
+            );
+            IsMcSessionStarted = true;
+        },
+        lorawan.CLASS_C => {
+            IsMcSessionStarted = true;
+        },
+        else => {
+            unreachable;
         }
-        break;
     }
 }
 
-/// TODO
-export fn OnBeaconStatusChange(arg_params: [*c]lorawan.LoRaMacHandlerBeaconParams_t) void {
-    var params = arg_params;
-    while (true) {
-        switch (params.*.State) {
-            @bitCast(c_uint, @as(c_int, 2)) => {
-                {
-                    _ = puts("OnBeaconStatusChange: LORAMAC_HANDLER_BEACON_RX");
-                    break;
-                }
-            },
-            @bitCast(c_uint, @as(c_int, 1)) => {
-                {
-                    _ = puts("OnBeaconStatusChange: LORAMAC_HANDLER_BEACON_LOST");
-                    break;
-                }
-            },
-            @bitCast(c_uint, @as(c_int, 3)) => {
-                {
-                    _ = puts("OnBeaconStatusChange: LORAMAC_HANDLER_BEACON_NRX");
-                    break;
-                }
-            },
-            else => {
-                {
-                    break;
-                }
-            },
+export fn OnBeaconStatusChange(params: [*c]lorawan.LoRaMacHandlerBeaconParams_t) void {
+    switch (params.*.State) {
+        lorawan.LORAMAC_HANDLER_BEACON_RX => {
+            _ = puts("OnBeaconStatusChange: LORAMAC_HANDLER_BEACON_RX");
+        },
+        lorawan.LORAMAC_HANDLER_BEACON_LOST => {
+            _ = puts("OnBeaconStatusChange: LORAMAC_HANDLER_BEACON_LOST");
+        },
+        lorawan.LORAMAC_HANDLER_BEACON_NRX => {
+            _ = puts("OnBeaconStatusChange: LORAMAC_HANDLER_BEACON_NRX");
+        },
+        else => {
+            unreachable;
         }
-        break;
     }
     lorawan.DisplayBeaconUpdate(params);
 }
 
-export fn OnSysTimeUpdate(arg_isSynchronized: bool, arg_timeCorrection: i32) void {
-    var isSynchronized = arg_isSynchronized;
-    var timeCorrection = arg_timeCorrection;
+export fn OnSysTimeUpdate(isSynchronized: bool, timeCorrection: i32) void {
     _ = timeCorrection;
     IsClockSynched = isSynchronized;
 }
