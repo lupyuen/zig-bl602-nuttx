@@ -11,6 +11,10 @@ const c = @cImport({
     @cDefine("NDEBUG",     "");
     @cDefine("ARCH_RISCV", "");
 
+    // TODO: Fix for "Unable to translate macro: undefined identifier `LL`"
+    @cDefine("LL", "");
+    @cDefine("__int_c_join(a, b)", "a");  //  Bypass zig/lib/include/stdint.h
+
     // NuttX Header Files
     @cInclude("arch/types.h");
     @cInclude("../../nuttx/include/limits.h");
