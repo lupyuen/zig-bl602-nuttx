@@ -179,7 +179,7 @@ fn PrepareTxFrame() void {
         @ptrCast(?*anyopaque, @ptrCast([*c]u8, @alignCast(std.meta.alignment(u8), &AppDataBuffer))), 
         @ptrCast(?*const anyopaque, @ptrCast([*c]const u8, @alignCast(std.meta.alignment(u8), &msg))), 
         @sizeOf(@TypeOf(msg)));
-    var appData: c.LmHandlerAppData_t = c.LmHandlerAppData_t {
+    var appData = c.LmHandlerAppData_t {
         .Buffer     = @ptrCast([*c]u8, @alignCast(std.meta.alignment(u8), &AppDataBuffer)),
         .BufferSize = @sizeOf(@TypeOf(msg)),
         .Port       = 1,
@@ -298,9 +298,9 @@ export fn OnClassChange(deviceClass: c.DeviceClass_t) void {
         c.CLASS_A => {
             IsMcSessionStarted = false;
         },
-        // Inform the server as soon as possible that the end-device has switched to ClassB
         c.CLASS_B => {
-            var appData: c.LmHandlerAppData_t = c.LmHandlerAppData_t {
+            // Inform the server as soon as possible that the end-device has switched to ClassB
+            var appData = c.LmHandlerAppData_t {
                 .Buffer     = null,
                 .BufferSize = 0,
                 .Port       = 0,
@@ -338,8 +338,8 @@ export fn OnBeaconStatusChange(params: [*c]c.LoRaMacHandlerBeaconParams_t) void 
     c.DisplayBeaconUpdate(params);
 }
 
-export fn OnSysTimeUpdate(isSynchronized: bool, timeCorrection: i32) void {
-    _ = timeCorrection;
+export fn OnSysTimeUpdate(isSynchronized: bool, _timeCorrection: i32) void {
+    _ = _timeCorrection;
     IsClockSynched = isSynchronized;
 }
 
@@ -367,7 +367,7 @@ export fn BoardGetRandomSeed() u32 {
 export fn OnTxPeriodicityChanged(periodicity: u32) void {
     TxPeriodicity = periodicity;
 
-    if( TxPeriodicity == 0 ) {
+    if (TxPeriodicity == 0) {
         // Revert to application default periodicity
         TxPeriodicity = @bitCast(u32,  // Cast to u32 because randr() can be negative
             APP_TX_DUTYCYCLE +
@@ -400,8 +400,8 @@ export fn FragDecoderWrite(addr: u32, data: [*c]u8, size: u32) i8 {
         return -1; // Fail
     }
     var i: u32 = 0;
-    while (i < size) : (i +%= 1) {
-        UnfragmentedData[addr +% i] = data[i];
+    while (i < size) : (i += 1) {
+        UnfragmentedData[addr + i] = data[i];
     }
     return 0; // Success
 }
@@ -411,8 +411,8 @@ export fn FragDecoderRead(addr: u32, data: [*c]u8, size: u32) i8 {
         return -1; // Fail
     }
     var i: u32 = 0;
-    while (i < size) : (i +%= 1) {
-        data[i] = UnfragmentedData[addr +% i];
+    while (i < size) : (i += 1) {
+        data[i] = UnfragmentedData[addr + i];
     }
     return 0; // Success
 }
@@ -421,15 +421,15 @@ export fn OnFragProgress(fragCounter: u16, fragNb: u16, fragSize: u8, fragNbLost
     _ = printf("\n###### =========== FRAG_DECODER ============ ######\n");
     _ = printf("######               PROGRESS                ######\n");
     _ = printf("###### ===================================== ######\n");
-    _ = printf("RECEIVED    : %5d / %5d Fragments\n", @bitCast(c_int, @as(c_uint, fragCounter)), @bitCast(c_int, @as(c_uint, fragNb)));
-    _ = printf("              %5d / %5d Bytes\n", @bitCast(c_int, @as(c_uint, fragCounter)) * @bitCast(c_int, @as(c_uint, fragSize)), @bitCast(c_int, @as(c_uint, fragNb)) * @bitCast(c_int, @as(c_uint, fragSize)));
-    _ = printf("LOST        :       %7d Fragments\n\n", @bitCast(c_int, @as(c_uint, fragNbLost)));
+    _ = printf("RECEIVED    : %5d / %5d Fragments\n", fragCounter, fragNb);
+    _ = printf("              %5d / %5d Bytes\n", fragCounter * fragSize, fragNb * fragSize);
+    _ = printf("LOST        :       %7d Fragments\n\n", fragNbLost);
 }
 
 export fn OnFragDone(status: i32, size: u32) void {
     FileRxCrc = c.Crc32(
         @ptrCast([*c]u8, @alignCast(std.meta.alignment(u8), &UnfragmentedData)),
-        @bitCast(u16, @truncate(c_ushort, size))
+        @truncate(u16, size)
     );
     IsFileTransferDone = true;
 
