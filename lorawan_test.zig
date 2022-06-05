@@ -447,23 +447,23 @@ export fn OnFragDone(status: i32, size: u32) void {
 fn handle_event_queue() void {
     _ = puts("handle_event_queue");
 
-    //  Loop forever handling Events from the Event Queue
+    // Loop forever handling Events from the Event Queue
     while (true) {
-        //  Get the next Event from the Event Queue
+        // Get the next Event from the Event Queue
         var ev: [*c]c.ble_npl_event = c.ble_npl_eventq_get(
-            &event_queue,                 //  Event Queue
+            &event_queue,           //  Event Queue
             c.BLE_NPL_TIME_FOREVER  //  No Timeout (Wait forever for event)
         );
 
-        //  If no Event due to timeout, wait for next Event.
-        //  Should never happen since we wait forever for an Event.
+        // If no Event due to timeout, wait for next Event.
+        // Should never happen since we wait forever for an Event.
         if (ev == null) { _ = printf("."); continue; }
         _ = printf("handle_event_queue: ev=%p\n", ev);
 
-        //  Remove the Event from the Event Queue
+        // Remove the Event from the Event Queue
         c.ble_npl_eventq_remove(&event_queue, ev);
 
-        //  Trigger the Event Handler Function
+        // Trigger the Event Handler Function
         c.ble_npl_event_run(ev);
 
         // Process the LoRaMac events
@@ -479,58 +479,12 @@ fn handle_event_queue() void {
             // Clear flag and prevent MCU to go into low power mode
             IsMacProcessPending = 0;
         } else {
-            //  The MCU wakes up through events
-            //  TODO: BoardLowPowerHandler();
+            // The MCU wakes up through events
+            // TODO: BoardLowPowerHandler();
         }
         // TODO: CRITICAL_SECTION_END();
     }
 }
-
-/// LoRaWAN Event Loop that dequeues Events from the Event Queue and processes the Events
-// static void handle_event_queue(void *arg) {
-//     puts("handle_event_queue");
-
-//     //  Loop forever handling Events from the Event Queue
-//     for (;;) {
-//         //  Get the next Event from the Event Queue
-//         struct ble_npl_event *ev = ble_npl_eventq_get(
-//             &event_queue,         //  Event Queue
-//             BLE_NPL_TIME_FOREVER  //  No Timeout (Wait forever for event)
-//         );
-
-//         //  If no Event due to timeout, wait for next Event.
-//         //  Should never happen since we wait forever for an Event.
-//         if (ev == NULL) { printf("."); continue; }
-//         printf("handle_event_queue: ev=%p\n", ev);
-
-//         //  Remove the Event from the Event Queue
-//         ble_npl_eventq_remove(&event_queue, ev);
-
-//         //  Trigger the Event Handler Function
-//         ble_npl_event_run(ev);
-
-//         // Processes the LoRaMac events
-//         LmHandlerProcess( );
-
-//         // If we have joined the network, do the uplink
-//         if (!LmHandlerIsBusy( )) {
-//             UplinkProcess( );
-//         }
-
-//         CRITICAL_SECTION_BEGIN( );
-//         if( IsMacProcessPending == 1 )
-//         {
-//             // Clear flag and prevent MCU to go into low power modes.
-//             IsMacProcessPending = 0;
-//         }
-//         else
-//         {
-//             //  The MCU wakes up through events
-//             //  TODO: BoardLowPowerHandler( );
-//         }
-//         CRITICAL_SECTION_END( );
-//     }
-// }
 
 ///////////////////////////////////////////////////////////////////////////////
 //  Entropy Pool
@@ -632,7 +586,7 @@ fn handle_event_queue() void {
 //  Variables
 
 /// Handler Callbacks. Changed `c.LmHandlerCallbacks_t` to `LmHandlerCallbacks_t`
-var LmHandlerCallbacks: LmHandlerCallbacks_t = LmHandlerCallbacks_t {
+var LmHandlerCallbacks = LmHandlerCallbacks_t {
     .GetBatteryLevel           = BoardGetBatteryLevel,
     .GetTemperature            = BoardGetTemperature,
     .GetRandomSeed             = BoardGetRandomSeed,
@@ -650,7 +604,7 @@ var LmHandlerCallbacks: LmHandlerCallbacks_t = LmHandlerCallbacks_t {
 };
 
 //// Handler Parameters
-var LmHandlerParams: c.LmHandlerParams_t = c.LmHandlerParams_t {
+var LmHandlerParams = c.LmHandlerParams_t {
     .Region              = ACTIVE_REGION,
     .AdrEnable           = LORAWAN_ADR_STATE,
     .IsTxConfirmed       = LORAWAN_DEFAULT_CONFIRMED_MSG_STATE,
@@ -663,8 +617,8 @@ var LmHandlerParams: c.LmHandlerParams_t = c.LmHandlerParams_t {
 };
 
 /// Compliance Parameters
-var LmhpComplianceParams: c.LmhpComplianceParams_t = c.LmhpComplianceParams_t {
-    .FwVersion = c.Version_t{
+var LmhpComplianceParams = c.LmhpComplianceParams_t {
+    .FwVersion = c.Version_t {
         .Value = c.FIRMWARE_VERSION,
     },
     .OnTxPeriodicityChanged       = OnTxPeriodicityChanged,
@@ -673,14 +627,14 @@ var LmhpComplianceParams: c.LmhpComplianceParams_t = c.LmhpComplianceParams_t {
 };
 
 //// Fragmentation Parameters (Unused)
-var FragmentationParams: c.LmhpFragmentationParams_t = c.LmhpFragmentationParams_t {
+var FragmentationParams = c.LmhpFragmentationParams_t {
 // TODO: #if( FRAG_DECODER_FILE_HANDLING_NEW_API == 1 )
-    .DecoderCallbacks = c.FragDecoderCallbacks_t{
+    .DecoderCallbacks = c.FragDecoderCallbacks_t {
         .FragDecoderWrite = FragDecoderWrite,
         .FragDecoderRead  = FragDecoderRead,
     },
 // #else
-//     .Buffer = UnfragmentedData,
+//     .Buffer     = UnfragmentedData,
 //     .BufferSize = UNFRAGMENTED_DATA_SIZE,
 // #endif
     .OnProgress = OnFragProgress,
@@ -775,7 +729,7 @@ extern fn LmHandlerInit(
     handlerParams: [*c]c.LmHandlerParams_t
 ) c.LmHandlerErrorStatus_t;
 
-/// TODO
+/// TODO: Assertion Check
 fn assert(ok: bool) void {
     if (ok) { return; }
     _ = puts("*** Assertion Failed");
