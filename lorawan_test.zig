@@ -187,8 +187,7 @@ fn PrepareTxFrame() void {
 
     //  Validate the message size and check if it can be transmitted
     var txInfo: c.LoRaMacTxInfo_t = undefined;
-    var status: c.LoRaMacStatus_t = 
-        c.LoRaMacQueryTxPossible(appData.BufferSize, &txInfo);
+    const status = c.LoRaMacQueryTxPossible(appData.BufferSize, &txInfo);
     _ = printf("PrepareTxFrame: status=%d, maxSize=%d, currentSize=%d\n", 
         status, 
         txInfo.MaxPossibleApplicationDataSize, 
@@ -197,8 +196,7 @@ fn PrepareTxFrame() void {
     assert(status == c.LORAMAC_STATUS_OK);
 
     //  Transmit the message
-    var sendStatus: c.LmHandlerErrorStatus_t = 
-        c.LmHandlerSend(&appData, LmHandlerParams.IsTxConfirmed);
+    const sendStatus = c.LmHandlerSend(&appData, LmHandlerParams.IsTxConfirmed);
     assert(sendStatus == c.LORAMAC_HANDLER_SUCCESS);
     _ = puts("PrepareTxFrame: Transmit OK");
 }
