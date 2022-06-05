@@ -1246,6 +1246,77 @@ Let's convert `MlmeReq_t` to an Opaque Type, since we won't be accessing the fie
 const MlmeReq_t = opaque {};
 ```
 
-We convert `LmHandlerCallbacks` to use our converted `MlmeReq_t`...
+[(Source)](https://github.com/lupyuen/zig-bl602-nuttx/blob/main/lorawan_test.zig#L695-L696)
+
+We convert `LmHandlerCallbacks` to use our Opaque Type `MlmeReq_t`...
 
 ```zig
+/// Handler Callbacks. Adapted from 
+/// https://github.com/lupyuen/zig-bl602-nuttx/blob/main/translated/lorawan_test_main.zig#L2818-L2833
+pub const LmHandlerCallbacks_t = extern struct {
+    GetBatteryLevel: ?fn () callconv(.C) u8,
+    GetTemperature: ?fn () callconv(.C) f32,
+    GetRandomSeed: ?fn () callconv(.C) u32,
+    OnMacProcess: ?fn () callconv(.C) void,
+    OnNvmDataChange: ?fn (lorawan.LmHandlerNvmContextStates_t, u16) callconv(.C) void,
+    OnNetworkParametersChange: ?fn ([*c]lorawan.CommissioningParams_t) callconv(.C) void,
+    OnMacMcpsRequest: ?fn (lorawan.LoRaMacStatus_t, [*c]lorawan.McpsReq_t, lorawan.TimerTime_t) callconv(.C) void,
+    /// Changed `[*c]lorawan.MlmeReq_t` to `*MlmeReq_t`
+    OnMacMlmeRequest: ?fn (lorawan.LoRaMacStatus_t, *MlmeReq_t, lorawan.TimerTime_t) callconv(.C) void,
+    OnJoinRequest: ?fn ([*c]lorawan.LmHandlerJoinParams_t) callconv(.C) void,
+    OnTxData: ?fn ([*c]lorawan.LmHandlerTxParams_t) callconv(.C) void,
+    OnRxData: ?fn ([*c]lorawan.LmHandlerAppData_t, [*c]lorawan.LmHandlerRxParams_t) callconv(.C) void,
+    OnClassChange: ?fn (lorawan.DeviceClass_t) callconv(.C) void,
+    OnBeaconStatusChange: ?fn ([*c]lorawan.LoRaMacHandlerBeaconParams_t) callconv(.C) void,
+    OnSysTimeUpdate: ?fn (bool, i32) callconv(.C) void,
+};
+```
+
+[(Source)](https://github.com/lupyuen/zig-bl602-nuttx/blob/main/lorawan_test.zig#L675-L693)
+
+We change all `MlmeReq_t` references from...
+
+```zig
+[*c]lorawan.MlmeReq_t
+```
+
+To our Opaque Type...
+
+```zig
+*MlmeReq_t
+```
+
+We also change all `LmHandlerCallbacks_t` references from...
+
+```zig
+[*c]lorawan.LmHandlerCallbacks_t
+```
+
+To our converted `LmHandlerCallbacks_t`...
+
+```zig
+*LmHandlerCallbacks_t
+```
+
+Which means we need to import the affected LoRaWAN Functions ourselves...
+
+```zig
+/// Changed `[*c]lorawan.MlmeReq_t` to `*MlmeReq_t`. Adapted from
+/// https://github.com/lupyuen/zig-bl602-nuttx/blob/main/translated/lorawan_test_main.zig#L2905
+extern fn DisplayMacMlmeRequestUpdate(
+    status: lorawan.LoRaMacStatus_t, 
+    mlmeReq: *MlmeReq_t, 
+    nextTxIn: lorawan.TimerTime_t
+) void;
+
+/// Changed `[*c]lorawan.LmHandlerCallbacks_t` to `*LmHandlerCallbacks_t`. Adapted from
+/// https://github.com/lupyuen/zig-bl602-nuttx/blob/main/translated/lorawan_test_main.zig#L2835
+extern fn LmHandlerInit(
+    callbacks: *LmHandlerCallbacks_t, 
+    handlerParams: [*c]lorawan.LmHandlerParams_t
+) lorawan.LmHandlerErrorStatus_t;
+```
+
+[(Source)](https://github.com/lupyuen/zig-bl602-nuttx/blob/main/lorawan_test.zig#L707-L720)
+
+After fixing the Opaque Type, Zig Compiler successfully compiles our LoRaWAN Test App [lorawan_test.zig](lorawan_test.zig) yay!

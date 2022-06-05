@@ -702,7 +702,7 @@ const LmHandlerTxEvents_t = enum {
 };
 
 ///////////////////////////////////////////////////////////////////////////////
-//  Imported Function
+//  Imported Functions
 
 /// Changed `[*c]lorawan.MlmeReq_t` to `*MlmeReq_t`. Adapted from
 /// https://github.com/lupyuen/zig-bl602-nuttx/blob/main/translated/lorawan_test_main.zig#L2905
