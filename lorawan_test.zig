@@ -78,7 +78,8 @@ const UNFRAGMENTED_DATA_SIZE = 21 * 50;
 ///////////////////////////////////////////////////////////////////////////////
 //  Main Function
 
-/// Main Function that will be called by NuttX
+/// Main Function that will be called by NuttX. We call the LoRaWAN Library 
+//  to Join LoRaWAN Network and send a Data Packet.
 pub export fn lorawan_test_main(
     _argc: c_int, 
     _argv: [*]const [*]const u8
@@ -87,12 +88,9 @@ pub export fn lorawan_test_main(
     _ = _argv;
     TxTimer = std.mem.zeroes(lorawan.TimerEvent_t);  // TODO: Added this
 
-    // TODO: Call the LoRaWAN Library to Join LoRaWAN Network
-    // and send a Data Packet
-
     // If we are using Entropy Pool and the BL602 ADC is available,
     // add the Internal Temperature Sensor data to the Entropy Pool
-    // init_entropy_pool();
+    // TODO: init_entropy_pool();
 
     // Compute the interval between transmissions based on Duty Cycle
     TxPeriodicity = @bitCast(u32,  // Cast to u32 because randr() can be negative
