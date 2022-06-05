@@ -223,7 +223,7 @@ fn UplinkProcess() void {
     isPending = IsTxFramePending;
     IsTxFramePending = 0;
     // TODO: CRITICAL_SECTION_END( );
-    if (@bitCast(c_int, @as(c_uint, isPending)) == @as(c_int, 1)) {
+    if (isPending == 1) {
         PrepareTxFrame();
     }
 }
@@ -254,7 +254,11 @@ export fn OnNetworkParametersChange(params: [*c]c.CommissioningParams_t) void {
     c.DisplayNetworkParametersUpdate(params);
 }
 
-export fn OnMacMcpsRequest(status: c.LoRaMacStatus_t, mcpsReq: [*c]c.McpsReq_t, nextTxIn: c.TimerTime_t) void {
+export fn OnMacMcpsRequest(
+    status: c.LoRaMacStatus_t, 
+    mcpsReq: [*c]c.McpsReq_t, 
+    nextTxIn: c.TimerTime_t
+) void {
     c.DisplayMacMcpsRequestUpdate(status, mcpsReq, nextTxIn);
 }
 
@@ -272,7 +276,7 @@ export fn OnJoinRequest(params: [*c]c.LmHandlerJoinParams_t) void {
     if (params.*.Status == c.LORAMAC_HANDLER_ERROR) {
         c.LmHandlerJoin();
     } else {
-        _ = c.LmHandlerRequestClass(@bitCast(c_uint, c.CLASS_A));
+        _ = c.LmHandlerRequestClass(LORAWAN_DEFAULT_CLASS);
     }
 }
 
