@@ -996,7 +996,7 @@ We'll refer to this auto-translated Zig Code when we manually convert our LoRaWA
 
 Finally we convert the LoRaWAN App from C to Zig, to show that we can build Complex IoT Apps in Zig.
 
-Here's the converted Zig App: [lorawan_test.zig](lorawan_test.zig)
+Here's the converted LoRaWAN Zig App: [lorawan_test.zig](lorawan_test.zig)
 
 ```zig
 /// Import the LoRaWAN Library from C
@@ -1075,11 +1075,9 @@ make
 
 [lorawan_test.zig](lorawan_test.zig) compiles OK with Zig Compiler.
 
-TODO: Test the LoRaWAN Zig App: [lorawan_test.zig](lorawan_test.zig)
-
 # Refer to Auto-Translated Zig Code
 
-Some parts can get tricky to convert from C to Zig, like this C code...
+Some parts of the LoRaWAN Zig App [lorawan_test.zig](lorawan_test.zig) can get tricky to convert from C to Zig, like this C code...
 
 ```c
 //  Original C code...
@@ -1115,7 +1113,7 @@ var TxPeriodicity: u32 = @bitCast(u32,
 
 # Opaque Type Error
 
-If we uncomment this line from [lorawan_test.zig](lorawan_test.zig)...
+If we uncomment this line from our LoRaWAN Zig App [lorawan_test.zig](lorawan_test.zig)...
 
 ```zig
     _ = &LmHandlerCallbacks;
@@ -1376,7 +1374,7 @@ Which refers to this line in `stdint.h`...
 #define __int_c_join(a, b) a ## b
 ```
 
-Strange that Zig Compiler doesn't understand the `##` Concatenation Operator.
+(Strange that Zig Compiler doesn't understand the `##` Concatenation Operator)
 
 We redefine the `__int_c_join` Macro without the `##` Concatenation Operator...
 
@@ -1389,3 +1387,35 @@ const c = @cImport({
 ```
 
 Now Zig Compiler successfully compiles our LoRaWAN Test App [lorawan_test.zig](lorawan_test.zig)
+
+# LoRaWAN Zig App Runs OK!
+
+We test the LoRaWAN Zig App on NuttX: [lorawan_test.zig](lorawan_test.zig)
+
+```text
+nsh> lorawan_test
+Application name   : Zig LoRaWAN Test
+...
+###### =========== MLME-Confirm ============ ######
+STATUS      : OK
+###### ===========   JOINED     ============ ######
+OTAA
+DevAddr     :  00D803AB
+DATA RATE   : DR_2
+...
+###### =========== MCPS-Confirm ============ ######
+STATUS      : OK
+###### =====   UPLINK FRAME        1   ===== ######
+CLASS       : A
+TX PORT     : 1
+TX DATA     : UNCONFIRMED
+48 69 20 4E 75 74 74 58 00
+DATA RATE   : DR_3
+U/L FREQ    : 923200000
+TX POWER    : 0
+CHANNEL MASK: 0003
+```
+
+[(See the complete log)](https://gist.github.com/lupyuen/0871ac515b18d9d68d3aacf831fd0f5b)
+
+LoRaWAN Zig App [lorawan_test.zig](lorawan_test.zig) runs OK on NuttX yay!
