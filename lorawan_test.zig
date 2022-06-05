@@ -168,25 +168,32 @@ fn PrepareTxFrame() void {
 
     //  Send a message to LoRaWAN
     const msg: [8:0]u8 = "Hi NuttX".*;
-    _ = printf("PrepareTxFrame: Transmit to LoRaWAN: %s (%d bytes)\n", @ptrCast([*c]const u8, @alignCast(@import("std").meta.alignment(u8), &msg)), @sizeOf([9]u8));
+    _ = printf("PrepareTxFrame: Transmit to LoRaWAN: %s (%d bytes)\n", 
+        @ptrCast([*c]const u8, @alignCast(std.meta.alignment(u8), &msg)), 
+        @as(c_int, @sizeOf(@TypeOf(msg))),
+    );
 
-    //  Compose the transmit request
-    assert(@sizeOf(msg) <= @sizeOf(AppDataBuffer));
+    //  TODO: Compose the transmit request
+    assert(@sizeOf(@TypeOf(msg)) <= @sizeOf(@TypeOf(AppDataBuffer)));
     _ = c.memcpy(
         @ptrCast(?*anyopaque, @ptrCast([*c]u8, @alignCast(std.meta.alignment(u8), &AppDataBuffer))), 
         @ptrCast(?*const anyopaque, @ptrCast([*c]const u8, @alignCast(std.meta.alignment(u8), &msg))), 
-        @sizeOf([9]u8));    
+        @sizeOf(@TypeOf(msg)));
     var appData: c.LmHandlerAppData_t = c.LmHandlerAppData_t{
-        .Port = @bitCast(u8, @truncate(i8, @as(c_int, 1))),
-        .BufferSize = @bitCast(u8, @truncate(u8, @sizeOf([9]u8))),
-        .Buffer = @ptrCast([*c]u8, @alignCast(std.meta.alignment(u8), &AppDataBuffer)),
+        .Port       = 1,
+        .BufferSize = @sizeOf(@TypeOf(msg)),
+        .Buffer     = @ptrCast([*c]u8, @alignCast(std.meta.alignment(u8), &AppDataBuffer)),
     };
 
     //  Validate the message size and check if it can be transmitted
     var txInfo: c.LoRaMacTxInfo_t = undefined;
     var status: c.LoRaMacStatus_t = 
         c.LoRaMacQueryTxPossible(appData.BufferSize, &txInfo);
-    _ = printf("PrepareTxFrame: status=%d, maxSize=%d, currentSize=%d\n", status, @bitCast(c_int, @as(c_uint, txInfo.MaxPossibleApplicationDataSize)), @bitCast(c_int, @as(c_uint, txInfo.CurrentPossiblePayloadSize)));
+    _ = printf("PrepareTxFrame: status=%d, maxSize=%d, currentSize=%d\n", 
+        status, 
+        txInfo.MaxPossibleApplicationDataSize, 
+        txInfo.CurrentPossiblePayloadSize
+    );
     assert(status == c.LORAMAC_STATUS_OK);
 
     //  Transmit the message
@@ -441,7 +448,7 @@ fn handle_event_queue() void {
     //  Loop forever handling Events from the Event Queue
     while (true) {
         //  Get the next Event from the Event Queue
-        var ev: u8 = c.ble_npl_eventq_get(
+        var ev: [*c]c.ble_npl_event = c.ble_npl_eventq_get(
             &event_queue,                 //  Event Queue
             c.BLE_NPL_TIME_FOREVER  //  No Timeout (Wait forever for event)
         );
@@ -769,7 +776,7 @@ extern fn LmHandlerInit(
 /// TODO
 fn assert(ok: bool) void {
     if (ok) { return; }
-    puts("*** Assertion Failed");
+    _ = puts("*** Assertion Failed");
     unreachable;
 }
 
