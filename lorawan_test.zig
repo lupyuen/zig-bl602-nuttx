@@ -383,29 +383,25 @@ export fn OnPingSlotPeriodicityChanged(pingSlotPeriodicity: u8) void {
 //  Fragment Handlers
 
 export fn FragDecoderWrite(addr: u32, data: [*c]u8, size: u32) i8 {
-    if (size >= @bitCast(c_uint, @as(c_int, 21) * @as(c_int, 50))) {
-        return @bitCast(i8, @truncate(i8, -@as(c_int, 1)));
+    if (size >= UNFRAGMENTED_DATA_SIZE) {
+        return -1; // Fail
     }
-    {
-        var i: u32 = 0;
-        while (i < size) : (i +%= 1) {
-            UnfragmentedData[addr +% i] = data[i];
-        }
+    var i: u32 = 0;
+    while (i < size) : (i +%= 1) {
+        UnfragmentedData[addr +% i] = data[i];
     }
-    return 0;
+    return 0; // Success
 }
 
 export fn FragDecoderRead(addr: u32, data: [*c]u8, size: u32) i8 {
-    if (size >= @bitCast(c_uint, @as(c_int, 21) * @as(c_int, 50))) {
-        return @bitCast(i8, @truncate(i8, -@as(c_int, 1)));
+    if (size >= UNFRAGMENTED_DATA_SIZE) {
+        return -1; // Fail
     }
-    {
-        var i: u32 = 0;
-        while (i < size) : (i +%= 1) {
-            data[i] = UnfragmentedData[addr +% i];
-        }
+    var i: u32 = 0;
+    while (i < size) : (i +%= 1) {
+        data[i] = UnfragmentedData[addr +% i];
     }
-    return 0;
+    return 0; // Success
 }
 
 export fn OnFragProgress(fragCounter: u16, fragNb: u16, fragSize: u8, fragNbLost: u16) void {
@@ -418,8 +414,12 @@ export fn OnFragProgress(fragCounter: u16, fragNb: u16, fragSize: u8, fragNbLost
 }
 
 export fn OnFragDone(status: i32, size: u32) void {
-    FileRxCrc = lorawan.Crc32(@ptrCast([*c]u8, @alignCast(std.meta.alignment(u8), &UnfragmentedData)), @bitCast(u16, @truncate(c_ushort, size)));
-    IsFileTransferDone = @as(c_int, 1) != 0;
+    FileRxCrc = lorawan.Crc32(
+        @ptrCast([*c]u8, @alignCast(std.meta.alignment(u8), &UnfragmentedData)),
+        @bitCast(u16, @truncate(c_ushort, size))
+    );
+    IsFileTransferDone = true;
+
     _ = printf("\n###### =========== FRAG_DECODER ============ ######\n");
     _ = printf("######               FINISHED                ######\n");
     _ = printf("###### ===================================== ######\n");
