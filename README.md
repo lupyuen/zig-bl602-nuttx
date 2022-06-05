@@ -1331,3 +1331,57 @@ extern fn LmHandlerInit(
 
 After fixing the Opaque Type, Zig Compiler successfully compiles our LoRaWAN Test App [lorawan_test.zig](lorawan_test.zig) yay!
 
+# Macro Error
+
+While compiling our LoRaWAN Test App [lorawan_test.zig](lorawan_test.zig), we see this Macro Error...
+
+```text
+zig-cache/o/23409ceec9a6e6769c416fde1695882f/cimport.zig:2904:32: 
+error: unable to translate macro: undefined identifier `LL`
+pub const __INT64_C_SUFFIX__ = @compileError("unable to translate macro: undefined identifier `LL`"); 
+// (no file):178:9
+```
+
+According to the Zig Docs, this means that the Zig Compiler couldn't translate a C Macro...
+
+-   ["C Macros"](https://ziglang.org/documentation/master/#C-Macros)
+
+So we define LL ourselves...
+
+```zig
+/// Import the LoRaWAN Library from C
+const c = @cImport({
+    // TODO: Workaround for "Unable to translate macro: undefined identifier `LL`"
+    @cDefine("LL", "");
+```
+
+(LL is the "long long" suffix?)
+
+Then Zig Compiler emits this error...
+
+```text
+zig-cache/o/83fc6cf7a78f5781f258f156f891554b/cimport.zig:2940:26: 
+error: unable to translate C expr: unexpected token '##'
+pub const __int_c_join = @compileError("unable to translate C expr: unexpected token '##'"); 
+// /home/user/zig-linux-x86_64-0.10.0-dev.2351+b64a1d5ab/lib/include/stdint.h:282:9
+```
+
+Which refers to this line in `stdint.h`...
+
+```c
+#define __int_c_join(a, b) a ## b
+```
+
+Strange that Zig Compiler doesn't understand the `##` Concatenation Operator.
+
+We redefine the `__int_c_join` Macro without the `##` Concatenation Operator...
+
+```zig
+/// Import the LoRaWAN Library from C
+const c = @cImport({
+    // TODO: Workaround for "Unable to translate macro: undefined identifier `LL`"
+    @cDefine("LL", "");
+    @cDefine("__int_c_join(a, b)", "a");  //  Bypass zig/lib/include/stdint.h
+```
+
+Now Zig Compiler successfully compiles our LoRaWAN Test App [lorawan_test.zig](lorawan_test.zig)
