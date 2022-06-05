@@ -162,8 +162,7 @@ fn PrepareTxFrame() void {
     _ = printf("PrepareTxFrame: Transmit to LoRaWAN: %s (%d bytes)\n", @ptrCast([*c]const u8, @alignCast(@import("std").meta.alignment(u8), &msg)), @sizeOf([9]u8));
 
     //  Compose the transmit request
-    //  TODO: assert(sizeof(msg) <= sizeof(AppDataBuffer));
-    _ = true or (@sizeOf([9]u8) <= @sizeOf([242]u8));
+    assert(@sizeOf(msg) <= @sizeOf(AppDataBuffer));
     _ = lorawan.memcpy(
         @ptrCast(?*anyopaque, @ptrCast([*c]u8, @alignCast(std.meta.alignment(u8), &AppDataBuffer))), 
         @ptrCast(?*const anyopaque, @ptrCast([*c]const u8, @alignCast(std.meta.alignment(u8), &msg))), 
@@ -179,14 +178,12 @@ fn PrepareTxFrame() void {
     var status: lorawan.LoRaMacStatus_t = 
         lorawan.LoRaMacQueryTxPossible(appData.BufferSize, &txInfo);
     _ = printf("PrepareTxFrame: status=%d, maxSize=%d, currentSize=%d\n", status, @bitCast(c_int, @as(c_uint, txInfo.MaxPossibleApplicationDataSize)), @bitCast(c_int, @as(c_uint, txInfo.CurrentPossiblePayloadSize)));
-    //  TODO: assert(status == LORAMAC_STATUS_OK);
-    _ = true or (status == @bitCast(c_uint, lorawan.LORAMAC_STATUS_OK));
+    assert(status == lorawan.LORAMAC_STATUS_OK);
 
     //  Transmit the message
     var sendStatus: lorawan.LmHandlerErrorStatus_t = 
         lorawan.LmHandlerSend(&appData, LmHandlerParams.IsTxConfirmed);
-    //  TODO: assert(sendStatus == LORAMAC_HANDLER_SUCCESS);
-    _ = true or (sendStatus == lorawan.LORAMAC_HANDLER_SUCCESS);
+    assert(sendStatus == lorawan.LORAMAC_HANDLER_SUCCESS);
     _ = puts("PrepareTxFrame: Transmit OK");
 }
 
@@ -716,6 +713,13 @@ extern fn LmHandlerInit(
     callbacks: *LmHandlerCallbacks_t, 
     handlerParams: [*c]lorawan.LmHandlerParams_t
 ) lorawan.LmHandlerErrorStatus_t;
+
+/// TODO
+fn assert(ok: bool) void {
+    if (ok) { return; }
+    puts("*** Assertion Failed");
+    unreachable;
+}
 
 /// Aliases for C Standard Library
 const printf = lorawan.printf;
