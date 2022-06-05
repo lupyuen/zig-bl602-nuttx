@@ -6,6 +6,11 @@ const std = @import("std");
 
 /// Import the LoRaWAN Library from C
 const lorawan = @cImport({
+    // NuttX Defines
+    @cDefine("__NuttX__",  "");
+    @cDefine("NDEBUG",     "");
+    @cDefine("ARCH_RISCV", "");
+
     // NuttX Header Files
     @cInclude("arch/types.h");
     @cInclude("../../nuttx/include/limits.h");
@@ -141,7 +146,7 @@ pub export fn lorawan_test_main(
     StartTxProcess(LmHandlerTxEvents_t.LORAMAC_HANDLER_TX_ON_TIMER);
 
     // Handle LoRaWAN Events
-    // TODO: handle_event_queue(null);  //  Never returns
+    handle_event_queue();  //  Never returns
 
     return 0;
 }
@@ -218,7 +223,7 @@ fn UplinkProcess() void {
 //  Event Handlers
 
 /// Function executed on TxTimer event
-export fn OnTxTimerEvent(event: ?*anyopaque) void {
+export fn OnTxTimerEvent(event: u8) void {
     _ = printf("OnTxTimerEvent: timeout in %ld ms, event=%p\n", TxPeriodicity, event);
     lorawan.TimerStop(&TxTimer);
     IsTxFramePending = 1;
@@ -424,6 +429,49 @@ export fn OnFragDone(status: i32, size: u32) void {
 
 ///////////////////////////////////////////////////////////////////////////////
 //  Event Queue
+
+/// LoRaWAN Event Loop that dequeues Events from the Event Queue and processes the Events
+fn handle_event_queue() void {
+    _ = puts("handle_event_queue");
+
+    //  Loop forever handling Events from the Event Queue
+    while (true) {
+        //  Get the next Event from the Event Queue
+        var ev: u8 = lorawan.ble_npl_eventq_get(
+            &event_queue,                 //  Event Queue
+            lorawan.BLE_NPL_TIME_FOREVER  //  No Timeout (Wait forever for event)
+        );
+
+        //  If no Event due to timeout, wait for next Event.
+        //  Should never happen since we wait forever for an Event.
+        if (ev == null) { _ = printf("."); continue; }
+        _ = printf("handle_event_queue: ev=%p\n", ev);
+
+        //  Remove the Event from the Event Queue
+        lorawan.ble_npl_eventq_remove(&event_queue, ev);
+
+        //  Trigger the Event Handler Function
+        lorawan.ble_npl_event_run(ev);
+
+        // Process the LoRaMac events
+        lorawan.LmHandlerProcess();
+
+        // If we have joined the network, do the uplink
+        if (!lorawan.LmHandlerIsBusy()) {
+            UplinkProcess();
+        }
+
+        // TODO: CRITICAL_SECTION_BEGIN();
+        if (IsMacProcessPending == 1) {
+            // Clear flag and prevent MCU to go into low power mode
+            IsMacProcessPending = 0;
+        } else {
+            //  The MCU wakes up through events
+            //  TODO: BoardLowPowerHandler();
+        }
+        // TODO: CRITICAL_SECTION_END();
+    }
+}
 
 /// LoRaWAN Event Loop that dequeues Events from the Event Queue and processes the Events
 // static void handle_event_queue(void *arg) {
@@ -697,7 +745,7 @@ const LmHandlerTxEvents_t = enum {
 };
 
 ///////////////////////////////////////////////////////////////////////////////
-//  Imported Functions
+//  Imported Functions and Variables
 
 /// Changed `[*c]lorawan.MlmeReq_t` to `*MlmeReq_t`. Adapted from
 /// https://github.com/lupyuen/zig-bl602-nuttx/blob/main/translated/lorawan_test_main.zig#L2905
@@ -720,6 +768,9 @@ fn assert(ok: bool) void {
     puts("*** Assertion Failed");
     unreachable;
 }
+
+/// LoRaWAN Event Queue
+extern var event_queue: lorawan.struct_ble_npl_eventq;
 
 /// Aliases for C Standard Library
 const printf = lorawan.printf;
