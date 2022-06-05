@@ -1,4 +1,4 @@
-//! LoRaWAN Zig App for NuttX. Ported from...
+//! LoRaWAN Zig App for NuttX. Ported from:
 //! https://github.com/lupyuen/lorawan_test/blob/main/lorawan_test_main.c
 
 /// Import the Zig Standard Library
