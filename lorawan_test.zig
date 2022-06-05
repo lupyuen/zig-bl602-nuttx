@@ -126,9 +126,9 @@ pub export fn lorawan_test_main(
         // Fatal error, endless loop.
         while (true) {}
     }
-    _ = &LmHandlerParams;////
-    _ = &LmhpComplianceParams;////
-    _ = &LmHandlerCallbacks;////
+    _ = &LmHandlerParams;       // For debugging
+    _ = &LmhpComplianceParams;  // For debugging
+    _ = &LmHandlerCallbacks;    // For debugging
 
     // Set system maximum tolerated rx error in milliseconds
     _ = c.LmHandlerSetSystemMaxRxError(20);
@@ -179,10 +179,10 @@ fn PrepareTxFrame() void {
         @ptrCast(?*anyopaque, @ptrCast([*c]u8, @alignCast(std.meta.alignment(u8), &AppDataBuffer))), 
         @ptrCast(?*const anyopaque, @ptrCast([*c]const u8, @alignCast(std.meta.alignment(u8), &msg))), 
         @sizeOf(@TypeOf(msg)));
-    var appData: c.LmHandlerAppData_t = c.LmHandlerAppData_t{
-        .Port       = 1,
-        .BufferSize = @sizeOf(@TypeOf(msg)),
+    var appData: c.LmHandlerAppData_t = c.LmHandlerAppData_t {
         .Buffer     = @ptrCast([*c]u8, @alignCast(std.meta.alignment(u8), &AppDataBuffer)),
+        .BufferSize = @sizeOf(@TypeOf(msg)),
+        .Port       = 1,
     };
 
     //  Validate the message size and check if it can be transmitted
