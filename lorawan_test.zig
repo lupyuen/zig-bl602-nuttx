@@ -58,7 +58,7 @@ const APP_TX_DUTYCYCLE_RND: c_int = 5000;
 
 /// LoRaWAN Adaptive Data Rate
 /// \remark Please note that when ADR is enabled the end-device should be static
-const LORAWAN_ADR_STATE = false;  // TODO: c.LORAMAC_HANDLER_ADR_OFF;
+const LORAWAN_ADR_STATE = false;  // Previously: c.LORAMAC_HANDLER_ADR_OFF;
 
 /// Default datarate
 /// \remark Please note that LORAWAN_DEFAULT_DATARATE is used only when ADR is disabled 
@@ -612,7 +612,7 @@ var LmHandlerParams = c.LmHandlerParams_t {
     .AdrEnable           = LORAWAN_ADR_STATE,
     .IsTxConfirmed       = LORAWAN_DEFAULT_CONFIRMED_MSG_STATE,
     .TxDatarate          = LORAWAN_DEFAULT_DATARATE,
-    .PublicNetworkEnable = true, // TODO: c.LORAWAN_PUBLIC_NETWORK,
+    .PublicNetworkEnable = true, // Previously: c.LORAWAN_PUBLIC_NETWORK,
     .DutyCycleEnabled    = LORAWAN_DUTYCYCLE_ON,
     .DataBufferMaxSize   = LORAWAN_APP_DATA_BUFFER_MAX_SIZE,
     .DataBuffer          = @ptrCast([*c]u8, @alignCast(std.meta.alignment(u8), &AppDataBuffer)), // TODO: Clean up
