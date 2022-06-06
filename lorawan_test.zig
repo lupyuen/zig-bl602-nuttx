@@ -675,9 +675,9 @@ var UnfragmentedData: [UNFRAGMENTED_DATA_SIZE]u8 =
 /// Timer to handle the application data transmission duty cycle
 var TxTimer: c.TimerEvent_t = undefined;  // Init the timer in Main Function
 
-// TODO: If we init TxTimer...
+// If we init TxTimer...
 // var TxTimer: c.TimerEvent_t = 
-//     std.mem.zeroes(c.TimerEvent_t);
+//   std.mem.zeroes(c.TimerEvent_t);
 // Zig Compiler crashes with...
 //   TODO buf_write_value_bytes maybe typethread 11512 panic:
 //   Unable to dump stack trace: debug info stripped
