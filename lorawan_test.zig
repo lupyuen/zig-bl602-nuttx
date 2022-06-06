@@ -33,7 +33,8 @@ const c = @cImport({
     @cInclude("../libs/liblorawan/src/apps/LoRaMac/common/LmHandler/packages/LmhpFragmentation.h");
     @cInclude("../libs/liblorawan/src/apps/LoRaMac/common/LmHandlerMsgDisplay.h");
 
-    // TODO: #ifdef CONFIG_LIBBL602_ADC
+    // TODO: BL602 Internal Temperature Sensor for seeding Entropy Pool
+    // #ifdef CONFIG_LIBBL602_ADC
     // @cInclude("../libs/libbl602_adc/bl602_adc.h");
     // @cInclude("../libs/libbl602_adc/bl602_glb.h");
     // #endif  //  CONFIG_LIBBL602_ADC
@@ -42,8 +43,9 @@ const c = @cImport({
 ///////////////////////////////////////////////////////////////////////////////
 //  Constants
 
-// TODO: #ifndef ACTIVE_REGION
-// #warning "No active region defined, LORAMAC_REGION_AS923 will be used as default."
+/// LoRaWAN Region
+/// TODO: #ifndef ACTIVE_REGION
+/// #warning "No active region defined, LORAMAC_REGION_AS923 will be used as default."
 const ACTIVE_REGION = c.LORAMAC_REGION_AS923;
 // #endif
 
