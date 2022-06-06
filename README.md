@@ -1016,7 +1016,7 @@ const c = @cImport({
     @cDefine("NDEBUG",     "");
     @cDefine("ARCH_RISCV", "");
 
-    // TODO: Workaround for "Unable to translate macro: undefined identifier `LL`"
+    // Workaround for "Unable to translate macro: undefined identifier `LL`"
     @cDefine("LL", "");
     @cDefine("__int_c_join(a, b)", "a");  //  Bypass zig/lib/include/stdint.h
 
@@ -1367,11 +1367,11 @@ So we define `LL` ourselves...
 ```zig
 /// Import the LoRaWAN Library from C
 const c = @cImport({
-    // TODO: Workaround for "Unable to translate macro: undefined identifier `LL`"
+    // Workaround for "Unable to translate macro: undefined identifier `LL`"
     @cDefine("LL", "");
 ```
 
-(LL is the "long long" suffix for C Constants? Which is probably not needed when we import C Types and Functions into Zig)
+(`LL` is the "long long" suffix for C Constants, which is probably not needed when we import C Types and Functions into Zig)
 
 Then Zig Compiler emits this error...
 
@@ -1388,14 +1388,14 @@ Which refers to this line in `stdint.h`...
 #define __int_c_join(a, b) a ## b
 ```
 
-(It fails because is `LL` is now blank)
+The `__int_c_join` Macro fails because the `LL` suffix is now blank and the `##` Concatenation Operator fails.
 
 We redefine the `__int_c_join` Macro without the `##` Concatenation Operator...
 
 ```zig
 /// Import the LoRaWAN Library from C
 const c = @cImport({
-    // TODO: Workaround for "Unable to translate macro: undefined identifier `LL`"
+    // Workaround for "Unable to translate macro: undefined identifier `LL`"
     @cDefine("LL", "");
     @cDefine("__int_c_join(a, b)", "a");  //  Bypass zig/lib/include/stdint.h
 ```
