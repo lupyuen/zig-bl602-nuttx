@@ -1526,6 +1526,10 @@ pub const fd_t = system.fd_t;
                                                                                      ^
 ```
 
+TODO: Or implement `std.log.info`
+
+https://gist.github.com/leecannon/d6f5d7e5af5881c466161270347ce84d
+
 TODO: Implement `std.debug.assert` and `unreachable`
 
 ```text
