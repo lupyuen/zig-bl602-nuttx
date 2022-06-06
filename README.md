@@ -1400,23 +1400,26 @@ Now Zig Compiler successfully compiles our LoRaWAN Test App [lorawan_test.zig](l
 
 # Struct Initialisation Error
 
-Zig Compiler fails when it tries to initialise this struct at startup...
+Zig Compiler crashes when it tries to initialise the Timer Struct at startup...
 
-```
+```zig
 /// Timer to handle the application data transmission duty cycle
 var TxTimer: c.TimerEvent_t = 
     std.mem.zeroes(c.TimerEvent_t);
 
 // Zig Compiler crashes with...
-//   TODO buf_write_value_bytes maybe typethread 11512 panic:
-//   Unable to dump stack trace: debug info stripped
+// TODO buf_write_value_bytes maybe typethread 11512 panic:
+// Unable to dump stack trace: debug info stripped
 ```
 
-So we do this instead...
+[(Source)](https://github.com/lupyuen/zig-bl602-nuttx/blob/main/lorawan_test.zig#L679-L684)
 
-```
-/// Timer to handle the application data transmission duty cycle
-var TxTimer: c.TimerEvent_t = undefined;  // Init the timer in Main Function
+So we initialise the Timer Struct in the Main Function instead...
+
+```zig
+/// Timer to handle the application data transmission duty cycle.
+/// Init the timer in Main Function.
+var TxTimer: c.TimerEvent_t = undefined;
 
 /// Main Function
 pub export fn lorawan_test_main(
@@ -1427,9 +1430,11 @@ pub export fn lorawan_test_main(
     TxTimer = std.mem.zeroes(c.TimerEvent_t);
 ```
 
+[(Source)](https://github.com/lupyuen/zig-bl602-nuttx/blob/main/lorawan_test.zig#L90-L101)
+
 # LoRaWAN Zig App Runs OK!
 
-We test the LoRaWAN Zig App on NuttX: [lorawan_test.zig](lorawan_test.zig)
+After fixing the above issues, we test the LoRaWAN Zig App on NuttX: [lorawan_test.zig](lorawan_test.zig)
 
 ```text
 nsh> lorawan_test
@@ -1457,4 +1462,4 @@ CHANNEL MASK: 0003
 
 [(See the complete log)](https://gist.github.com/lupyuen/0871ac515b18d9d68d3aacf831fd0f5b)
 
-LoRaWAN Zig App [lorawan_test.zig](lorawan_test.zig) runs OK on NuttX yay!
+LoRaWAN Zig App [lorawan_test.zig](lorawan_test.zig) successfully joins the LoRaWAN Network and sends a Data Packet yay!
