@@ -1467,3 +1467,28 @@ CHANNEL MASK: 0003
 [(See the complete log)](https://gist.github.com/lupyuen/0871ac515b18d9d68d3aacf831fd0f5b)
 
 LoRaWAN Zig App [lorawan_test.zig](lorawan_test.zig) successfully joins the LoRaWAN Network and sends a Data Packet yay!
+
+# TODO
+
+TODO: Do `std.debug.print`, `std.debug.assert` and `unreachable` work?
+
+TODO: Clean up the Zig Pointers
+
+```zig
+    // TODO: Change to `mem.copy(u8, dest[0..byte_count], source[0..byte_count]);`
+    _ = c.memcpy(
+        @ptrCast(?*anyopaque, @ptrCast([*c]u8, @alignCast(std.meta.alignment(u8), &AppDataBuffer))), 
+        @ptrCast(?*const anyopaque, @ptrCast([*c]const u8, @alignCast(std.meta.alignment(u8), &msg))), 
+        @sizeOf(@TypeOf(msg))
+    );
+```
+
+TODO: Read the Internal Temperature Sensor
+
+TODO: Encode the Temperature Sensor Data with TinyCBOR and transmit to The Things Network
+
+https://lupyuen.github.io/articles/cbor2
+
+TODO: Monitor sensor data with Prometheus and Grafana
+
+https://lupyuen.github.io/articles/prometheus

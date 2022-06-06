@@ -491,7 +491,7 @@ fn handle_event_queue() void {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-//  Entropy Pool
+//  Entropy Pool and Internal Temperature Sensor
 
 // #if defined(CONFIG_CRYPTO_RANDOM_POOL) && defined(CONFIG_LIBBL602_ADC)
 /// Read the Internal Temperature Sensor as Float. Returns 0 if successful.
