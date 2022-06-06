@@ -1466,7 +1466,7 @@ CHANNEL MASK: 0003
 
 [(See the complete log)](https://gist.github.com/lupyuen/0871ac515b18d9d68d3aacf831fd0f5b)
 
-LoRaWAN Zig App [lorawan_test.zig](lorawan_test.zig) successfully joins the LoRaWAN Network and sends a Data Packet yay!
+LoRaWAN Zig App [lorawan_test.zig](lorawan_test.zig) successfully joins the LoRaWAN Network (ChirpStack on RAKwireless WisGate) and sends a Data Packet to the LoRaWAN Gateway yay!
 
 # TODO
 
