@@ -76,11 +76,11 @@ const LORAWAN_DUTYCYCLE_ON = true;
 
 /// Defines the maximum size for the buffer receiving the fragmentation result.
 /// \remark By default FragDecoder.h defines:
-///         \ref FRAG_MAX_NB   21
-///         \ref FRAG_MAX_SIZE 50
-///         FileSize = FRAG_MAX_NB * FRAG_MAX_SIZE
-///         If bigger file size is to be received or is fragmented differently
-///         one must update those parameters.
+/// \ref FRAG_MAX_NB   21
+/// \ref FRAG_MAX_SIZE 50
+/// FileSize = FRAG_MAX_NB * FRAG_MAX_SIZE
+/// If bigger file size is to be received or is fragmented differently
+/// one must update those parameters.
 const UNFRAGMENTED_DATA_SIZE = 21 * 50;
 
 ///////////////////////////////////////////////////////////////////////////////
