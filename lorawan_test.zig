@@ -174,6 +174,13 @@ fn PrepareTxFrame() void {
         @as(c_int, @sizeOf(@TypeOf(msg))),
     );
 
+    // TODO: App fails to receive Join Accept Response if we call `std.mem.copy` instead of `memcpy`. Why?
+    // std.mem.copy(
+    //     u8, 
+    //     AppDataBuffer[0..@sizeOf(@TypeOf(msg)) - 1], 
+    //     msg[0..@sizeOf(@TypeOf(msg)) - 1]
+    // );
+
     // Compose the transmit request
     assert(@sizeOf(@TypeOf(msg)) <= @sizeOf(@TypeOf(AppDataBuffer)));
     _ = c.memcpy(
@@ -186,13 +193,6 @@ fn PrepareTxFrame() void {
         .BufferSize = @sizeOf(@TypeOf(msg)),
         .Port       = 1,
     };
-
-    // TODO: App fails to receive Join Accept Response if we call `std.mem.copy` instead of `memcpy`. Why?
-    // std.mem.copy(
-    //     u8, 
-    //     AppDataBuffer[0..@sizeOf(@TypeOf(msg)) - 1], 
-    //     msg[0..@sizeOf(@TypeOf(msg)) - 1]
-    // );
 
     // Validate the message size and check if it can be transmitted
     var txInfo: c.LoRaMacTxInfo_t = undefined;
@@ -671,15 +671,18 @@ var IsFileTransferDone: bool = false;  // bool
 var FileRxCrc: u32 = 0;  // uint32_t
 
 /// User application data
-var AppDataBuffer: [LORAWAN_APP_DATA_BUFFER_MAX_SIZE]u8 = 
+/// (Aligned to 32-bits because it's exported to C)
+var AppDataBuffer: [LORAWAN_APP_DATA_BUFFER_MAX_SIZE]u8 align(4) = 
     std.mem.zeroes([LORAWAN_APP_DATA_BUFFER_MAX_SIZE]u8);
 
 /// Un-fragmented data storage (Unused)
-var UnfragmentedData: [UNFRAGMENTED_DATA_SIZE]u8 = 
+/// (Aligned to 32-bits because it's exported to C)
+var UnfragmentedData: [UNFRAGMENTED_DATA_SIZE]u8 align(4) = 
     std.mem.zeroes([UNFRAGMENTED_DATA_SIZE]u8);
 
 /// Timer to handle the application data transmission duty cycle
-var TxTimer: c.TimerEvent_t = undefined;  // Init the timer in Main Function
+/// (Aligned to 32-bits because it's exported to C)
+var TxTimer: c.TimerEvent_t align(4) = undefined;  // Init the timer in Main Function
 
 // If we init TxTimer...
 // var TxTimer: c.TimerEvent_t = 
