@@ -1485,19 +1485,28 @@ TODO: Clean up names of Types, Functions and Variables
 TODO: App fails to receive Join Accept Response if we call `std.mem.copy` instead of `memcpy`. Why?
 
 ```zig
-    // With memcpy...
+    // With memcpy: Join Accept Response received OK
     _ = c.memcpy(
         @ptrCast(?*anyopaque, @ptrCast([*c]u8, @alignCast(std.meta.alignment(u8), &AppDataBuffer))), 
         @ptrCast(?*const anyopaque, @ptrCast([*c]const u8, @alignCast(std.meta.alignment(u8), &msg))), 
         @sizeOf(@TypeOf(msg))
     );
 
-    // With std.mem.copy...
+    // With std.mem.copy: Join Accept Response not received
     std.mem.copy(
         u8, 
         AppDataBuffer[0..@sizeOf(@TypeOf(msg)) - 1], 
         msg[0..@sizeOf(@TypeOf(msg)) - 1]
     );
+```
+
+TODO: Do we need to align buffers to 32 bits when exporting to C?
+
+```zig
+/// User application data
+/// (Aligned to 32-bit because it's exported to C)
+var AppDataBuffer: [LORAWAN_APP_DATA_BUFFER_MAX_SIZE]u8 align(4) = 
+    std.mem.zeroes([LORAWAN_APP_DATA_BUFFER_MAX_SIZE]u8);
 ```
 
 TODO: Implement `std.debug.print`

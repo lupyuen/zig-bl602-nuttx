@@ -671,18 +671,20 @@ var IsFileTransferDone: bool = false;  // bool
 var FileRxCrc: u32 = 0;  // uint32_t
 
 /// User application data
-/// (Aligned to 32-bits because it's exported to C)
+/// (Aligned to 32-bit because it's exported to C)
 var AppDataBuffer: [LORAWAN_APP_DATA_BUFFER_MAX_SIZE]u8 align(4) = 
     std.mem.zeroes([LORAWAN_APP_DATA_BUFFER_MAX_SIZE]u8);
 
 /// Un-fragmented data storage (Unused)
-/// (Aligned to 32-bits because it's exported to C)
+/// (Aligned to 32-bit because it's exported to C)
 var UnfragmentedData: [UNFRAGMENTED_DATA_SIZE]u8 align(4) = 
     std.mem.zeroes([UNFRAGMENTED_DATA_SIZE]u8);
 
-/// Timer to handle the application data transmission duty cycle
-/// (Aligned to 32-bits because it's exported to C)
-var TxTimer: c.TimerEvent_t align(4) = undefined;  // Init the timer in Main Function
+/// Timer to handle the application data transmission duty cycle.
+/// We Init the timer in Main Function.
+/// (Aligned to 32-bit because it's exported to C)
+var TxTimer: c.TimerEvent_t align(4) = 
+    undefined;
 
 // If we init TxTimer...
 // var TxTimer: c.TimerEvent_t = 
