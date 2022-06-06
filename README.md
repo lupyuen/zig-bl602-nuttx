@@ -990,9 +990,15 @@ And the auto-translation from C to Zig: [translated/lorawan_test_main.zig](trans
 
 We'll refer to this auto-translated Zig Code when we manually convert our LoRaWAN App [lorawan_test_main.c](https://github.com/lupyuen/lorawan_test/blob/main/lorawan_test_main.c) from C to Zig in the next section...
 
+![Pine64 PineDio Stack BL604 (left) talking LoRaWAN to RAKwireless WisGate (right)](https://lupyuen.github.io/images/lorawan3-title.jpg)
+
+[_Pine64 PineDio Stack BL604 (left) talking LoRaWAN to RAKwireless WisGate (right)_](https://lupyuen.github.io/articles/lorawan3)
+
 # Convert LoRaWAN App to Zig
 
 Finally we convert the LoRaWAN App [lorawan_test_main.c](https://github.com/lupyuen/lorawan_test/blob/main/lorawan_test_main.c) from C to Zig, to show that we can build Complex IoT Apps in Zig.
+
+The LoRaWAN App runs on PineDio Stack BL604 (RISC-V). The app connects to a LoRaWAN Gateway (like ChirpStack or The Things Network) and sends a Data Packet at regular intervals.
 
 Here's the original C code: [lorawan_test_main.c](https://github.com/lupyuen/lorawan_test/blob/main/lorawan_test_main.c)
 
@@ -1391,6 +1397,35 @@ const c = @cImport({
 ```
 
 Now Zig Compiler successfully compiles our LoRaWAN Test App [lorawan_test.zig](lorawan_test.zig)
+
+# Struct Initialisation Error
+
+Zig Compiler fails when it tries to initialise this struct at startup...
+
+```
+/// Timer to handle the application data transmission duty cycle
+var TxTimer: c.TimerEvent_t = 
+    std.mem.zeroes(c.TimerEvent_t);
+
+// Zig Compiler crashes with...
+//   TODO buf_write_value_bytes maybe typethread 11512 panic:
+//   Unable to dump stack trace: debug info stripped
+```
+
+So we do this instead...
+
+```
+/// Timer to handle the application data transmission duty cycle
+var TxTimer: c.TimerEvent_t = undefined;  // Init the timer in Main Function
+
+/// Main Function
+pub export fn lorawan_test_main(
+    _argc: c_int, 
+    _argv: [*]const [*]const u8
+) c_int {
+    // Init the Timer Struct at startup
+    TxTimer = std.mem.zeroes(c.TimerEvent_t);
+```
 
 # LoRaWAN Zig App Runs OK!
 

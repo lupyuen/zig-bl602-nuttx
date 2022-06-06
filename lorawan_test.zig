@@ -95,7 +95,9 @@ pub export fn lorawan_test_main(
 ) c_int {
     _ = _argc;
     _ = _argv;
-    TxTimer = std.mem.zeroes(c.TimerEvent_t);  // TODO: Added this
+
+    // Init the Timer Struct at startup
+    TxTimer = std.mem.zeroes(c.TimerEvent_t);
 
     // If we are using Entropy Pool and the BL602 ADC is available,
     // add the Internal Temperature Sensor data to the Entropy Pool
