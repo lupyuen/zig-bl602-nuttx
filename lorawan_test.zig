@@ -44,10 +44,7 @@ const c = @cImport({
 //  Constants
 
 /// LoRaWAN Region
-/// TODO: #ifndef ACTIVE_REGION
-/// #warning "No active region defined, LORAMAC_REGION_AS923 will be used as default."
 const ACTIVE_REGION = c.LORAMAC_REGION_AS923;
-// #endif
 
 /// LoRaWAN default end-device class
 const LORAWAN_DEFAULT_CLASS = c.CLASS_A;
