@@ -167,7 +167,7 @@ fn PrepareTxFrame() void {
         return;
     }
 
-    //  Send a message to LoRaWAN
+    // Send a message to LoRaWAN
     const msg: [8:0]u8 = "Hi NuttX".*;
     _ = printf("PrepareTxFrame: Transmit to LoRaWAN: %s (%d bytes)\n", 
         @ptrCast([*c]const u8, @alignCast(std.meta.alignment(u8), &msg)), 
@@ -176,7 +176,6 @@ fn PrepareTxFrame() void {
 
     // Compose the transmit request
     assert(@sizeOf(@TypeOf(msg)) <= @sizeOf(@TypeOf(AppDataBuffer)));
-    // TODO: Change to `mem.copy(u8, dest[0..byte_count], source[0..byte_count]);`
     _ = c.memcpy(
         @ptrCast(?*anyopaque, @ptrCast([*c]u8, @alignCast(std.meta.alignment(u8), &AppDataBuffer))), 
         @ptrCast(?*const anyopaque, @ptrCast([*c]const u8, @alignCast(std.meta.alignment(u8), &msg))), 
@@ -187,6 +186,13 @@ fn PrepareTxFrame() void {
         .BufferSize = @sizeOf(@TypeOf(msg)),
         .Port       = 1,
     };
+
+    // TODO: App fails to receive Join Accept Response if we call `std.mem.copy` instead of `memcpy`. Why?
+    // std.mem.copy(
+    //     u8, 
+    //     AppDataBuffer[0..@sizeOf(@TypeOf(msg)) - 1], 
+    //     msg[0..@sizeOf(@TypeOf(msg)) - 1]
+    // );
 
     // Validate the message size and check if it can be transmitted
     var txInfo: c.LoRaMacTxInfo_t = undefined;
