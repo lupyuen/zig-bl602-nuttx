@@ -1470,7 +1470,17 @@ LoRaWAN Zig App [lorawan_test.zig](lorawan_test.zig) successfully joins the LoRa
 
 # TODO
 
-TODO: Do `std.debug.print`, `std.debug.assert` and `unreachable` work?
+TODO: Read the Internal Temperature Sensor
+
+TODO: Encode the Temperature Sensor Data with TinyCBOR and transmit to The Things Network
+
+https://lupyuen.github.io/articles/cbor2
+
+TODO: Monitor sensor data with Prometheus and Grafana
+
+https://lupyuen.github.io/articles/prometheus
+
+TODO: Clean up names of Types, Functions and Variables
 
 TODO: App fails to receive Join Accept Response if we call `std.mem.copy` instead of `memcpy`. Why?
 
@@ -1490,12 +1500,68 @@ TODO: App fails to receive Join Accept Response if we call `std.mem.copy` instea
     );
 ```
 
-TODO: Read the Internal Temperature Sensor
+TODO: Implement `std.debug.print`
 
-TODO: Encode the Temperature Sensor Data with TinyCBOR and transmit to The Things Network
+```text
+/home/user/zig-linux-x86_64-0.10.0-dev.2351+b64a1d5ab/lib/std/os.zig:148:24: error: container 'system' has no member called 'fd_t'
+pub const fd_t = system.fd_t;
+                       ^
+/home/user/zig-linux-x86_64-0.10.0-dev.2351+b64a1d5ab/lib/std/Thread/Futex.zig:94:9: error: Unsupported operating system freestanding
+        @compileError("Unsupported operating system " ++ @tagName(builtin.target.os.tag));
+        ^
+/home/user/zig-linux-x86_64-0.10.0-dev.2351+b64a1d5ab/lib/std/Thread/Futex.zig:85:27: note: called from here
+        return unsupported(.{ ptr, expect, timeout });
+                          ^
+/home/user/zig-linux-x86_64-0.10.0-dev.2351+b64a1d5ab/lib/std/Thread/Futex.zig:84:86: note: called from here
+    fn wait(ptr: *const Atomic(u32), expect: u32, timeout: ?u64) error{Timeout}!void {
+                                                                                     ^
+```
 
-https://lupyuen.github.io/articles/cbor2
+TODO: Implement `std.debug.assert` and `unreachable`
 
-TODO: Monitor sensor data with Prometheus and Grafana
-
-https://lupyuen.github.io/articles/prometheus
+```text
+riscv_exception: EXCEPTION: Breakpoint. MCAUSE: 00000003
+riscv_exception: PANIC!!! Exception = 00000003
+up_assert: Assertion failed at file:common/riscv_exception.c line: 89 task: lora                                  wan_test
+backtrace| 3: 0x230162d6 0x23016bb6 0x23016a50 0x23005ede
+riscv_registerdump: EPC: 230162d6
+riscv_registerdump: A0: 2307d618 A1: 00000000 A2: 42021380 A3: 0000002
+riscv_registerdump: A4: 2308d4f8 A5: 2308d4f8 A6: 00000000 A7: 00000000
+riscv_registerdump: T0: 00000000 T1: 00000000 T2: 00000000 T3: 00000000
+riscv_registerdump: T4: 00000000 T5: 00000000 T6: 00000000
+riscv_registerdump: S0: 42021af0 S1: 00000000 S2: 00000000 S3: 00000000
+riscv_registerdump: S4: 00000000 S5: 00000000 S6: 00000000 S7: 00000000
+riscv_registerdump: S8: 00000000 S9: 00000000 S10: 00000000 S11: 00000000
+riscv_registerdump: SP: 42021ae0 FP: 42021af0 TP: 00000000 RA: 23016bb6
+riscv_dumpstate: sp:     42015150
+riscv_dumpstate: IRQ stack:
+riscv_dumpstate:   base: 42013240
+riscv_dumpstate:   size: 00002000
+riscv_stackdump: 42015140: 2307a000 000007d0 2307a000 23008320 80007880 2308d000                                   00000059 23079190
+riscv_stackdump: 42015160: 000f4240 00002710 420151a8 2308d4f8 00000001 00000000                                   00000000 00000000
+riscv_stackdump: 42015180: 00000000 00000000 00000000 420219d8 420219d8 23079000                                   00000003 23005ca2
+riscv_stackdump: 420151a0: 42010498 00000016 230790d4 2308d4f8 2308d4f8 2308d4f8                                   00000000 23001d38
+riscv_stackdump: 420151c0: deadbeef deadbeef 00000003 2308d4f8 00000003 2308d000                                   23001cc0 230027be
+riscv_stackdump: 420151e0: deadbeef deadbeef deadbeef 00000000 deadbeef deadbeef                                   deadbeef 2308d4f8
+riscv_stackdump: 42015200: deadbeef deadbeef deadbeef 00000000 00000000 42013000                                   2308d000 230019b6
+riscv_stackdump: 42015220: deadbeef deadbeef deadbeef 2308d4f8 deadbeef 00000000                                   230162d6 23000dcc
+riscv_dumpstate: sp:     42021ae0
+riscv_dumpstate: User stack:
+riscv_dumpstate:   base: 420213a0
+riscv_dumpstate:   size: 000007d0
+riscv_dumpstate: User Stack
+riscv_stackdump: 42021ae0: 00000000 00000000 42021b00 23016bb6 00000000 00000000                                   42021b20 23016a50
+riscv_stackdump: 42021b00: 00000000 00000000 00000000 42021380 00000001 00000000                                   23016a36 23005ede
+riscv_stackdump: 42021b20: 00000000 00000000 00000001 42021380 00000000 00000000                                   00000000 2308d4f8
+riscv_stackdump: 42021b40: 00000000 00000000 00000000 23003042 00000000 00000000                                   00000000 2308d4f8
+riscv_showtasks:    PID    PRI      USED     STACK   FILLED    COMMAND
+riscv_showtasks:   ----   ----       868      8192    10.5%    irq
+riscv_dump_task:      0      0       724      8160     8.8%    Idle Task
+riscv_dump_task:      1    224       488      2000    24.4%    hpwork
+riscv_dump_task:      2    100      1188      8144    14.5%    nsh_main
+riscv_dump_task:      3    100       408      2000    20.4%    lorawan_test
+backtrace| 0: 0x23008a46
+backtrace| 1: 0x230085ce
+backtrace| 2: 0x230085ce
+backtrace| 3: 0x230162d6 0x23016bb6 0x23016a50 0x23005ede
+```
