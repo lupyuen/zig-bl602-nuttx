@@ -621,7 +621,7 @@ var LmHandlerParams = c.LmHandlerParams_t {
     .PublicNetworkEnable = true, // Previously: c.LORAWAN_PUBLIC_NETWORK,
     .DutyCycleEnabled    = LORAWAN_DUTYCYCLE_ON,
     .DataBufferMaxSize   = LORAWAN_APP_DATA_BUFFER_MAX_SIZE,
-    .DataBuffer          = @ptrCast([*c]u8, @alignCast(std.meta.alignment(u8), &AppDataBuffer)), // TODO: Clean up
+    .DataBuffer          = @ptrCast([*c]u8, @alignCast(std.meta.alignment(u8), &AppDataBuffer)),
     .PingSlotPeriodicity = c.REGION_COMMON_DEFAULT_PING_SLOT_PERIODICITY,
 };
 
@@ -743,7 +743,7 @@ extern fn LmHandlerInit(
     handlerParams: [*c]c.LmHandlerParams_t
 ) c.LmHandlerErrorStatus_t;
 
-/// TODO: Assertion Check
+/// TODO: Assertion Failure should show Source Line Number
 fn assert(ok: bool) void {
     if (ok) { return; }
     _ = puts("*** Assertion Failed");

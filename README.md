@@ -813,6 +813,8 @@ We include the right header files into [LoRaMac.c](https://github.com/lupyuen/Lo
 
 TODO: Compile the other files in the LoRaWAN Library with `build.zig`
 
+https://ziglang.org/documentation/master/#Zig-Build-System
+
 TODO: Test the LoRaWAN Library
 
 # LoRaWAN App for NuttX
