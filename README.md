@@ -1002,7 +1002,11 @@ The LoRaWAN App runs on PineDio Stack BL604 (RISC-V). The app connects to a LoRa
 
 Here's the original C code: [lorawan_test_main.c](https://github.com/lupyuen/lorawan_test/blob/main/lorawan_test_main.c)
 
+(700 lines of C code)
+
 And our converted LoRaWAN Zig App: [lorawan_test.zig](lorawan_test.zig)
+
+(631 lines of Zig code)
 
 ```zig
 /// Import the LoRaWAN Library from C
