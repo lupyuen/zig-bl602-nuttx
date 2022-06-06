@@ -1472,14 +1472,21 @@ LoRaWAN Zig App [lorawan_test.zig](lorawan_test.zig) successfully joins the LoRa
 
 TODO: Do `std.debug.print`, `std.debug.assert` and `unreachable` work?
 
-TODO: Clean up the Zig Pointers
+TODO: App fails to receive Join Accept Response if we call `std.mem.copy` instead of `memcpy`. Why?
 
 ```zig
-    // TODO: Change to `mem.copy(u8, dest[0..byte_count], source[0..byte_count]);`
+    // With memcpy...
     _ = c.memcpy(
         @ptrCast(?*anyopaque, @ptrCast([*c]u8, @alignCast(std.meta.alignment(u8), &AppDataBuffer))), 
         @ptrCast(?*const anyopaque, @ptrCast([*c]const u8, @alignCast(std.meta.alignment(u8), &msg))), 
         @sizeOf(@TypeOf(msg))
+    );
+
+    // With std.mem.copy...
+    std.mem.copy(
+        u8, 
+        AppDataBuffer[0..@sizeOf(@TypeOf(msg)) - 1], 
+        msg[0..@sizeOf(@TypeOf(msg)) - 1]
     );
 ```
 
