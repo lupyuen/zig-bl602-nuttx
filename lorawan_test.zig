@@ -92,7 +92,6 @@ pub export fn lorawan_test_main(
     _argc: c_int, 
     _argv: [*]const [*]const u8
 ) c_int {
-    debug("This is a debug message - {}", .{42});////
     _ = _argc;
     _ = _argv;
 
@@ -528,17 +527,20 @@ pub fn panic(
 /// Called by Zig for `std.log.debug`, `std.log.info`, `std.log.err`, ...
 /// https://gist.github.com/leecannon/d6f5d7e5af5881c466161270347ce84d
 pub fn log(
-    comptime message_level: std.log.Level,
-    comptime scope: @Type(.EnumLiteral),
+    comptime _message_level: std.log.Level,
+    comptime _scope: @Type(.EnumLiteral),
     comptime format: []const u8,
     args: anytype,
 ) void {
-    _ = message_level;
-    _ = scope;
-    _ = format;
-    _ = args;
-    // TODO: Format the message and print it
-    _ = puts("*****log");
+    // Format the message
+    _ = _message_level;
+    _ = _scope;
+    var buf: [100]u8 = std.mem.zeroes([100]u8);  // TODO: Expand the buffer
+    _ = std.fmt.bufPrint(&buf, format, args)
+        catch { _ = puts("*** log error"); };
+
+    // Print the message
+    _ = puts(@ptrCast([*c]const u8, &buf));
 }
 
 ///////////////////////////////////////////////////////////////////////////////
