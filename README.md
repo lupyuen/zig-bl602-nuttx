@@ -1566,6 +1566,66 @@ CHANNEL MASK: 0003
 
 LoRaWAN Zig App [lorawan_test.zig](lorawan_test.zig) successfully joins the LoRaWAN Network (ChirpStack on RAKwireless WisGate) and sends a Data Packet to the LoRaWAN Gateway yay!
 
+# Integer Overflow
+
+The Zig Compiler reveals interesting insights when auto-translating our C code to Zig.
+
+This C code copies an array, byte by byte...
+
+```c
+static int8_t FragDecoderWrite( uint32_t addr, uint8_t *data, uint32_t size ) {
+    ...
+    for(uint32_t i = 0; i < size; i++ ) {
+        UnfragmentedData[addr + i] = data[i];
+    }
+    return 0; // Success
+}
+```
+
+[(Source)](https://github.com/lupyuen/lorawan_test/blob/main/lorawan_test_main.c#L539-L550)
+
+Here's the auto-translated Zig code...
+
+```zig
+pub fn FragDecoderWrite(arg_addr: u32, arg_data: [*c]u8, arg_size: u32) callconv(.C) i8 {
+    ...
+    var size = arg_size;
+    var i: u32 = 0;
+    while (i < size) : (i +%= 1) {
+        UnfragmentedData[addr +% i] = data[i];
+    }
+    return 0;
+}
+```
+
+[(Source)](https://github.com/lupyuen/zig-bl602-nuttx/blob/main/translated/lorawan_test_main.zig#L4335-L4349)
+
+Note that the Array Indexing in C...
+
+```c
+//  Array Indexing in C...
+UnfragmentedData[addr + i]
+```
+
+Gets translated to this in Zig...
+
+```zig
+//  Array Indexing in Zig...
+UnfragmentedData[addr +% i]
+```
+
+`+` in C becomes `+%` in Zig!
+
+_What's `+%`?_
+
+TODO
+
+Wrapping Addition
+
+https://ziglang.org/documentation/master/#Runtime-Integer-Values
+
+https://ziglang.org/documentation/master/#Integer-Overflow
+
 # TODO
 
 TODO: Read the Internal Temperature Sensor
