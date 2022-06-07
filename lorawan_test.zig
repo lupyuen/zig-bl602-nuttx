@@ -496,6 +496,21 @@ fn handle_event_queue() void {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+//  Panic Handler
+
+/// Print the Panic Message and halt. See 
+/// https://andrewkelley.me/post/zig-stack-traces-kernel-panic-bare-bones-os.html
+pub fn panic(
+    message: []const u8, 
+    _stack_trace: ?*std.builtin.StackTrace
+) noreturn {
+    _ = _stack_trace;
+    _ = puts("\n!ZIG PANIC!");
+    _ = puts(@ptrCast([*c]const u8, message));
+    while(true) {}
+}
+
+///////////////////////////////////////////////////////////////////////////////
 //  Entropy Pool and Internal Temperature Sensor
 
 // #if defined(CONFIG_CRYPTO_RANDOM_POOL) && defined(CONFIG_LIBBL602_ADC)
