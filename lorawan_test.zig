@@ -123,7 +123,7 @@ pub export fn lorawan_test_main(
     // Init LoRaWAN
     if (LmHandlerInit(&LmHandlerCallbacks, &LmHandlerParams)
         != c.LORAMAC_HANDLER_SUCCESS) {
-        _ = printf("LoRaMac wasn't properly initialized\n");
+        std.log.err("LoRaMac wasn't properly initialized", .{});
         // Fatal error, endless loop.
         while (true) {}
     }
