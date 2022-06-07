@@ -758,16 +758,10 @@ extern fn LmHandlerInit(
     handlerParams: [*c]c.LmHandlerParams_t
 ) c.LmHandlerErrorStatus_t;
 
-/// TODO: Assertion Failure should show Source Line Number
-fn assert(ok: bool) void {
-    if (ok) { return; }
-    _ = puts("*** Assertion Failed");
-    unreachable;
-}
-
 /// LoRaWAN Event Queue
 extern var event_queue: c.struct_ble_npl_eventq;
 
-/// Aliases for C Standard Library
+/// Aliases for C and Zig Standard Library
+const assert = std.debug.assert;
 const printf = c.printf;
 const puts   = c.puts;
