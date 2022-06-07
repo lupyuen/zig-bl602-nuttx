@@ -531,10 +531,13 @@ pub fn log(
     comptime format: []const u8,
     args: anytype,
 ) void {
-    // Format the message
     _ = _message_level;
     _ = _scope;
-    var buf: [100]u8 = std.mem.zeroes([100]u8);  // TODO: Expand the buffer
+
+    // Format the message
+    // TODO: Expand the buffer
+    // TODO: Ensure that buffer is Null-Terminated
+    var buf = std.mem.zeroes([100]u8);
     _ = std.fmt.bufPrint(&buf, format, args)
         catch { _ = puts("*** log error"); };
 
