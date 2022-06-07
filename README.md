@@ -1663,6 +1663,14 @@ Here's the list of __Safety Checks__ done by Zig at runtime...
 
 -   ["__Undefined Behavior"__](https://ziglang.org/documentation/master/#Undefined-Behavior)
 
+# Panic Handler
+
+TODO
+
+https://andrewkelley.me/post/zig-stack-traces-kernel-panic-bare-bones-os.html
+
+https://github.com/ziglang/zig/blob/master/lib/std/builtin.zig#L763-L847
+
 # TODO
 
 TODO: Read the Internal Temperature Sensor
