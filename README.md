@@ -1661,21 +1661,25 @@ thread 127875 panic: index out of bounds
 
 Here's the list of __Safety Checks__ done by Zig at runtime...
 
--   ["__Undefined Behavior"__](https://ziglang.org/documentation/master/#Undefined-Behavior)
+-   ["Undefined Behavior"](https://ziglang.org/documentation/master/#Undefined-Behavior)
 
 # Panic Handler
 
-TODO: Handle `unreachable`, `std.debug.panic` and `std.debug.assert`
+_Some debug features don't seem to be working right? Like `unreachable`, `std.debug.assert` and `std.debug.panic`?_
 
-https://andrewkelley.me/post/zig-stack-traces-kernel-panic-bare-bones-os.html
+That's because for Embedded Platforms we need to implement our own Panic Handler...
 
-https://github.com/ziglang/zig/blob/master/lib/std/builtin.zig#L763-L847
+-   ["Using Zig to Provide Stack Traces on Kernel Panic for a Bare Bones Operating System"](https://andrewkelley.me/post/zig-stack-traces-kernel-panic-bare-bones-os.html)
+
+-   [Default Panic Handler: `std.debug.default_panic`](https://github.com/ziglang/zig/blob/master/lib/std/builtin.zig#L763-L847)
+
+With our own Panic Handler, this Assertion Failure...
 
 ```zig
-assert(TxPeriodicity != 0);
+std.debug.assert(TxPeriodicity != 0);
 ```
 
-TODO
+Will show this Stack Trace...
 
 ```text
 !ZIG PANIC!
@@ -1685,7 +1689,7 @@ Stack Trace:
 0x23016ce0
 ```
 
-TODO
+The first address `23016394` doesn't look interesting, because it's inside the `assert` function...
 
 ```text
 /home/user/zig-linux-x86_64-0.10.0-dev.2351+b64a1d5ab/lib/std/debug.zig:259
@@ -1701,11 +1705,11 @@ pub fn assert(ok: bool) void {
 23016394:	a009                j	23016396 <std.debug.assert+0x2e>
 ```
 
-TODO
+But the second address `23016ce0` reveals the assertion that failed...
 
 ```text
 /home/user/nuttx/zig-bl602-nuttx/lorawan_test.zig:95
-    assert(TxPeriodicity != 0);
+    std.debug.assert(TxPeriodicity != 0);
 23016ccc:	42013537          	lui	a0,0x42013
 23016cd0:	fbc52503          	lw	a0,-68(a0) # 42012fbc <TxPeriodicity>
 23016cd4:	00a03533          	snez	a0,a0
@@ -1715,6 +1719,35 @@ TODO
     TxTimer = std.mem.zeroes(c.TimerEvent_t);
 23016ce0:	42016537          	lui	a0,0x42016
 ```
+
+This is our implementation of the Zig Panic Handler...
+
+```zig
+/// Called by Zig when it hits a Panic. We print the Panic Message, Stack Trace and halt. See 
+/// https://andrewkelley.me/post/zig-stack-traces-kernel-panic-bare-bones-os.html
+/// https://github.com/ziglang/zig/blob/master/lib/std/builtin.zig#L763-L847
+pub fn panic(
+    message: []const u8, 
+    _stack_trace: ?*std.builtin.StackTrace
+) noreturn {
+    // Print the Panic Message
+    _ = _stack_trace;
+    _ = puts("\n!ZIG PANIC!");
+    _ = puts(@ptrCast([*c]const u8, message));
+
+    // Print the Stack Trace
+    _ = puts("Stack Trace:");
+    var it = std.debug.StackIterator.init(@returnAddress(), null);
+    while (it.next()) |return_address| {
+        _ = printf("%p\n", return_address);
+    }
+
+    // Halt
+    while(true) {}
+}
+```
+
+[(Source)](https://github.com/lupyuen/zig-bl602-nuttx/blob/main/lorawan_test.zig#L501-L522)
 
 # TODO
 
