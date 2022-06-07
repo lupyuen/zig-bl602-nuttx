@@ -92,6 +92,7 @@ pub export fn lorawan_test_main(
     _argc: c_int, 
     _argv: [*]const [*]const u8
 ) c_int {
+    debug("This is a debug message - {}", .{42});////
     _ = _argc;
     _ = _argv;
 
@@ -522,6 +523,25 @@ pub fn panic(
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+//  Logging
+
+/// Called by Zig for `std.log.debug`, `std.log.info`, `std.log.err`, ...
+/// https://gist.github.com/leecannon/d6f5d7e5af5881c466161270347ce84d
+pub fn log(
+    comptime message_level: std.log.Level,
+    comptime scope: @Type(.EnumLiteral),
+    comptime format: []const u8,
+    args: anytype,
+) void {
+    _ = message_level;
+    _ = scope;
+    _ = format;
+    _ = args;
+    // TODO: Format the message and print it
+    _ = puts("*****log");
+}
+
+///////////////////////////////////////////////////////////////////////////////
 //  Entropy Pool and Internal Temperature Sensor
 
 // #if defined(CONFIG_CRYPTO_RANDOM_POOL) && defined(CONFIG_LIBBL602_ADC)
@@ -774,5 +794,6 @@ extern var event_queue: c.struct_ble_npl_eventq;
 
 /// Aliases for C and Zig Standard Library
 const assert = std.debug.assert;
+const debug  = std.log.debug;
 const printf = c.printf;
 const puts   = c.puts;
