@@ -498,15 +498,26 @@ fn handle_event_queue() void {
 ///////////////////////////////////////////////////////////////////////////////
 //  Panic Handler
 
-/// Print the Panic Message and halt. See 
+/// Called by Zig when it hits a Panic. We print the Panic Message, Stack Trace and halt. See 
 /// https://andrewkelley.me/post/zig-stack-traces-kernel-panic-bare-bones-os.html
+/// https://github.com/ziglang/zig/blob/master/lib/std/builtin.zig#L763-L847
 pub fn panic(
     message: []const u8, 
     _stack_trace: ?*std.builtin.StackTrace
 ) noreturn {
+    // Print the Panic Message
     _ = _stack_trace;
     _ = puts("\n!ZIG PANIC!");
     _ = puts(@ptrCast([*c]const u8, message));
+
+    // Print the Stack Trace
+    _ = puts("Stack Trace:");
+    var it = std.debug.StackIterator.init(@returnAddress(), null);
+    while (it.next()) |return_address| {
+        _ = printf("%p\n", return_address);
+    }
+
+    // Halt
     while(true) {}
 }
 

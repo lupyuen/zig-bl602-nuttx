@@ -1665,11 +1665,56 @@ Here's the list of __Safety Checks__ done by Zig at runtime...
 
 # Panic Handler
 
-TODO
+TODO: Handle `unreachable`, `std.debug.panic` and `std.debug.assert`
 
 https://andrewkelley.me/post/zig-stack-traces-kernel-panic-bare-bones-os.html
 
 https://github.com/ziglang/zig/blob/master/lib/std/builtin.zig#L763-L847
+
+```zig
+assert(TxPeriodicity != 0);
+```
+
+TODO
+
+```text
+!ZIG PANIC!
+reached unreachable code
+Stack Trace:
+0x23016394
+0x23016ce0
+```
+
+TODO
+
+```text
+/home/user/zig-linux-x86_64-0.10.0-dev.2351+b64a1d5ab/lib/std/debug.zig:259
+pub fn assert(ok: bool) void {
+2301637c:	00b51c63          	bne	a0,a1,23016394 <std.debug.assert+0x2c>
+23016380:	a009                j	23016382 <std.debug.assert+0x1a>
+23016382:	2307e537          	lui	a0,0x2307e
+23016386:	f9850513          	addi	a0,a0,-104 # 2307df98 <__unnamed_4>
+2301638a:	4581                li	a1,0
+2301638c:	00000097          	auipc	ra,0x0
+23016390:	f3c080e7          	jalr	-196(ra) # 230162c8 <panic>
+    if (!ok) unreachable; // assertion failure
+23016394:	a009                j	23016396 <std.debug.assert+0x2e>
+```
+
+TODO
+
+```text
+/home/user/nuttx/zig-bl602-nuttx/lorawan_test.zig:95
+    assert(TxPeriodicity != 0);
+23016ccc:	42013537          	lui	a0,0x42013
+23016cd0:	fbc52503          	lw	a0,-68(a0) # 42012fbc <TxPeriodicity>
+23016cd4:	00a03533          	snez	a0,a0
+23016cd8:	fffff097          	auipc	ra,0xfffff
+23016cdc:	690080e7          	jalr	1680(ra) # 23016368 <std.debug.assert>
+/home/user/nuttx/zig-bl602-nuttx/lorawan_test.zig:100
+    TxTimer = std.mem.zeroes(c.TimerEvent_t);
+23016ce0:	42016537          	lui	a0,0x42016
+```
 
 # TODO
 
@@ -1736,52 +1781,3 @@ pub const fd_t = system.fd_t;
 TODO: Or implement `std.log.info`
 
 https://gist.github.com/leecannon/d6f5d7e5af5881c466161270347ce84d
-
-TODO: Implement `std.debug.assert` and `unreachable`
-
-```text
-riscv_exception: EXCEPTION: Breakpoint. MCAUSE: 00000003
-riscv_exception: PANIC!!! Exception = 00000003
-up_assert: Assertion failed at file:common/riscv_exception.c line: 89 task: lora                                  wan_test
-backtrace| 3: 0x230162d6 0x23016bb6 0x23016a50 0x23005ede
-riscv_registerdump: EPC: 230162d6
-riscv_registerdump: A0: 2307d618 A1: 00000000 A2: 42021380 A3: 0000002
-riscv_registerdump: A4: 2308d4f8 A5: 2308d4f8 A6: 00000000 A7: 00000000
-riscv_registerdump: T0: 00000000 T1: 00000000 T2: 00000000 T3: 00000000
-riscv_registerdump: T4: 00000000 T5: 00000000 T6: 00000000
-riscv_registerdump: S0: 42021af0 S1: 00000000 S2: 00000000 S3: 00000000
-riscv_registerdump: S4: 00000000 S5: 00000000 S6: 00000000 S7: 00000000
-riscv_registerdump: S8: 00000000 S9: 00000000 S10: 00000000 S11: 00000000
-riscv_registerdump: SP: 42021ae0 FP: 42021af0 TP: 00000000 RA: 23016bb6
-riscv_dumpstate: sp:     42015150
-riscv_dumpstate: IRQ stack:
-riscv_dumpstate:   base: 42013240
-riscv_dumpstate:   size: 00002000
-riscv_stackdump: 42015140: 2307a000 000007d0 2307a000 23008320 80007880 2308d000                                   00000059 23079190
-riscv_stackdump: 42015160: 000f4240 00002710 420151a8 2308d4f8 00000001 00000000                                   00000000 00000000
-riscv_stackdump: 42015180: 00000000 00000000 00000000 420219d8 420219d8 23079000                                   00000003 23005ca2
-riscv_stackdump: 420151a0: 42010498 00000016 230790d4 2308d4f8 2308d4f8 2308d4f8                                   00000000 23001d38
-riscv_stackdump: 420151c0: deadbeef deadbeef 00000003 2308d4f8 00000003 2308d000                                   23001cc0 230027be
-riscv_stackdump: 420151e0: deadbeef deadbeef deadbeef 00000000 deadbeef deadbeef                                   deadbeef 2308d4f8
-riscv_stackdump: 42015200: deadbeef deadbeef deadbeef 00000000 00000000 42013000                                   2308d000 230019b6
-riscv_stackdump: 42015220: deadbeef deadbeef deadbeef 2308d4f8 deadbeef 00000000                                   230162d6 23000dcc
-riscv_dumpstate: sp:     42021ae0
-riscv_dumpstate: User stack:
-riscv_dumpstate:   base: 420213a0
-riscv_dumpstate:   size: 000007d0
-riscv_dumpstate: User Stack
-riscv_stackdump: 42021ae0: 00000000 00000000 42021b00 23016bb6 00000000 00000000                                   42021b20 23016a50
-riscv_stackdump: 42021b00: 00000000 00000000 00000000 42021380 00000001 00000000                                   23016a36 23005ede
-riscv_stackdump: 42021b20: 00000000 00000000 00000001 42021380 00000000 00000000                                   00000000 2308d4f8
-riscv_stackdump: 42021b40: 00000000 00000000 00000000 23003042 00000000 00000000                                   00000000 2308d4f8
-riscv_showtasks:    PID    PRI      USED     STACK   FILLED    COMMAND
-riscv_showtasks:   ----   ----       868      8192    10.5%    irq
-riscv_dump_task:      0      0       724      8160     8.8%    Idle Task
-riscv_dump_task:      1    224       488      2000    24.4%    hpwork
-riscv_dump_task:      2    100      1188      8144    14.5%    nsh_main
-riscv_dump_task:      3    100       408      2000    20.4%    lorawan_test
-backtrace| 0: 0x23008a46
-backtrace| 1: 0x230085ce
-backtrace| 2: 0x230085ce
-backtrace| 3: 0x230162d6 0x23016bb6 0x23016a50 0x23005ede
-```
