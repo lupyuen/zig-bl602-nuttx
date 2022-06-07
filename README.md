@@ -990,6 +990,102 @@ Here's the original C code: [lorawan_test_main.c](https://github.com/lupyuen/lor
 
 And the auto-translation from C to Zig: [translated/lorawan_test_main.zig](translated/lorawan_test_main.zig)
 
+Here's a snippet from the original C code...
+
+```c
+int main(int argc, FAR char *argv[]) {
+#ifdef __clang__
+    puts("lorawan_test_main: Compiled with zig cc");
+#else
+    puts("lorawan_test_main: Compiled with gcc");
+#endif  //  __clang__
+
+    //  If we are using Entropy Pool and the BL602 ADC is available,
+    //  add the Internal Temperature Sensor data to the Entropy Pool
+    init_entropy_pool();
+
+    //  Compute the interval between transmissions based on Duty Cycle
+    TxPeriodicity = APP_TX_DUTYCYCLE + randr( -APP_TX_DUTYCYCLE_RND, APP_TX_DUTYCYCLE_RND );
+
+    const Version_t appVersion    = { .Value = FIRMWARE_VERSION };
+    const Version_t gitHubVersion = { .Value = GITHUB_VERSION };
+    DisplayAppInfo( "lorawan_test", 
+                    &appVersion,
+                    &gitHubVersion );
+
+    //  Init LoRaWAN
+    if ( LmHandlerInit( &LmHandlerCallbacks, &LmHandlerParams ) != LORAMAC_HANDLER_SUCCESS )
+    {
+        printf( "LoRaMac wasn't properly initialized\n" );
+        //  Fatal error, endless loop.
+        while ( 1 ) {}
+    }
+
+    // Set system maximum tolerated rx error in milliseconds
+    LmHandlerSetSystemMaxRxError( 20 );
+
+    // The LoRa-Alliance Compliance protocol package should always be initialized and activated.
+    LmHandlerPackageRegister( PACKAGE_ID_COMPLIANCE, &LmhpComplianceParams );
+    LmHandlerPackageRegister( PACKAGE_ID_CLOCK_SYNC, NULL );
+    LmHandlerPackageRegister( PACKAGE_ID_REMOTE_MCAST_SETUP, NULL );
+    LmHandlerPackageRegister( PACKAGE_ID_FRAGMENTATION, &FragmentationParams );
+
+    IsClockSynched     = false;
+    IsFileTransferDone = false;
+
+    //  Join the LoRaWAN Network
+    LmHandlerJoin( );
+
+    //  Set the Transmit Timer
+    StartTxProcess( LORAMAC_HANDLER_TX_ON_TIMER );
+
+    //  Handle LoRaWAN Events
+    handle_event_queue(NULL);  //  Never returns
+
+    return 0;
+}
+```
+
+[(Source)](https://github.com/lupyuen/lorawan_test/blob/main/lorawan_test_main.c#L271-L323)
+
+And the auto-translated Zig code...
+
+```zig
+pub export fn lorawan_test_main(arg_argc: c_int, arg_argv: [*c][*c]u8) c_int {
+    var argc = arg_argc;
+    _ = argc;
+    var argv = arg_argv;
+    _ = argv;
+    _ = puts("lorawan_test_main: Compiled with zig cc");
+    init_entropy_pool();
+    TxPeriodicity = @bitCast(u32, @as(c_int, 40000) + randr(-@as(c_int, 5000), @as(c_int, 5000)));
+    const appVersion: Version_t = Version_t{
+        .Value = @bitCast(u32, @as(c_int, 16908288)),
+    };
+    const gitHubVersion: Version_t = Version_t{
+        .Value = @bitCast(u32, @as(c_int, 83886080)),
+    };
+    DisplayAppInfo("lorawan_test", &appVersion, &gitHubVersion);
+    if (LmHandlerInit(&LmHandlerCallbacks, &LmHandlerParams) != LORAMAC_HANDLER_SUCCESS) {
+        _ = printf("LoRaMac wasn't properly initialized\n");
+        while (true) {}
+    }
+    _ = LmHandlerSetSystemMaxRxError(@bitCast(u32, @as(c_int, 20)));
+    _ = LmHandlerPackageRegister(@bitCast(u8, @truncate(i8, @as(c_int, 0))), @ptrCast(?*anyopaque, &LmhpComplianceParams));
+    _ = LmHandlerPackageRegister(@bitCast(u8, @truncate(i8, @as(c_int, 1))), @intToPtr(?*anyopaque, @as(c_int, 0)));
+    _ = LmHandlerPackageRegister(@bitCast(u8, @truncate(i8, @as(c_int, 2))), @intToPtr(?*anyopaque, @as(c_int, 0)));
+    _ = LmHandlerPackageRegister(@bitCast(u8, @truncate(i8, @as(c_int, 3))), @ptrCast(?*anyopaque, &FragmentationParams));
+    IsClockSynched = @as(c_int, 0) != 0;
+    IsFileTransferDone = @as(c_int, 0) != 0;
+    LmHandlerJoin();
+    StartTxProcess(@bitCast(c_uint, LORAMAC_HANDLER_TX_ON_TIMER));
+    handle_event_queue(@intToPtr(?*anyopaque, @as(c_int, 0)));
+    return 0;
+}
+```
+
+[(Source)](https://github.com/lupyuen/zig-bl602-nuttx/blob/main/translated/lorawan_test_main.zig#L4535-L4565)
+
 We'll refer to this auto-translated Zig Code when we manually convert our LoRaWAN App [lorawan_test_main.c](https://github.com/lupyuen/lorawan_test/blob/main/lorawan_test_main.c) from C to Zig in the next section...
 
 ![Pine64 PineDio Stack BL604 (left) talking LoRaWAN to RAKwireless WisGate (right)](https://lupyuen.github.io/images/lorawan3-title.jpg)
