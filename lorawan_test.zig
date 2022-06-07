@@ -168,10 +168,9 @@ fn PrepareTxFrame() void {
     }
 
     // Send a message to LoRaWAN
-    const msg: [8:0]u8 = "Hi NuttX".*;
-    _ = printf("PrepareTxFrame: Transmit to LoRaWAN: %s (%d bytes)\n", 
-        @ptrCast([*c]const u8, @alignCast(std.meta.alignment(u8), &msg)), 
-        @as(c_int, @sizeOf(@TypeOf(msg))),
+    const msg: [8:0]u8 = "Hi NuttX".*;  // 9 bytes including null
+    debug("PrepareTxFrame: Transmit to LoRaWAN: {s} ({} bytes)",
+        .{ msg, @sizeOf(@TypeOf(msg)) }
     );
 
     // TODO: App fails to receive Join Accept Response if we call `std.mem.copy` instead of `memcpy`. Why?
