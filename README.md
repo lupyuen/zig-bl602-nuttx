@@ -1566,7 +1566,7 @@ CHANNEL MASK: 0003
 
 LoRaWAN Zig App [lorawan_test.zig](lorawan_test.zig) successfully joins the LoRaWAN Network (ChirpStack on RAKwireless WisGate) and sends a Data Packet to the LoRaWAN Gateway yay!
 
-# Integer Overflow
+# Safety Checks
 
 The Zig Compiler reveals interesting insights when auto-translating our C code to Zig.
 
@@ -1616,17 +1616,52 @@ UnfragmentedData[addr +% i]
 
 `+` in C becomes `+%` in Zig!
 
-_What's `+%`?_
+_What's `+%` in Zig?_
 
-TODO
+That's the Zig Operator for [__Wraparound Addition__](https://ziglang.org/documentation/master/#Wrapping-Operations).
 
-Wrapping Addition
+Which means that the result wraps back to 0 (and beyond) if the addition overflows the integer.
 
-https://ziglang.org/documentation/master/#Runtime-Integer-Values
+But this isn't what we intended, since we don't expect the addition to overflow. That's why in our final converted Zig code, we revert `+%` back to `+`...
 
-https://ziglang.org/documentation/master/#Integer-Overflow
+```zig
+export fn FragDecoderWrite(addr: u32, data: [*c]u8, size: u32) i8 {
+    ...
+    var i: u32 = 0;
+    while (i < size) : (i += 1) {
+        UnfragmentedData[addr + i] = data[i];
+    }
+    return 0; // Success
+}
+```
 
-https://ziglang.org/documentation/master/#Index-out-of-Bounds
+[(Source)](https://github.com/lupyuen/zig-bl602-nuttx/blob/main/lorawan_test.zig#L407-L416)
+
+_What happens if the addition overflows?_
+
+We'll see a Runtime Error...
+
+```text
+thread 128175 panic: integer overflow
+```
+
+[(Source)](https://ziglang.org/documentation/master/#Integer-Overflow)
+
+Which is probably a good thing, to ensure that our values are sensible.
+
+_What if our Array Index goes out of bounds?_
+
+We'll get this Runtime Error...
+
+```text
+thread 127875 panic: index out of bounds
+```
+
+[(Source)](https://ziglang.org/documentation/master/#Index-out-of-Bounds)
+
+Here's the list of __Safety Checks__ done by Zig at runtime...
+
+-   ["__Undefined Behavior"__](https://ziglang.org/documentation/master/#Undefined-Behavior)
 
 # TODO
 
