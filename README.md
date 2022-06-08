@@ -1549,6 +1549,7 @@ OTAA
 DevAddr     :  00D803AB
 DATA RATE   : DR_2
 ...
+PrepareTxFrame: Transmit to LoRaWAN (9 bytes): Hi NuttX
 ###### =========== MCPS-Confirm ============ ######
 STATUS      : OK
 ###### =====   UPLINK FRAME        1   ===== ######
