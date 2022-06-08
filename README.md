@@ -1655,7 +1655,7 @@ _What happens if the addition overflows?_
 We'll see a Runtime Error...
 
 ```text
-thread 128175 panic: integer overflow
+panic: integer overflow
 ```
 
 [(Source)](https://ziglang.org/documentation/master/#Integer-Overflow)
@@ -1667,7 +1667,7 @@ _What if our Array Index goes out of bounds?_
 We'll get this Runtime Error...
 
 ```text
-thread 127875 panic: index out of bounds
+panic: index out of bounds
 ```
 
 [(Source)](https://ziglang.org/documentation/master/#Index-out-of-Bounds)
@@ -1675,6 +1675,10 @@ thread 127875 panic: index out of bounds
 Here's the list of __Safety Checks__ done by Zig at runtime...
 
 -   ["Undefined Behavior"](https://ziglang.org/documentation/master/#Undefined-Behavior)
+
+If we prefer to live recklessly, this is how we disable the Safety Checks...
+
+-   ["@setRuntimeSafety"](https://ziglang.org/documentation/master/#setRuntimeSafety)
 
 # Panic Handler
 
