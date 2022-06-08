@@ -1749,7 +1749,15 @@ pub fn panic(
 
 [(Source)](https://github.com/lupyuen/zig-bl602-nuttx/blob/main/lorawan_test.zig#L501-L522)
 
+# Logging
+
+TODO: Implement `std.log.debug`
+
+https://gist.github.com/leecannon/d6f5d7e5af5881c466161270347ce84d
+
 # TODO
+
+TODO: Clean up names of Types, Functions and Variables
 
 TODO: Read the Internal Temperature Sensor
 
@@ -1761,29 +1769,9 @@ TODO: Monitor sensor data with Prometheus and Grafana
 
 https://lupyuen.github.io/articles/prometheus
 
-TODO: Add new code with `@import()` and Packages
+TODO: Add new code with `@import()`
 
 https://zig.news/mattnite/import-and-packages-23mb
-
-TODO: Clean up names of Types, Functions and Variables
-
-TODO: App fails to receive Join Accept Response if we call `std.mem.copy` instead of `memcpy`. Why?
-
-```zig
-    // With memcpy: Join Accept Response received OK
-    _ = c.memcpy(
-        @ptrCast(?*anyopaque, @ptrCast([*c]u8, @alignCast(std.meta.alignment(u8), &AppDataBuffer))), 
-        @ptrCast(?*const anyopaque, @ptrCast([*c]const u8, @alignCast(std.meta.alignment(u8), &msg))), 
-        @sizeOf(@TypeOf(msg))
-    );
-
-    // With std.mem.copy: Join Accept Response not received
-    std.mem.copy(
-        u8, 
-        AppDataBuffer[0..@sizeOf(@TypeOf(msg)) - 1], 
-        msg[0..@sizeOf(@TypeOf(msg)) - 1]
-    );
-```
 
 TODO: Do we need to align buffers to 32 bits when exporting to C?
 
@@ -1793,24 +1781,3 @@ TODO: Do we need to align buffers to 32 bits when exporting to C?
 var AppDataBuffer: [LORAWAN_APP_DATA_BUFFER_MAX_SIZE]u8 align(4) = 
     std.mem.zeroes([LORAWAN_APP_DATA_BUFFER_MAX_SIZE]u8);
 ```
-
-TODO: Implement `std.debug.print`
-
-```text
-/home/user/zig-linux-x86_64-0.10.0-dev.2351+b64a1d5ab/lib/std/os.zig:148:24: error: container 'system' has no member called 'fd_t'
-pub const fd_t = system.fd_t;
-                       ^
-/home/user/zig-linux-x86_64-0.10.0-dev.2351+b64a1d5ab/lib/std/Thread/Futex.zig:94:9: error: Unsupported operating system freestanding
-        @compileError("Unsupported operating system " ++ @tagName(builtin.target.os.tag));
-        ^
-/home/user/zig-linux-x86_64-0.10.0-dev.2351+b64a1d5ab/lib/std/Thread/Futex.zig:85:27: note: called from here
-        return unsupported(.{ ptr, expect, timeout });
-                          ^
-/home/user/zig-linux-x86_64-0.10.0-dev.2351+b64a1d5ab/lib/std/Thread/Futex.zig:84:86: note: called from here
-    fn wait(ptr: *const Atomic(u32), expect: u32, timeout: ?u64) error{Timeout}!void {
-                                                                                     ^
-```
-
-TODO: Or implement `std.log.info`
-
-https://gist.github.com/leecannon/d6f5d7e5af5881c466161270347ce84d
