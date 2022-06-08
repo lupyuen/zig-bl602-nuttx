@@ -1678,7 +1678,7 @@ Here's the list of __Safety Checks__ done by Zig at runtime...
 
 # Panic Handler
 
-_Some debug features don't seem to be working right? Like `unreachable`, `std.debug.assert` and `std.debug.panic`?_
+_Some debug features don't seem to be working? Like `unreachable`, `std.debug.assert` and `std.debug.panic`?_
 
 That's because for Embedded Platforms we need to implement our own Panic Handler...
 
@@ -1702,7 +1702,7 @@ Stack Trace:
 0x23016ce0
 ```
 
-The first address `23016394` doesn't look interesting, because it's inside the `assert` function...
+According to our RISC-V Disassembly, the first address `23016394` doesn't look interesting, because it's inside the `assert` function...
 
 ```text
 /home/user/zig-linux-x86_64-0.10.0-dev.2351+b64a1d5ab/lib/std/debug.zig:259
