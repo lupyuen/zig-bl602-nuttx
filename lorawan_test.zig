@@ -234,7 +234,9 @@ fn UplinkProcess() void {
 
 /// Function executed on TxTimer event
 export fn OnTxTimerEvent(event: [*c]c.struct_ble_npl_event) void {
-    _ = printf("OnTxTimerEvent: timeout in %ld ms, event=%p\n", TxPeriodicity, event);
+    debug("OnTxTimerEvent: timeout in {} ms, event=0x{x}", .{
+        TxPeriodicity, @ptrToInt(event)
+    });
     c.TimerStop(&TxTimer);
     IsTxFramePending = 1;
 
@@ -419,12 +421,12 @@ export fn FragDecoderRead(addr: u32, data: [*c]u8, size: u32) i8 {
 }
 
 export fn OnFragProgress(fragCounter: u16, fragNb: u16, fragSize: u8, fragNbLost: u16) void {
-    _ = printf("\n###### =========== FRAG_DECODER ============ ######\n");
-    _ = printf("######               PROGRESS                ######\n");
-    _ = printf("###### ===================================== ######\n");
-    _ = printf("RECEIVED    : %5d / %5d Fragments\n", fragCounter, fragNb);
-    _ = printf("              %5d / %5d Bytes\n", fragCounter * fragSize, fragNb * fragSize);
-    _ = printf("LOST        :       %7d Fragments\n\n", fragNbLost);
+    debug("###### =========== FRAG_DECODER ============ ######", .{});
+    debug("######               PROGRESS                ######", .{});
+    debug("###### ===================================== ######", .{});
+    debug("RECEIVED    : {} / {} Fragments", .{ fragCounter, fragNb });
+    debug("              {} / {} Bytes", .{ fragCounter * fragSize, fragNb * fragSize });
+    debug("LOST        :      {} Fragments", .{ fragNbLost });
 }
 
 export fn OnFragDone(status: i32, size: u32) void {
@@ -434,11 +436,11 @@ export fn OnFragDone(status: i32, size: u32) void {
     );
     IsFileTransferDone = true;
 
-    _ = printf("\n###### =========== FRAG_DECODER ============ ######\n");
-    _ = printf("######               FINISHED                ######\n");
-    _ = printf("###### ===================================== ######\n");
-    _ = printf("STATUS      : %ld\n", status);
-    _ = printf("CRC         : %08lX\n\n", FileRxCrc);
+    debug("###### =========== FRAG_DECODER ============ ######", .{});
+    debug("######               FINISHED                ######", .{});
+    debug("###### ===================================== ######", .{});
+    debug("STATUS      : {}", .{ status });
+    debug("CRC         : {x}", .{ FileRxCrc});
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -458,8 +460,8 @@ fn handle_event_queue() void {
 
         // If no Event due to timeout, wait for next Event.
         // Should never happen since we wait forever for an Event.
-        if (ev == null) { _ = printf("."); continue; }
-        _ = printf("handle_event_queue: ev=%p\n", ev);
+        if (ev == null) { debug("handle_event_queue: timeout", .{}); continue; }
+        debug("handle_event_queue: ev=0x{x}", .{ @ptrToInt(ev) });
 
         // Remove the Event from the Event Queue
         c.ble_npl_eventq_remove(&event_queue, ev);
