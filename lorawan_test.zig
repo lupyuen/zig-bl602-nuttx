@@ -1,4 +1,5 @@
-//! LoRaWAN Zig App for NuttX. Ported from:
+//! LoRaWAN Zig App for NuttX. We call the LoRaWAN Library 
+//! to Join a LoRaWAN Network and send a Data Packet. Ported from:
 //! https://github.com/lupyuen/lorawan_test/blob/main/lorawan_test_main.c
 
 /// Import the Zig Standard Library
@@ -87,7 +88,7 @@ const UNFRAGMENTED_DATA_SIZE = 21 * 50;
 //  Main Function
 
 /// Main Function that will be called by NuttX. We call the LoRaWAN Library 
-//  to Join LoRaWAN Network and send a Data Packet.
+//  to Join a LoRaWAN Network and send a Data Packet.
 pub export fn lorawan_test_main(
     _argc: c_int, 
     _argv: [*]const [*]const u8
@@ -527,14 +528,21 @@ pub fn log(
     _ = _scope;
 
     // Format the message
-    // TODO: Expand the buffer
-    // TODO: Ensure that buffer is Null-Terminated
-    var buf = std.mem.zeroes([100]u8);
-    _ = std.fmt.bufPrint(&buf, format, args)
-        catch { _ = puts("*** log error"); };
+    var buf: [100]u8 = undefined;  // Limit to 100 chars
+    var slice = std.fmt.bufPrint(&buf, format, args)
+        catch { _ = puts("*** log error: buf too small"); return; };
+    
+    // Terminate the formatted message with a null
+    var buf2: [buf.len + 1 : 0]u8 = undefined;
+    std.mem.copy(
+        u8, 
+        buf2[0..slice.len], 
+        slice[0..slice.len]
+    );
+    buf2[slice.len] = 0;
 
-    // Print the message
-    _ = puts(@ptrCast([*c]const u8, &buf));
+    // Print the formatted message
+    _ = puts(&buf2);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
