@@ -793,11 +793,14 @@ extern fn LmHandlerInit(
     handlerParams: [*c]c.LmHandlerParams_t
 ) c.LmHandlerErrorStatus_t;
 
+/// For safety, we import these functions ourselves to enforce Null-Terminated Strings.
+/// We changed `[*c]const u8` to `[*:0]const u8`
+extern fn printf(format: [*:0]const u8, ...) c_int;
+extern fn puts(str: [*:0]const u8) c_int;
+
 /// LoRaWAN Event Queue
 extern var event_queue: c.struct_ble_npl_eventq;
 
-/// Aliases for C and Zig Standard Library
+/// Aliases for Zig Standard Library
 const assert = std.debug.assert;
 const debug  = std.log.debug;
-const printf = c.printf;
-const puts   = c.puts;
