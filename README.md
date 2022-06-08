@@ -72,6 +72,10 @@ For the LoRaWAN Zig App, see this...
 
 -   ["Convert LoRaWAN App to Zig"](#convert-lorawan-app-to-zig)
 
+To compile the LoRa SX1262 Library in C with Zig Compiler, see this...
+
+-   ["Zig Compiler as Drop-In Replacement for GCC"](#zig-compiler-as-drop-in-replacement-for-gcc)
+
 Here's how we made Zig and LoRaWAN run on BL602 NuttX...
 
 # Zig App for NuttX
@@ -456,6 +460,10 @@ NuttShell (NSH) NuttX-10.3.0-RC2
 nsh> hello
 Hello, Zig!
 ```
+
+![Pine64 PineCone BL602 Board (right) connected to Semtech SX1262 LoRa Transceiver (left) over SPI](https://lupyuen.github.io/images/spi2-title.jpg)
+
+[_Pine64 PineCone BL602 Board (right) connected to Semtech SX1262 LoRa Transceiver (left) over SPI_](https://lupyuen.github.io/articles/spi2)
 
 # Zig Compiler as Drop-In Replacement for GCC
 
