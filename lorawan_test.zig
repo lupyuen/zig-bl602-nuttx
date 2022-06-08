@@ -168,7 +168,7 @@ fn PrepareTxFrame() void {
     }
 
     // Send a message to LoRaWAN
-    const msg: [9]u8 = "Hi NuttX\x00".*;  // 9 bytes including null
+    const msg: []const u8 = "Hi NuttX\x00";  // 9 bytes including null
     debug("PrepareTxFrame: Transmit to LoRaWAN ({} bytes): {s}", .{ 
         msg.len, msg 
     });

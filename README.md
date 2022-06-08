@@ -1752,9 +1752,53 @@ pub fn panic(
 
 # Logging
 
-TODO: Implement `std.log.debug`
+We have implemented Debug Logging `std.log.debug` that's described here...
 
-https://gist.github.com/leecannon/d6f5d7e5af5881c466161270347ce84d
+-   ["A simple overview of Zig's std.log"](https://gist.github.com/leecannon/d6f5d7e5af5881c466161270347ce84d)
+
+Here's how we call `std.log.debug` to print a log message...
+
+```zig
+const debug  = std.log.debug;
+
+const msg: []const u8 = "Hi NuttX\x00";  // 9 bytes including null
+
+debug("Transmit to LoRaWAN ({} bytes): {s}", .{ 
+    msg.len, msg 
+});
+
+// Prints: Transmit to LoRaWAN (9 bytes): Hi NuttX
+```
+
+`.{ ... }` creates an [__Anonymous Struct__](https://ziglearn.org/chapter-1/#anonymous-structs) with a variable number of arguments that will be passed to `std.log.debug` for printing.
+
+Below is our implementation of `std.log.debug`...
+
+```zig
+/// Called by Zig for `std.log.debug`, `std.log.info`, `std.log.err`, ...
+/// https://gist.github.com/leecannon/d6f5d7e5af5881c466161270347ce84d
+pub fn log(
+    comptime _message_level: std.log.Level,
+    comptime _scope: @Type(.EnumLiteral),
+    comptime format: []const u8,
+    args: anytype,
+) void {
+    _ = _message_level;
+    _ = _scope;
+
+    // Format the message
+    // TODO: Expand the buffer
+    // TODO: Ensure that buffer is Null-Terminated
+    var buf = std.mem.zeroes([100]u8);
+    _ = std.fmt.bufPrint(&buf, format, args)
+        catch { _ = puts("*** log error"); };
+
+    // Print the message
+    _ = puts(@ptrCast([*c]const u8, &buf));
+}
+```
+
+[(Source)](https://github.com/lupyuen/zig-bl602-nuttx/blob/main/lorawan_test.zig#L518-L538)
 
 # TODO
 
