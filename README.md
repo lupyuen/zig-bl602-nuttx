@@ -1104,7 +1104,7 @@ Here's the original C code: [lorawan_test_main.c](https://github.com/lupyuen/lor
 
 And our converted LoRaWAN Zig App: [lorawan_test.zig](lorawan_test.zig)
 
-(631 lines of Zig code)
+(673 lines of Zig code)
 
 ```zig
 /// Import the LoRaWAN Library from C
