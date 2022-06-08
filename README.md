@@ -1689,7 +1689,11 @@ That's because for Embedded Platforms we need to implement our own Panic Handler
 With our own Panic Handler, this Assertion Failure...
 
 ```zig
-std.debug.assert(TxPeriodicity != 0);
+//  Create a short alias named `assert`
+const assert = std.debug.assert;
+
+//  Assertion Failure
+assert(TxPeriodicity != 0);
 ```
 
 Will show this Stack Trace...
@@ -1722,7 +1726,7 @@ But the second address `23016ce0` reveals the assertion that failed...
 
 ```text
 /home/user/nuttx/zig-bl602-nuttx/lorawan_test.zig:95
-    std.debug.assert(TxPeriodicity != 0);
+    assert(TxPeriodicity != 0);
 23016ccc:	42013537          	lui	a0,0x42013
 23016cd0:	fbc52503          	lw	a0,-68(a0) # 42012fbc <TxPeriodicity>
 23016cd4:	00a03533          	snez	a0,a0
@@ -1771,15 +1775,18 @@ We have implemented Debug Logging `std.log.debug` that's described here...
 Here's how we call `std.log.debug` to print a log message...
 
 ```zig
+//  Create a short alias named `debug`
 const debug  = std.log.debug;
 
-const msg: []const u8 = "Hi NuttX\x00";  // 9 bytes including null
+//  Message with 8 bytes
+const msg: []const u8 = "Hi NuttX";
 
+//  Print the message
 debug("Transmit to LoRaWAN ({} bytes): {s}", .{ 
     msg.len, msg 
 });
 
-// Prints: Transmit to LoRaWAN (9 bytes): Hi NuttX
+// Prints: Transmit to LoRaWAN (8 bytes): Hi NuttX
 ```
 
 `.{ ... }` creates an [__Anonymous Struct__](https://ziglearn.org/chapter-1/#anonymous-structs) with a variable number of arguments that will be passed to `std.log.debug` for printing.
