@@ -1,10 +1,10 @@
-# Zig on RISC-V BL602 with Apache NuttX RTOS
+# Zig on RISC-V BL602 with Apache NuttX RTOS and LoRaWAN
 
 Read the article...
 
 -   ["Zig on RISC-V BL602: Quick Peek with Apache NuttX RTOS"](https://lupyuen.github.io/articles/zig)
 
-To build the Zig App for NuttX on BL602...
+To build the Hello Zig App for NuttX on BL602...
 
 ```bash
 ##  Enable Zig App in NuttX menuconfig
@@ -68,7 +68,11 @@ nsh> hello
 Hello, Zig!
 ```
 
-Here's how we made Zig run on BL602 NuttX...
+For the LoRaWAN Zig App, see this...
+
+-   ["Cnovert LoRaWAN App to Zig"](#convert-lorawan-app-to-zig)
+
+Here's how we made Zig and LoRaWAN run on BL602 NuttX...
 
 # Zig App for NuttX
 
