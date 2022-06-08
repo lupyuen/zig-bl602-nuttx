@@ -1812,6 +1812,8 @@ pub fn log(
 
 [(Source)](https://github.com/lupyuen/zig-bl602-nuttx/blob/main/lorawan_test.zig#L518-L538)
 
+This implementation calls `puts()`, which is supported by Apache NuttX RTOS since it's [__POSIX-Compliant__](https://nuttx.apache.org/docs/latest/introduction/inviolables.html#strict-posix-compliance).
+
 # TODO
 
 TODO: Clean up names of Types, Functions and Variables
