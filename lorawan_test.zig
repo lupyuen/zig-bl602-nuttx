@@ -203,7 +203,7 @@ fn PrepareTxFrame() void {
 }
 
 fn StartTxProcess(txEvent: LmHandlerTxEvents_t) void {
-    _ = puts("StartTxProcess");
+    debug("StartTxProcess", .{});
     switch (txEvent) {
         LmHandlerTxEvents_t.LORAMAC_HANDLER_TX_ON_TIMER => {
             // Schedule 1st packet transmission
@@ -218,12 +218,12 @@ fn StartTxProcess(txEvent: LmHandlerTxEvents_t) void {
 }
 
 fn UplinkProcess() void {
-    _ = puts("UplinkProcess");
+    debug("UplinkProcess", .{});
     var isPending: u8 = 0;
-    // TODO: CRITICAL_SECTION_BEGIN( );
+    // TODO: CRITICAL_SECTION_BEGIN();
     isPending = IsTxFramePending;
     IsTxFramePending = 0;
-    // TODO: CRITICAL_SECTION_END( );
+    // TODO: CRITICAL_SECTION_END();
     if (isPending == 1) {
         PrepareTxFrame();
     }
@@ -272,7 +272,7 @@ export fn OnMacMlmeRequest(
 }
 
 export fn OnJoinRequest(params: [*c]c.LmHandlerJoinParams_t) void {
-    _ = puts("OnJoinRequest");
+    debug("OnJoinRequest", .{});
     c.DisplayJoinRequestUpdate(params);
     if (params.*.Status == c.LORAMAC_HANDLER_ERROR) {
         c.LmHandlerJoin();
@@ -282,17 +282,17 @@ export fn OnJoinRequest(params: [*c]c.LmHandlerJoinParams_t) void {
 }
 
 export fn OnTxData(params: [*c]c.LmHandlerTxParams_t) void {
-    _ = puts("OnTxData");
+    debug("OnTxData", .{});
     c.DisplayTxUpdate(params);
 }
 
 export fn OnRxData(appData: [*c]c.LmHandlerAppData_t, params: [*c]c.LmHandlerRxParams_t) void {
-    _ = puts("OnRxData");
+    debug("OnRxData", .{});
     c.DisplayRxUpdate(appData, params);
 }
 
 export fn OnClassChange(deviceClass: c.DeviceClass_t) void {
-    _ = puts("OnClassChange");
+    debug("OnClassChange", .{});
     c.DisplayClassUpdate(deviceClass);
 
     switch (deviceClass) {
@@ -324,13 +324,13 @@ export fn OnClassChange(deviceClass: c.DeviceClass_t) void {
 export fn OnBeaconStatusChange(params: [*c]c.LoRaMacHandlerBeaconParams_t) void {
     switch (params.*.State) {
         c.LORAMAC_HANDLER_BEACON_RX => {
-            _ = puts("OnBeaconStatusChange: LORAMAC_HANDLER_BEACON_RX");
+            debug("OnBeaconStatusChange: LORAMAC_HANDLER_BEACON_RX", .{});
         },
         c.LORAMAC_HANDLER_BEACON_LOST => {
-            _ = puts("OnBeaconStatusChange: LORAMAC_HANDLER_BEACON_LOST");
+            debug("OnBeaconStatusChange: LORAMAC_HANDLER_BEACON_LOST", .{});
         },
         c.LORAMAC_HANDLER_BEACON_NRX => {
-            _ = puts("OnBeaconStatusChange: LORAMAC_HANDLER_BEACON_NRX");
+            debug("OnBeaconStatusChange: LORAMAC_HANDLER_BEACON_NRX", .{});
         },
         else => {
             unreachable;
@@ -446,7 +446,7 @@ export fn OnFragDone(status: i32, size: u32) void {
 
 /// LoRaWAN Event Loop that dequeues Events from the Event Queue and processes the Events
 fn handle_event_queue() void {
-    _ = puts("handle_event_queue");
+    debug("handle_event_queue", .{});
 
     // Loop forever handling Events from the Event Queue
     while (true) {
