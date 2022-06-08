@@ -173,19 +173,11 @@ fn PrepareTxFrame() void {
         .{ msg, @sizeOf(@TypeOf(msg)) }
     );
 
-    // TODO: App fails to receive Join Accept Response if we call `std.mem.copy` instead of `memcpy`. Why?
-    // std.mem.copy(
-    //     u8, 
-    //     AppDataBuffer[0..@sizeOf(@TypeOf(msg)) - 1], 
-    //     msg[0..@sizeOf(@TypeOf(msg)) - 1]
-    // );
-
     // Compose the transmit request
-    assert(@sizeOf(@TypeOf(msg)) <= @sizeOf(@TypeOf(AppDataBuffer)));
-    _ = c.memcpy(
-        @ptrCast(?*anyopaque, @ptrCast([*c]u8, @alignCast(std.meta.alignment(u8), &AppDataBuffer))), 
-        @ptrCast(?*const anyopaque, @ptrCast([*c]const u8, @alignCast(std.meta.alignment(u8), &msg))), 
-        @sizeOf(@TypeOf(msg))
+    std.mem.copy(
+        u8, 
+        AppDataBuffer[0..@sizeOf(@TypeOf(msg)) - 1], 
+        msg[0..@sizeOf(@TypeOf(msg)) - 1]
     );
     var appData = c.LmHandlerAppData_t {
         .Buffer     = @ptrCast([*c]u8, @alignCast(std.meta.alignment(u8), &AppDataBuffer)),
