@@ -163,25 +163,25 @@ pub export fn lorawan_test_main(
 fn PrepareTxFrame() void {
     // If we haven't joined the LoRaWAN Network, try again later
     if (c.LmHandlerIsBusy()) {
-        _ = puts("PrepareTxFrame: Busy");
+        debug("PrepareTxFrame: Busy", .{});
         return;
     }
 
     // Send a message to LoRaWAN
-    const msg: [8:0]u8 = "Hi NuttX".*;  // 9 bytes including null
-    debug("PrepareTxFrame: Transmit to LoRaWAN: {s} ({} bytes)",
-        .{ msg, @sizeOf(@TypeOf(msg)) }
-    );
+    const msg: [9]u8 = "Hi NuttX\x00".*;  // 9 bytes including null
+    debug("PrepareTxFrame: Transmit to LoRaWAN ({} bytes): {s}", .{ 
+        msg.len, msg 
+    });
 
     // Compose the transmit request
     std.mem.copy(
         u8, 
-        AppDataBuffer[0..@sizeOf(@TypeOf(msg)) - 1], 
-        msg[0..@sizeOf(@TypeOf(msg)) - 1]
+        AppDataBuffer[0..msg.len], 
+        msg[0..msg.len]
     );
     var appData = c.LmHandlerAppData_t {
-        .Buffer     = @ptrCast([*c]u8, @alignCast(std.meta.alignment(u8), &AppDataBuffer)),
-        .BufferSize = @sizeOf(@TypeOf(msg)),
+        .Buffer     = @ptrCast([*c]u8, &AppDataBuffer),
+        .BufferSize = msg.len,
         .Port       = 1,
     };
 
