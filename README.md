@@ -70,7 +70,7 @@ Hello, Zig!
 
 For the LoRaWAN Zig App, see this...
 
--   ["Cnovert LoRaWAN App to Zig"](#convert-lorawan-app-to-zig)
+-   ["Convert LoRaWAN App to Zig"](#convert-lorawan-app-to-zig)
 
 Here's how we made Zig and LoRaWAN run on BL602 NuttX...
 
