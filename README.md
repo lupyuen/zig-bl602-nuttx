@@ -1,8 +1,10 @@
 # Zig on RISC-V BL602 with Apache NuttX RTOS and LoRaWAN
 
-Read the article...
+Read the articles...
 
 -   ["Zig on RISC-V BL602: Quick Peek with Apache NuttX RTOS"](https://lupyuen.github.io/articles/zig)
+
+-   ["Build an IoT App with Zig and LoRaWAN"](https://lupyuen.github.io/articles/iot)
 
 To build the Hello Zig App for NuttX on BL602...
 
@@ -62,9 +64,6 @@ Boot NuttX and enter this at the NuttX Shell...
 NuttShell (NSH) NuttX-10.3.0-RC2
 
 nsh> hello_zig
-Hello, Zig!
-
-nsh> hello
 Hello, Zig!
 ```
 
