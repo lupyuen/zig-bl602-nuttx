@@ -88,7 +88,7 @@ const UNFRAGMENTED_DATA_SIZE = 21 * 50;
 //  Main Function
 
 /// Main Function that will be called by NuttX. We call the LoRaWAN Library 
-//  to Join a LoRaWAN Network and send a Data Packet.
+/// to Join a LoRaWAN Network and send a Data Packet.
 pub export fn lorawan_test_main(
     _argc: c_int, 
     _argv: [*]const [*]const u8

@@ -1832,6 +1832,137 @@ pub fn log(
 
 This implementation calls `puts()`, which is supported by Apache NuttX RTOS since it's [__POSIX-Compliant__](https://nuttx.apache.org/docs/latest/introduction/inviolables.html#strict-posix-compliance).
 
+# Compare C and Zig
+
+The Original C Code and the Converted Zig Code for our LoRaWAN App look highly similar.
+
+Here's the Main Function from our Original C Code...
+
+```c
+/// Main Function that will be called by NuttX. We call the LoRaWAN Library 
+/// to Join a LoRaWAN Network and send a Data Packet.
+int main(int argc, FAR char *argv[]) {
+    //  If we are using Entropy Pool and the BL602 ADC is available,
+    //  add the Internal Temperature Sensor data to the Entropy Pool
+    init_entropy_pool();
+
+    //  Compute the interval between transmissions based on Duty Cycle
+    TxPeriodicity = APP_TX_DUTYCYCLE + randr( -APP_TX_DUTYCYCLE_RND, APP_TX_DUTYCYCLE_RND );
+
+    const Version_t appVersion    = { .Value = FIRMWARE_VERSION };
+    const Version_t gitHubVersion = { .Value = GITHUB_VERSION };
+    DisplayAppInfo( "lorawan_test", 
+                    &appVersion,
+                    &gitHubVersion );
+
+    //  Init LoRaWAN
+    if ( LmHandlerInit( &LmHandlerCallbacks, &LmHandlerParams ) != LORAMAC_HANDLER_SUCCESS )
+    {
+        printf( "LoRaMac wasn't properly initialized\n" );
+        //  Fatal error, endless loop.
+        while ( 1 ) {}
+    }
+
+    // Set system maximum tolerated rx error in milliseconds
+    LmHandlerSetSystemMaxRxError( 20 );
+
+    // The LoRa-Alliance Compliance protocol package should always be initialized and activated.
+    LmHandlerPackageRegister( PACKAGE_ID_COMPLIANCE, &LmhpComplianceParams );
+    LmHandlerPackageRegister( PACKAGE_ID_CLOCK_SYNC, NULL );
+    LmHandlerPackageRegister( PACKAGE_ID_REMOTE_MCAST_SETUP, NULL );
+    LmHandlerPackageRegister( PACKAGE_ID_FRAGMENTATION, &FragmentationParams );
+
+    IsClockSynched     = false;
+    IsFileTransferDone = false;
+
+    //  Join the LoRaWAN Network
+    LmHandlerJoin( );
+
+    //  Set the Transmit Timer
+    StartTxProcess( LORAMAC_HANDLER_TX_ON_TIMER );
+
+    //  Handle LoRaWAN Events
+    handle_event_queue(NULL);  //  Never returns
+
+    return 0;
+}
+```
+
+[(Source)](https://github.com/lupyuen/lorawan_test/blob/main/lorawan_test_main.c#L271-L323)
+
+And the Main Function from our Converted Zig Code (after some scrubbing)...
+
+```zig
+/// Main Function that will be called by NuttX. We call the LoRaWAN Library 
+/// to Join a LoRaWAN Network and send a Data Packet.
+pub export fn lorawan_test_main(
+    _argc: c_int, 
+    _argv: [*]const [*]const u8
+) c_int {
+    _ = _argc;
+    _ = _argv;
+
+    // Init the Timer Struct at startup
+    TxTimer = std.mem.zeroes(c.TimerEvent_t);
+
+    // If we are using Entropy Pool and the BL602 ADC is available,
+    // add the Internal Temperature Sensor data to the Entropy Pool
+    // TODO: init_entropy_pool();
+
+    // Compute the interval between transmissions based on Duty Cycle
+    TxPeriodicity = @bitCast(u32,  // Cast to u32 because randr() can be negative
+        APP_TX_DUTYCYCLE +
+        c.randr(
+            -APP_TX_DUTYCYCLE_RND,
+            APP_TX_DUTYCYCLE_RND
+        )
+    );
+
+    // Show the Firmware and GitHub Versions
+    const appVersion = c.Version_t {
+        .Value = c.FIRMWARE_VERSION,
+    };
+    const gitHubVersion = c.Version_t {
+        .Value = c.GITHUB_VERSION,
+    };
+    c.DisplayAppInfo("Zig LoRaWAN Test", &appVersion, &gitHubVersion);
+
+    // Init LoRaWAN
+    if (LmHandlerInit(&LmHandlerCallbacks, &LmHandlerParams)
+        != c.LORAMAC_HANDLER_SUCCESS) {
+        std.log.err("LoRaMac wasn't properly initialized", .{});
+        // Fatal error, endless loop.
+        while (true) {}
+    }
+
+    // Set system maximum tolerated rx error in milliseconds
+    _ = c.LmHandlerSetSystemMaxRxError(20);
+
+    // The LoRa-Alliance Compliance protocol package should always be initialized and activated.
+    _ = c.LmHandlerPackageRegister(c.PACKAGE_ID_COMPLIANCE,         &LmhpComplianceParams);
+    _ = c.LmHandlerPackageRegister(c.PACKAGE_ID_CLOCK_SYNC,         null);
+    _ = c.LmHandlerPackageRegister(c.PACKAGE_ID_REMOTE_MCAST_SETUP, null);
+    _ = c.LmHandlerPackageRegister(c.PACKAGE_ID_FRAGMENTATION,      &FragmentationParams);
+
+    // Init the Clock Sync and File Transfer status
+    IsClockSynched     = false;
+    IsFileTransferDone = false;
+
+    // Join the LoRaWAN Network
+    c.LmHandlerJoin();
+
+    // Set the Transmit Timer
+    StartTxProcess(LmHandlerTxEvents_t.LORAMAC_HANDLER_TX_ON_TIMER);
+
+    // Handle LoRaWAN Events
+    handle_event_queue();  //  Never returns
+
+    return 0;
+}
+```
+
+[(Source)](https://github.com/lupyuen/zig-bl602-nuttx/blob/main/lorawan_test.zig#L90-L158)
+
 # TODO
 
 TODO: Clean up names of Types, Functions and Variables
