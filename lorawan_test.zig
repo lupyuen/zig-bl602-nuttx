@@ -104,7 +104,7 @@ pub export fn lorawan_test_main(
     // TODO: init_entropy_pool();
 
     // Compute the interval between transmissions based on Duty Cycle
-    TxPeriodicity = @bitCast(u32,  // Cast to u32 because randr() can be negative
+    TxPeriodicity = @intCast(u32,  // Cast to u32 because randr() can be negative
         APP_TX_DUTYCYCLE +
         c.randr(
             -APP_TX_DUTYCYCLE_RND,
@@ -372,7 +372,7 @@ export fn OnTxPeriodicityChanged(periodicity: u32) void {
 
     if (TxPeriodicity == 0) {
         // Revert to application default periodicity
-        TxPeriodicity = @bitCast(u32,  // Cast to u32 because randr() can be negative
+        TxPeriodicity = @intCast(u32,  // Cast to u32 because randr() can be negative
             APP_TX_DUTYCYCLE +
             c.randr(
                 -APP_TX_DUTYCYCLE_RND,
