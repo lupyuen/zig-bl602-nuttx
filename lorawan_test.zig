@@ -168,20 +168,22 @@ fn PrepareTxFrame() void {
         return;
     }
 
-    // Send a message to LoRaWAN
+    // Message to be sent to LoRaWAN
     const msg: []const u8 = "Hi NuttX\x00";  // 9 bytes including null
     debug("PrepareTxFrame: Transmit to LoRaWAN ({} bytes): {s}", .{ 
         msg.len, msg 
     });
 
-    // Compose the transmit request
+    // Copy message into LoRaWAN buffer
     std.mem.copy(
-        u8, 
-        AppDataBuffer[0..msg.len], 
-        msg[0..msg.len]
+        u8,              // Type
+        &AppDataBuffer,  // Destination
+        msg              // Source
     );
+
+    // Compose the transmit request
     var appData = c.LmHandlerAppData_t {
-        .Buffer     = @ptrCast([*c]u8, &AppDataBuffer),
+        .Buffer     = &AppDataBuffer,
         .BufferSize = msg.len,
         .Port       = 1,
     };
@@ -431,8 +433,8 @@ export fn OnFragProgress(fragCounter: u16, fragNb: u16, fragSize: u8, fragNbLost
 
 export fn OnFragDone(status: i32, size: u32) void {
     FileRxCrc = c.Crc32(
-        @ptrCast([*c]u8, @alignCast(std.meta.alignment(u8), &UnfragmentedData)),
-        @truncate(u16, size)
+        &UnfragmentedData,
+        @intCast(u16, size)
     );
     IsFileTransferDone = true;
 
@@ -673,7 +675,7 @@ var LmHandlerParams = c.LmHandlerParams_t {
     .PublicNetworkEnable = true, // Previously: c.LORAWAN_PUBLIC_NETWORK,
     .DutyCycleEnabled    = LORAWAN_DUTYCYCLE_ON,
     .DataBufferMaxSize   = LORAWAN_APP_DATA_BUFFER_MAX_SIZE,
-    .DataBuffer          = @ptrCast([*c]u8, @alignCast(std.meta.alignment(u8), &AppDataBuffer)),
+    .DataBuffer          = &AppDataBuffer,
     .PingSlotPeriodicity = c.REGION_COMMON_DEFAULT_PING_SLOT_PERIODICITY,
 };
 
