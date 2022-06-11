@@ -649,7 +649,8 @@ pub fn log(
 //  Variables
 
 /// Handler Callbacks. Changed `c.LmHandlerCallbacks_t` to `LmHandlerCallbacks_t`
-var LmHandlerCallbacks = LmHandlerCallbacks_t {
+/// (Aligned to 32 bits because it's passed to C)
+var LmHandlerCallbacks align(4) = LmHandlerCallbacks_t {
     .GetBatteryLevel           = BoardGetBatteryLevel,
     .GetTemperature            = BoardGetTemperature,
     .GetRandomSeed             = BoardGetRandomSeed,
@@ -667,7 +668,8 @@ var LmHandlerCallbacks = LmHandlerCallbacks_t {
 };
 
 //// Handler Parameters
-var LmHandlerParams = c.LmHandlerParams_t {
+/// (Aligned to 32 bits because it's passed to C)
+var LmHandlerParams align(4) = c.LmHandlerParams_t {
     .Region              = ACTIVE_REGION,
     .AdrEnable           = LORAWAN_ADR_STATE,
     .IsTxConfirmed       = LORAWAN_DEFAULT_CONFIRMED_MSG_STATE,
@@ -680,7 +682,8 @@ var LmHandlerParams = c.LmHandlerParams_t {
 };
 
 /// Compliance Parameters
-var LmhpComplianceParams = c.LmhpComplianceParams_t {
+/// (Aligned to 32 bits because it's passed to C)
+var LmhpComplianceParams align(4) = c.LmhpComplianceParams_t {
     .FwVersion = c.Version_t {
         .Value = c.FIRMWARE_VERSION,
     },
@@ -689,8 +692,9 @@ var LmhpComplianceParams = c.LmhpComplianceParams_t {
     .OnPingSlotPeriodicityChanged = OnPingSlotPeriodicityChanged,
 };
 
-//// Fragmentation Parameters (Unused)
-var FragmentationParams = c.LmhpFragmentationParams_t {
+/// Fragmentation Parameters (Unused)
+/// (Aligned to 32 bits because it's passed to C)
+var FragmentationParams align(4) = c.LmhpFragmentationParams_t {
 // TODO: #if( FRAG_DECODER_FILE_HANDLING_NEW_API == 1 )
     .DecoderCallbacks = c.FragDecoderCallbacks_t {
         .FragDecoderWrite = FragDecoderWrite,
@@ -705,43 +709,45 @@ var FragmentationParams = c.LmhpFragmentationParams_t {
 };
 
 /// Indicates if LoRaMacProcess call is pending.
-/// \warning If variable is equal to 0 then the MCU can be set in low power mode
-var IsMacProcessPending: u8 = 0;  // uint8_t
+/// If variable is equal to 0 then the MCU can be set in low power mode
+var IsMacProcessPending: u8 = 0;
 
-var IsTxFramePending: u8 = 0;  //  uint8_t
+/// Set to 1 if a transmit is pending
+var IsTxFramePending: u8 = 0;
 
-var TxPeriodicity: u32 = 0;  // uint32_t
+/// Random interval between transmissions (milliseconds)
+var TxPeriodicity: u32 = 0;
 
 /// Indicates if the system time has been synchronized
-var IsClockSynched: bool = false;  // bool
+var IsClockSynched: bool = false;
 
 /// MC Session Started
-var IsMcSessionStarted: bool = false;  // bool
+var IsMcSessionStarted: bool = false;
 
 /// Indicates if the file transfer is done
-var IsFileTransferDone: bool = false;  // bool
+var IsFileTransferDone: bool = false;
 
 /// Received file computed CRC32
-var FileRxCrc: u32 = 0;  // uint32_t
+var FileRxCrc: u32 = 0;
 
 /// User application data
-/// (Aligned to 32-bit because it's exported to C)
-var AppDataBuffer: [LORAWAN_APP_DATA_BUFFER_MAX_SIZE]u8 align(4) = 
+/// (Aligned to 32 bits because it's passed to C)
+var AppDataBuffer align(4) = 
     std.mem.zeroes([LORAWAN_APP_DATA_BUFFER_MAX_SIZE]u8);
 
 /// Un-fragmented data storage (Unused)
-/// (Aligned to 32-bit because it's exported to C)
-var UnfragmentedData: [UNFRAGMENTED_DATA_SIZE]u8 align(4) = 
+/// (Aligned to 32 bits because it's passed to C)
+var UnfragmentedData align(4) = 
     std.mem.zeroes([UNFRAGMENTED_DATA_SIZE]u8);
 
 /// Timer to handle the application data transmission duty cycle.
 /// We Init the timer in Main Function.
-/// (Aligned to 32-bit because it's exported to C)
+/// (Aligned to 32 bits because it's passed to C)
 var TxTimer: c.TimerEvent_t align(4) = 
     undefined;
 
 // If we init TxTimer...
-// var TxTimer: c.TimerEvent_t = 
+// var TxTimer: c.TimerEvent_t align(4) = 
 //   std.mem.zeroes(c.TimerEvent_t);
 // Zig Compiler crashes with...
 //   TODO buf_write_value_bytes maybe typethread 11512 panic:
