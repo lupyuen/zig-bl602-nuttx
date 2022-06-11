@@ -160,7 +160,7 @@ pub export fn lorawan_test_main(
 ///////////////////////////////////////////////////////////////////////////////
 //  Transmit Data
 
-/// Prepare the payload of a Data Packet transmit it
+/// Prepare the payload of a Data Packet and transmit it
 fn PrepareTxFrame() void {
     // If we haven't joined the LoRaWAN Network, try again later
     if (c.LmHandlerIsBusy()) {
