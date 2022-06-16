@@ -2065,7 +2065,9 @@ https://gist.github.com/lupyuen/0871ac515b18d9d68d3aacf831fd0f5b
 
 TODO: Render Call Graph with Mermaid.js
 
-TODO: Group LoRaWAN Functions in Call Graph by LoRaWAN Module, so we can see the calls across LoRaWAN Modules
+https://mermaid-js.github.io/mermaid/#/./flowchart?id=flowcharts
+
+TODO: Group LoRaWAN Functions in Call Graph by LoRaWAN Module (Subgraph), so we can see the calls across LoRaWAN Modules
 
 TODO: Manually partition the LoRaWAN Functions into LoRaWAN Modules, since we don't have Source File Info in Zig
 
