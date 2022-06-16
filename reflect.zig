@@ -848,22 +848,37 @@ fn reflect() void {
         @compileLog("T.Struct.decls[0].name: ", T.Struct.decls[0].name);
         // Shows | *"T.Struct.decls[0].name: ", "__builtin_bswap16"
 
-        @compileLog("@TypeOf(c.LmHandlerJoin): ", @TypeOf(c.LmHandlerJoin));
+        // Remember the C Header
+        var header: []const u8 = "";
 
         // For every C Declaration...
         for (T.Struct.decls) |decl, i| {
-            // If the C Declaration starts with "Lm" (LoRaMAC)...
-            if (std.mem.startsWith(u8, decl.name, "Lm")) {
-                // Dump the C Declaration
-                var T2 = @typeInfo(c);
-                @compileLog("decl.name: ", T2.Struct.decls[i].name);
+            var T2 = @typeInfo(c);
 
-                // Strangely we can't do this...
-                //   @compileLog("decl.name: ", i, decl.name);
-                // Because it shows...
-                //   *"decl.name: ", []const u8{76,109,110,83,116,97,116,117,115,95,116}
+            // If the C Declaration ends with "_H"...
+            if (
+                std.mem.endsWith(u8, decl.name, "_H") or
+                std.mem.endsWith(u8, decl.name, "_H_") or
+                std.mem.endsWith(u8, decl.name, "_H__")
+            ) {
+                // Dump the C Header and remember it
+                var name = T2.Struct.decls[i].name;
+                @compileLog("-----", name);
+                header = name;
+
+            // Else if we have seen a header...
+            } else if (!std.mem.eql(u8, header, "")) {
+                // Dump the C Declaration
+                var name = T2.Struct.decls[i].name;
+                @compileLog("decl.name:", name);
             }
-        }
+
+            // Strangely we can't do this...
+            //   @compileLog("decl.name:", decl.name);
+            // Because it shows...
+            //   *"decl.name:", []const u8{76,109,110,83,116,97,116,117,115,95,116}
+
+        }   // End of C Declaration
 
     }   // End of Compile-Time Code
 }

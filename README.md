@@ -1962,6 +1962,31 @@ pub export fn lorawan_test_main(
 
 [(Source)](https://github.com/lupyuen/zig-bl602-nuttx/blob/main/lorawan_test.zig#L90-L158)
 
+TODO: Clean up names of Types, Functions and Variables
+
+TODO: Read the Internal Temperature Sensor
+
+TODO: Encode the Temperature Sensor Data with TinyCBOR and transmit to The Things Network
+
+https://lupyuen.github.io/articles/cbor2
+
+TODO: Monitor sensor data with Prometheus and Grafana
+
+https://lupyuen.github.io/articles/prometheus
+
+TODO: Add new code with `@import()`
+
+https://zig.news/mattnite/import-and-packages-23mb
+
+TODO: Do we need to align buffers to 32 bits when exporting to C?
+
+```zig
+/// User application data
+/// (Aligned to 32-bit because it's exported to C)
+var AppDataBuffer: [LORAWAN_APP_DATA_BUFFER_MAX_SIZE]u8 align(4) = 
+    std.mem.zeroes([LORAWAN_APP_DATA_BUFFER_MAX_SIZE]u8);
+```
+
 # Zig Type Reflection
 
 Zig Type Reflection ... Can we use it to generate a Structured Call Graph for C Libraries ... Like for #LoRaWAN? 🤔
@@ -2069,31 +2094,4 @@ https://mermaid-js.github.io/mermaid/#/./flowchart?id=flowcharts
 
 TODO: Group LoRaWAN Functions in Call Graph by LoRaWAN Module (Subgraph), so we can see the calls across LoRaWAN Modules
 
-TODO: Manually partition the LoRaWAN Functions into LoRaWAN Modules, since we don't have Source File Info in Zig
-
-# TODO
-
-TODO: Clean up names of Types, Functions and Variables
-
-TODO: Read the Internal Temperature Sensor
-
-TODO: Encode the Temperature Sensor Data with TinyCBOR and transmit to The Things Network
-
-https://lupyuen.github.io/articles/cbor2
-
-TODO: Monitor sensor data with Prometheus and Grafana
-
-https://lupyuen.github.io/articles/prometheus
-
-TODO: Add new code with `@import()`
-
-https://zig.news/mattnite/import-and-packages-23mb
-
-TODO: Do we need to align buffers to 32 bits when exporting to C?
-
-```zig
-/// User application data
-/// (Aligned to 32-bit because it's exported to C)
-var AppDataBuffer: [LORAWAN_APP_DATA_BUFFER_MAX_SIZE]u8 align(4) = 
-    std.mem.zeroes([LORAWAN_APP_DATA_BUFFER_MAX_SIZE]u8);
-```
+TODO: Automatically partition the LoRaWAN Functions into LoRaWAN Modules, by analysing the HEADER_NAME_H__ symbols
