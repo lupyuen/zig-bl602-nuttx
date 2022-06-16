@@ -848,26 +848,27 @@ fn reflect() void {
         @compileLog("T.Struct.decls[0].name: ", T.Struct.decls[0].name);
         // Shows | *"T.Struct.decls[0].name: ", "__builtin_bswap16"
 
-        @compileLog("T.Struct.decls[4743].name: ", T.Struct.decls[4743].name);
-        
         // For every C Declaration...
         for (T.Struct.decls) |decl, i| {
             // If the C Declaration starts with "Lm" (LoRaMAC)...
             if (std.mem.startsWith(u8, decl.name, "Lm")) {
                 // Dump the C Declaration
-                @compileLog("decl.name: ", i, decl.name);
-                //  Shows | *"decl.name: ", []const u8{76,109,110,83,116,97,116,117,115,95,116}
+                var T2 = @typeInfo(c);
+                @compileLog("decl.name: ", T2.Struct.decls[i].name);
 
-                process_decl(i);
+                // Strangely we can't do this...
+                //   @compileLog("decl.name: ", i, decl.name);
+                // Because it shows...
+                //   *"decl.name: ", []const u8{76,109,110,83,116,97,116,117,115,95,116}
             }
         }
-        @compileLog("@typeInfo(c).Struct.decls[4743].name: ", @typeInfo(c).Struct.decls[4743].name);
 
     }   // End of Compile-Time Code
 }
 
-fn process_decl(i: u32) void {
-    comptime {
-        @compileLog("decl.name: ", i, @typeInfo(c).Struct.decls[i].name);
-    }
-}
+// fn process_decl(i: u32) void {
+//     comptime {
+//         var T = @typeInfo(c);
+//         @compileLog("decl.name: ", i, T.Struct.decls[i].name);
+//     }
+// }
