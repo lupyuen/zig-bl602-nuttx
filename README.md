@@ -2059,6 +2059,16 @@ Which is a list of C Types and Functions from the LoRaWAN Library.
 
 TODO: Use this to visualise the Call Graph (by module) for the LoRaWAN Library.
 
+TODO: Import LoRaWAN Call Log into Zig: 
+
+https://gist.github.com/lupyuen/0871ac515b18d9d68d3aacf831fd0f5b
+
+TODO: Render Call Graph with Mermaid.js
+
+TODO: Group LoRaWAN Functions in Call Graph by LoRaWAN Module, so we can see the calls across LoRaWAN Modules
+
+TODO: Manually partition the LoRaWAN Functions into LoRaWAN Modules, since we don't have Source File Info in Zig
+
 # TODO
 
 TODO: Clean up names of Types, Functions and Variables

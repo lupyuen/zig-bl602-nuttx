@@ -848,6 +848,8 @@ fn reflect() void {
         @compileLog("T.Struct.decls[0].name: ", T.Struct.decls[0].name);
         // Shows | *"T.Struct.decls[0].name: ", "__builtin_bswap16"
 
+        @compileLog("@TypeOf(c.LmHandlerJoin): ", @TypeOf(c.LmHandlerJoin));
+
         // For every C Declaration...
         for (T.Struct.decls) |decl, i| {
             // If the C Declaration starts with "Lm" (LoRaMAC)...
