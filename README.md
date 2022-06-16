@@ -1962,6 +1962,101 @@ pub export fn lorawan_test_main(
 
 [(Source)](https://github.com/lupyuen/zig-bl602-nuttx/blob/main/lorawan_test.zig#L90-L158)
 
+# Zig Type Reflection
+
+ZigLang Type Reflection ... Can we use it to generate a Structured Call Graph for C Libraries ... Like for #LoRaWAN? 🤔
+
+This Zig Program imports the LoRaWAN Library from C and dumps out the LoRaWAN Types and Functions...
+
+```zig
+// Do Type Reflection on the imported C functions
+fn reflect() void {
+    // We run this at Compile-Time (instead of Runtime)...
+    comptime {
+        // Allow Zig Compiler to loop up to 100,000 times (Default is 1,000)
+        @setEvalBranchQuota(100_000);
+
+        // Get the Type Info of the C Namespace
+        const T = @typeInfo(c);
+
+        // Show the Type Info of the C Namespace (Struct)
+        @compileLog("@typeInfo(c): ", T);
+        // Shows | *"@typeInfo(c): ", std.builtin.Type { .Struct = (struct std.builtin.Type.Struct constant)}
+
+        // Show the number of Fields in the C Namespace (0)
+        @compileLog("T.Struct.fields.len: ", T.Struct.fields.len);
+        // Shows | *"T.Struct.fields.len: ", 0
+
+        // Show the number of Declarations in the C Namespace (4743)
+        @compileLog("T.Struct.decls.len: ", T.Struct.decls.len);
+        // Shows | *"T.Struct.decls.len: ", 4743
+
+        // Show the first Declaration in the C Namespace (__builtin_bswap16)
+        @compileLog("T.Struct.decls[0].name: ", T.Struct.decls[0].name);
+        // Shows | *"T.Struct.decls[0].name: ", "__builtin_bswap16"
+
+        // For every C Declaration...
+        for (T.Struct.decls) |decl, i| {
+            // If the C Declaration starts with "Lm" (LoRaMAC)...
+            if (std.mem.startsWith(u8, decl.name, "Lm")) {
+                // Dump the C Declaration
+                var T2 = @typeInfo(c);
+                @compileLog("decl.name: ", T2.Struct.decls[i].name);
+
+                // Strangely we can't do this...
+                //   @compileLog("decl.name: ", i, decl.name);
+                // Because it shows...
+                //   *"decl.name: ", []const u8{76,109,110,83,116,97,116,117,115,95,116}
+            }
+        }
+
+    }   // End of Compile-Time Code
+}
+```
+
+[(Source)](https://github.com/lupyuen/zig-bl602-nuttx/blob/main/reflect.zig#L822-L867)
+
+When Zig Compiler compiles the code above, we see this at Compile-Time...
+
+```text
+$ zig build-obj --verbose-cimport -target riscv32-freestanding-none -mcpu=baseline_rv32-d -isystem /Users/Luppy/pinecone/nuttx/nuttx/include -I /Users/Luppy/pinecone/nuttx/apps/examples/lorawan_test reflect.zig
+info(compilation): C import output: zig-cache/o/e979b806463a36dcecc2ef773bd2d2ad/cimport.zig
+| *"@typeInfo(c): ", std.builtin.Type { .Struct = (struct std.builtin.Type.Struct constant)}
+| *"T.Struct.fields.len: ", 0
+| *"T.Struct.decls.len: ", 4744
+| *"T.Struct.decls[0].name: ", "__builtin_bswap16"
+| *"decl.name: ", "LmnStatus_t"
+| *"decl.name: ", "LmHandlerAdrStates_t"
+| *"decl.name: ", "LmHandlerFlagStatus_t"
+...
+| *"decl.name: ", "LmHandlerInit"
+| *"decl.name: ", "LmHandlerIsBusy"
+| *"decl.name: ", "LmHandlerProcess"
+| *"decl.name: ", "LmHandlerGetDutyCycleWaitTime"
+| *"decl.name: ", "LmHandlerSend"
+| *"decl.name: ", "LmHandlerJoin"
+...
+./reflect.zig:836:9: error: found compile log statement
+        @compileLog("@typeInfo(c): ", T);
+        ^
+./reflect.zig:840:9: error: found compile log statement
+        @compileLog("T.Struct.fields.len: ", T.Struct.fields.len);
+        ^
+./reflect.zig:844:9: error: found compile log statement
+        @compileLog("T.Struct.decls.len: ", T.Struct.decls.len);
+        ^
+./reflect.zig:848:9: error: found compile log statement
+        @compileLog("T.Struct.decls[0].name: ", T.Struct.decls[0].name);
+        ^
+./reflect.zig:857:17: error: found compile log statement
+                @compileLog("decl.name: ", T2.Struct.decls[i].name);
+                ^
+```
+
+Which is a list of C Types and Functions from the LoRaWAN Library.
+
+TODO: Use this to visualise the Call Graph (by module) for the LoRaWAN Library.
+
 # TODO
 
 TODO: Clean up names of Types, Functions and Variables
