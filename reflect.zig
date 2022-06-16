@@ -867,7 +867,10 @@ fn reflect() void {
                 header = name;
 
             // Else if we have seen a header...
-            } else if (!std.mem.eql(u8, header, "")) {
+            //} else if (!std.mem.eql(u8, header, "")) {                
+            //} else if (std.mem.startsWith(u8, decl.name, "Lm")) {
+
+            } else {
                 // Dump the C Declaration
                 var name = T2.Struct.decls[i].name;
                 @compileLog("decl.name:", name);

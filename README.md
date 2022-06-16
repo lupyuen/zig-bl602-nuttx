@@ -2094,4 +2094,48 @@ https://mermaid-js.github.io/mermaid/#/./flowchart?id=flowcharts
 
 TODO: Group LoRaWAN Functions in Call Graph by LoRaWAN Module (Subgraph), so we can see the calls across LoRaWAN Modules
 
+# Group by C Header Files
+
 TODO: Automatically partition the LoRaWAN Functions into LoRaWAN Modules, by analysing the HEADER_NAME_H__ symbols
+
+```zig
+        // Get the Type Info of the C Namespace
+        const T = @typeInfo(c);
+
+        // Remember the C Header
+        var header: []const u8 = "";
+
+        // For every C Declaration...
+        for (T.Struct.decls) |decl, i| {
+            var T2 = @typeInfo(c);
+
+            // If the C Declaration ends with "_H"...
+            if (
+                std.mem.endsWith(u8, decl.name, "_H") or
+                std.mem.endsWith(u8, decl.name, "_H_") or
+                std.mem.endsWith(u8, decl.name, "_H__")
+            ) {
+                // Dump the C Header and remember it
+                var name = T2.Struct.decls[i].name;
+                @compileLog("-----", name);
+                header = name;
+
+            } else {
+                // Dump the C Declaration
+                var name = T2.Struct.decls[i].name;
+                @compileLog("decl.name:", name);
+            }
+
+            // Strangely we can't do this...
+            //   @compileLog("decl.name:", decl.name);
+            // Because it shows...
+            //   *"decl.name:", []const u8{76,109,110,83,116,97,116,117,115,95,116}
+
+        }   // End of C Declaration
+
+    }   // End of Compile-Time Code
+```
+
+We get this...
+
+https://gist.github.com/lupyuen/7f0058c982b958a245123714fccd2289
