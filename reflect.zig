@@ -822,8 +822,13 @@ const debug  = std.log.debug;
 ///////////////////////////////////////////////////////////////////////////////
 //  Reflection
 
+// Do Type Reflection on the imported C functions
 fn reflect() void {
+    // We run this at Compile-Time (instead of Runtime)...
     comptime {
+        // Allow Zig Compiler to loop up to 100,000 times (Default is 1,000)
+        @setEvalBranchQuota(100_000);
+
         // Get the Type Info of the C Namespace
         const T = @typeInfo(c);
 
@@ -843,10 +848,14 @@ fn reflect() void {
         @compileLog("T.Struct.decls[0].name: ", T.Struct.decls[0].name);
         // Shows | *"T.Struct.decls[0].name: ", "__builtin_bswap16"
 
-        // Show all Declarations in the C Namespace.
-        // Output Log: https://gist.github.com/lupyuen/34bc145387e2a94e6ca5b59adbe6b21f
+        // For every Declaration in the C Namespace...
         for (T.Struct.decls) |decl| {
-            @compileLog("declc.name: ", decl.name);
+            // If the C Declatation starts with "Lm" (LoRaMAC)...
+            if (std.mem.startsWith(u8, decl.name, "Lm")) {
+                // Dump the C Declatation
+                @compileLog("decl.name: ", decl.name);
+                //  Shows | *"decl.name: ", []const u8{76,109,110,83,116,97,116,117,115,95,116}
+            }
         }
     }
 }
