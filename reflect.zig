@@ -848,11 +848,11 @@ fn reflect() void {
         @compileLog("T.Struct.decls[0].name: ", T.Struct.decls[0].name);
         // Shows | *"T.Struct.decls[0].name: ", "__builtin_bswap16"
 
-        // For every Declaration in the C Namespace...
+        // For every C Declaration...
         for (T.Struct.decls) |decl| {
-            // If the C Declatation starts with "Lm" (LoRaMAC)...
+            // If the C Declaration starts with "Lm" (LoRaMAC)...
             if (std.mem.startsWith(u8, decl.name, "Lm")) {
-                // Dump the C Declatation
+                // Dump the C Declaration
                 @compileLog("decl.name: ", decl.name);
                 //  Shows | *"decl.name: ", []const u8{76,109,110,83,116,97,116,117,115,95,116}
             }
