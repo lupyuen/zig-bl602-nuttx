@@ -2096,7 +2096,9 @@ TODO: Group LoRaWAN Functions in Call Graph by LoRaWAN Module (Subgraph), so we 
 
 # Group by C Header Files
 
-TODO: Automatically partition the LoRaWAN Functions into LoRaWAN Modules, by analysing the HEADER_NAME_H__ symbols
+Can we automatically identify the LoRaWAN Module for every LoRaWAN Function, by analysing the `HEADER_NAME_H__` C Header Macros?
+
+Let's try this...
 
 ```zig
 // Get the Type Info of the C Namespace
@@ -2130,4 +2132,32 @@ for (T.Struct.decls) |decl, i| {
 
 We get this...
 
-https://gist.github.com/lupyuen/7f0058c982b958a245123714fccd2289
+```text
+| *"decl.name:", "LmHandlerInit"
+| *"decl.name:", "LmHandlerIsBusy"
+| *"decl.name:", "LmHandlerProcess"
+| *"decl.name:", "LmHandlerGetDutyCycleWaitTime"
+| *"decl.name:", "LmHandlerSend"
+| *"decl.name:", "LmHandlerJoin"
+...
+| *"-----", "__LORAMAC_HANDLER_H__"
+| *"-----", "__LORAMAC_HANDLER_TYPES_H__"
+| *"decl.name:", "LMH_SYS_TIME_UPDATE_NEW_API"
+| *"decl.name:", "__LMHP_COMPLIANCE__"
+```
+
+[(Source)](https://gist.github.com/lupyuen/7f0058c982b958a245123714fccd2289)
+
+Which isn't useful. `LmHandlerInit` is actually declared inside the C Header File for `__LORAMAC_HANDLER_H__`. But somehow the Zig Type Reflection moves `LmHandlerInit` up to the top, before `__LORAMAC_HANDLER_H__` appears.
+
+So it seems we need to manually group the LoRaWAN Functions into LoRaWAN Modules.
+
+The LoRaWAN Functions appear to be sequenced according to the C Header File, so we only need to manually tag the first LoRaWAN Function for each LoRaWAN Module. Like this...
+
+```text
+LmHandlerInit → __LORAMAC_HANDLER_H__
+LoRaMacInitialization → __LORAMAC_H__
+RegionCommonValueInRange → __REGIONCOMMON_H__
+SX126xInit → __SX126x_H__
+SX126xIoInit → __SX126x_BOARD_H__
+```
