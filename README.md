@@ -1964,7 +1964,7 @@ pub export fn lorawan_test_main(
 
 # Zig Type Reflection
 
-ZigLang Type Reflection ... Can we use it to generate a Structured Call Graph for C Libraries ... Like for #LoRaWAN? 🤔
+Zig Type Reflection ... Can we use it to generate a Structured Call Graph for C Libraries ... Like for #LoRaWAN? 🤔
 
 This Zig Program imports the LoRaWAN Library from C and dumps out the LoRaWAN Types and Functions...
 
