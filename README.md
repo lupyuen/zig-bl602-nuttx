@@ -2086,10 +2086,6 @@ Which is a list of C Types and Functions from the LoRaWAN Library.
 
 TODO: Use this to visualise the Call Graph (by module) for the LoRaWAN Library.
 
-TODO: Import LoRaWAN Call Log into Zig: 
-
-https://gist.github.com/lupyuen/0871ac515b18d9d68d3aacf831fd0f5b
-
 TODO: Render Call Graph with Mermaid.js
 
 https://mermaid-js.github.io/mermaid/#/./flowchart?id=flowcharts
@@ -2165,3 +2161,97 @@ RegionCommonValueInRange → __REGIONCOMMON_H__
 SX126xInit → __SX126x_H__
 SX126xIoInit → __SX126x_BOARD_H__
 ```
+
+# Import Call Log
+
+Here's a log of calls to the LoRaWAN Functions in the LoRaWAN Library...
+
+https://gist.github.com/lupyuen/0871ac515b18d9d68d3aacf831fd0f5b
+
+To render the Call Graph, we'll import this Call Log into our Zig App.
+
+We import the Call Log like so...
+
+```zig
+/// Run Log captured for this app. From
+/// https://gist.github.com/lupyuen/0871ac515b18d9d68d3aacf831fd0f5b
+const run_log =
+    ...
+    \\RadioSetChannel: freq=923200000
+    \\RadioSetTxConfig: modem=1, power=13, fdev=0, bandwidth=0, datarate=10, coderate=1, preambleLen=8, fixLen=0, crcOn=1, freqHopOn=0, hopPeriod=0, iqInverted=0, timeout=4000
+    \\RadioSetTxConfig: SpreadingFactor=10, Bandwidth=4, CodingRate=1, LowDatarateOptimize=0, PreambleLength=8, HeaderType=0, PayloadLength=255, CrcMode=1, InvertIQ=0
+    \\RadioStandby
+    \\RadioSetModem
+    \\SX126xSetTxParams: power=13, rampTime=7
+    \\SX126xSetPaConfig: paDutyCycle=4, hpMax=7, deviceSel=0, paLut=1
+    \\SecureElementRandomNumber: 0xbc9f21c2
+    \\RadioSend: size=23
+    \\00 00 00 00 00 00 00 00 00 5b b1 7b 37 e7 5e c1 4b c2 21 9c 04 48 1b
+    \\RadioSend: PreambleLength=8, HeaderType=0, PayloadLength=23, CrcMode=1, InvertIQ=0
+    \\TimerStop:     0x4201b86c
+    \\TimerStart2:   0x4201b86c, 4000 ms
+    \\callout_reset: evq=0x420131a8, ev=0x4201b86c
+    \\
+    \\###### =========== MLME-Request ============ ######
+    \\######               MLME_JOIN               ######
+    \\###### ===================================== ######
+    \\STATUS      : OK
+    \\StartTxProcess
+    \\handle_event_queue
+    \\DIO1 add event
+    \\handle_event_queue: ev=0x4201b894
+    \\RadioOnDioIrq
+    \\RadioIrqProcess
+    \\IRQ_TX_DONE
+    \\TimerStop:     0x4201b86c
+    \\TODO: RtcGetCalendarTime
+    \\TODO: RtcBkupRead
+    \\RadioOnDioIrq
+    \\RadioIrqProcess
+    \\ProcessRadioTxDone: RxWindow1Delay=4988
+    \\RadioSleep
+    ...
+;
+```
+
+[(Source)](https://github.com/lupyuen/zig-bl602-nuttx/blob/293ccb37ec6fdd6b4ac40da5410bdf4c97f12eea/reflect.zig#L916-L2409)
+
+And we'll process the Call Log line by line like so...
+
+```zig
+// Show the first line of the Run Log
+var run_log_split = std.mem.split(u8, run_log, "\n");
+const line = run_log_split.next();
+@compileLog("line:", line);
+
+// Shows | *"line:", []const u8{103,112,108,104,95,101,110,97,98,108,101,58,32,87,65,82,78,73,78,71,58,32,112,105,110,57,58,32,65,108,114,101,97,100,121,32,100,101,116,97,99,104,101,100}
+```
+
+[(Source)](https://github.com/lupyuen/zig-bl602-nuttx/blob/293ccb37ec6fdd6b4ac40da5410bdf4c97f12eea/reflect.zig#L900-L904)
+
+Each line of the Call Log contains the LoRaWAN Function Name. We'll match this with the info from Zig Type Reflection to plot the Call Graph.
+
+# Self Type Reflection
+
+Our Zig App can do Type Reflection on itself to discover its Types, Constants, Variables and Functions...
+
+```zig
+// Show the Type Info for our Zig Namespace
+const ThisType = @typeInfo(@This());
+@compileLog("ThisType: ", ThisType);
+@compileLog("ThisType.Struct.decls.len: ", ThisType.Struct.decls.len);
+@compileLog("ThisType.Struct.decls[0].name: ", ThisType.Struct.decls[0].name);
+@compileLog("ThisType.Struct.decls[1].name: ", ThisType.Struct.decls[1].name);
+@compileLog("ThisType.Struct.decls[2].name: ", ThisType.Struct.decls[2].name);
+
+// Shows...
+// | *"ThisType: ", std.builtin.Type { .Struct = (struct std.builtin.Type.Struct constant)}
+// | *"ThisType.Struct.decls.len: ", 66
+// | *"ThisType.Struct.decls[0].name: ", "std"
+// | *"ThisType.Struct.decls[1].name: ", "c"
+// | *"ThisType.Struct.decls[2].name: ", "ACTIVE_REGION"    
+```
+
+[(Source)](https://github.com/lupyuen/zig-bl602-nuttx/blob/293ccb37ec6fdd6b4ac40da5410bdf4c97f12eea/reflect.zig#L886-L898)
+
+We'll use this to plot the Function Calls from our Zig Functions to the C Functions in the LoRaWAN Library.
