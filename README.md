@@ -2039,7 +2039,9 @@ fn reflect() void {
 }
 ```
 
-[(Source)](https://github.com/lupyuen/zig-bl602-nuttx/blob/main/reflect.zig#L822-L867)
+[(Source)](https://github.com/lupyuen/zig-bl602-nuttx/blob/d30cc1e8714f053ad5e417087f5685a62f9df10e/reflect.zig#L825-L867)
+
+[(`@typeInfo` is explained here)](https://ziglang.org/documentation/master/#typeInfo)
 
 When Zig Compiler compiles the code above, we see this at Compile-Time...
 
@@ -2098,7 +2100,7 @@ TODO: Group LoRaWAN Functions in Call Graph by LoRaWAN Module (Subgraph), so we 
 
 Can we automatically identify the LoRaWAN Module for every LoRaWAN Function, by analysing the `HEADER_NAME_H__` C Header Macros?
 
-Let's try this...
+Let's try this to dump out all C Declarations and Macros imported from C...
 
 ```zig
 // Get the Type Info of the C Namespace
@@ -2130,7 +2132,9 @@ for (T.Struct.decls) |decl, i| {
 }   // End of C Declaration
 ```
 
-We get this...
+[(Source)](https://github.com/lupyuen/zig-bl602-nuttx/blob/293ccb37ec6fdd6b4ac40da5410bdf4c97f12eea/reflect.zig#L825-L885)
+
+We get this list of LoRaWAN Functions and LoRaWAN Macros...
 
 ```text
 | *"decl.name:", "LmHandlerInit"
