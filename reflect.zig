@@ -918,12 +918,9 @@ fn reflect() void {
                     // Dump the C Declaration
                     var name = T2.Struct.decls[i].name;
                     @compileLog("Found call log", name);
-                    break;  //// For Debugging
+                    break;
                 }
             }   // End of C Declaration
-
-            // @compileLog("break for debugging");
-            // break;  //// For Debugging
 
         }  // End of Call Log
 

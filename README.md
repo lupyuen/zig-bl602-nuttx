@@ -2254,14 +2254,16 @@ https://gist.github.com/lupyuen/0871ac515b18d9d68d3aacf831fd0f5b
 
 Each line of the Call Log contains the LoRaWAN Function Name. We'll match this with the info from Zig Type Reflection to plot the Call Graph.
 
-To render the Call Graph, we'll import this Call Log into our Zig App.
-
-We import the Call Log like so...
+We import the Call Log into our Zig App like so...
 
 ```zig
 /// Call Log captured for this app. From
 /// https://gist.github.com/lupyuen/0871ac515b18d9d68d3aacf831fd0f5b
 const call_log =
+    \\init_event_queue
+    \\TimerInit:     0x4201c76c
+    \\SX126xIoInit: Compiled with gcc
+    \\init_gpio
     ...
     \\RadioSetChannel: freq=923200000
     \\RadioSetTxConfig: modem=1, power=13, fdev=0, bandwidth=0, datarate=10, coderate=1, preambleLen=8, fixLen=0, crcOn=1, freqHopOn=0, hopPeriod=0, iqInverted=0, timeout=4000
@@ -2333,9 +2335,7 @@ while (true) {
 
 # Match Call Log
 
-TODO
-
-https://gist.github.com/lupyuen/e423de95105708223cf5f1b6455e07d7
+Let's match the Call Log with the Function Names from our LoRaWAN Library...
 
 ```zig
 var call_log_split = std.mem.split(u8, call_log, "\n");
@@ -2353,14 +2353,36 @@ while (true) {
             // Dump the C Declaration
             var name = T2.Struct.decls[i].name;
             @compileLog("Found call log", name);
-            break;  //// For Debugging
+            break;
         }
     }   // End of C Declaration
-
-    // @compileLog("break for debugging");
-    // break;  //// For Debugging
 
 }  // End of Call Log
 ```
 
 [(Source)](https://github.com/lupyuen/zig-bl602-nuttx/blob/0c480450bcffca353948fc24f41258316c95b8e1/reflect.zig#L906-L928)
+
+The code above produces this result...
+
+```text
+| *"Found call log", "LoRaMacInitialization"
+| *"Found call log", "TimerInit"
+| *"Found call log", "SX126xIoInit"
+| *"Found call log", "SX126xSetTx"
+| *"Found call log", "SX126xSetPaConfig"
+| *"Found call log", "TimerInit"
+| *"Found call log", "TimerInit"
+| *"Found call log", "RadioSetModem"
+| *"Found call log", "RadioSetModem"
+| *"Found call log", "RadioSetPublicNetwork"
+| *"Found call log", "RadioSleep"
+| *"Found call log", "RadioSetModem"
+| *"Found call log", "RadioSetPublicNetwork"
+...
+```
+
+[(Source)](https://gist.github.com/lupyuen/e423de95105708223cf5f1b6455e07d7)
+
+Which is a list of LoRaWAN Functions and the sequence they were called.
+
+One step closer to rendering our Structured Call Graph!
