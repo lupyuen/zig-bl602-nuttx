@@ -826,8 +826,8 @@ const debug  = std.log.debug;
 fn reflect() void {
     // We run this at Compile-Time (instead of Runtime)...
     comptime {
-        // Allow Zig Compiler to loop up to 1,000,000 times (Default is 1,000)
-        @setEvalBranchQuota(1_000_000);
+        // Allow Zig Compiler to loop up to 10,000,000 times (Default is 1,000)
+        @setEvalBranchQuota(10_000_000);
 
         // Get the Type Info of the C Namespace
         const T = @typeInfo(c);
@@ -903,12 +903,7 @@ fn reflect() void {
         var run_log_split = std.mem.split(u8, run_log, "\n");
         while (true) {
             const line = run_log_split.next().?;
-            @compileLog("line:", line);
-
-            const s = "gplh_enable: WARNING: pin9: Already detached";
-            if (std.mem.eql(u8, s, line)) {
-                @compileLog("Found", s);
-            }
+            // @compileLog("line:", line);
 
             // For every C Declaration...
             for (T.Struct.decls) |decl, i| {
@@ -918,15 +913,13 @@ fn reflect() void {
                 if (std.mem.eql(u8, decl.name, line)) {
                     // Dump the C Declaration
                     var name = T2.Struct.decls[i].name;
-                    @compileLog("decl.name:", name);
-
-                    @compileLog("break for debugging");
+                    @compileLog("Found run log", name);
                     break;  //// For Debugging
                 }
             }   // End of C Declaration
 
-            @compileLog("break for debugging");
-            break;  //// For Debugging
+            // @compileLog("break for debugging");
+            // break;  //// For Debugging
 
         }  // End of Run Log
 
