@@ -881,6 +881,9 @@ fn reflect() void {
             // Because it shows...
             //   *"decl.name:", []const u8{76,109,110,83,116,97,116,117,115,95,116}
 
+            @compileLog("break for debugging");
+            break;  //// For Debugging
+
         }   // End of C Declaration
 
         // Show the Type Info for our Zig Namespace
@@ -899,9 +902,20 @@ fn reflect() void {
 
         // Show the first line of the Run Log
         var run_log_split = std.mem.split(u8, run_log, "\n");
-        const line = run_log_split.next();
-        @compileLog("line:", line);
-        // Shows | *"line:", []const u8{103,112,108,104,95,101,110,97,98,108,101,58,32,87,65,82,78,73,78,71,58,32,112,105,110,57,58,32,65,108,114,101,97,100,121,32,100,101,116,97,99,104,101,100}
+        while (true) {
+            const line = run_log_split.next().?;
+            @compileLog("line:", line);
+            // Shows | *"line:", []const u8{103,112,108,104,95,101,110,97,98,108,101,58,32,87,65,82,78,73,78,71,58,32,112,105,110,57,58,32,65,108,114,101,97,100,121,32,100,101,116,97,99,104,101,100}
+
+            @compileLog("break for debugging");
+            break;  //// For Debugging
+        }
+
+        const run_log2 = "abcdef";
+        var buf3 = run_log2[0..2];
+        @compileLog("buf3:", @TypeOf("buf3"), @TypeOf(buf3), buf3);
+        @compileLog("run_log:", @TypeOf("run_log"));
+        @compileLog("run_log2:", @TypeOf("run_log2"), run_log2);
 
     }   // End of Compile-Time Code
 }

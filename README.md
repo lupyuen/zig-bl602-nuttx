@@ -1989,7 +1989,7 @@ var AppDataBuffer: [LORAWAN_APP_DATA_BUFFER_MAX_SIZE]u8 align(4) =
 
 # Zig Type Reflection
 
-Zig Type Reflection ... Can we use it to generate a Structured Call Graph for C Libraries ... Like for #LoRaWAN? 🤔
+Zig Type Reflection ... Can we use it to generate a Structured Call Graph for C Libraries ... Like for the LoRaWAN Library? 🤔
 
 This Zig Program imports the LoRaWAN Library from C and dumps out the LoRaWAN Types and Functions...
 
