@@ -34,6 +34,9 @@ const c = @cImport({
     @cInclude("../libs/liblorawan/src/apps/LoRaMac/common/LmHandler/packages/LmhpFragmentation.h");
     @cInclude("../libs/liblorawan/src/apps/LoRaMac/common/LmHandlerMsgDisplay.h");
 
+    // Fix for missing Radio Function Declarations in radio.h
+    @cInclude("radio-sx1262.h");
+
     // TODO: BL602 Internal Temperature Sensor for seeding Entropy Pool
     // #ifdef CONFIG_LIBBL602_ADC
     // @cInclude("../libs/libbl602_adc/bl602_adc.h");
