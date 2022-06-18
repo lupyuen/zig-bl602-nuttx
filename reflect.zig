@@ -907,10 +907,11 @@ fn reflect() void {
 
             // For every C Declaration...
             for (T.Struct.decls) |decl, i| {
+                if (std.mem.eql(u8, decl.name, "Radio")) { continue; }  // Skip Radio
                 var T2 = @typeInfo(c);
 
-                // If the C Declaration ends with "_H"...
-                if (std.mem.eql(u8, decl.name, line)) {
+                // If the C Declaration matches the Run Log
+                if (std.mem.startsWith(u8, line, decl.name)) {
                     // Dump the C Declaration
                     var name = T2.Struct.decls[i].name;
                     @compileLog("Found run log", name);
