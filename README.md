@@ -2248,9 +2248,24 @@ We'll use this to plot the Function Calls from our Zig Functions to the C Functi
 
 # Import Call Log
 
-Here's a log of calls to the LoRaWAN Functions in the LoRaWAN Library...
+Earlier we have captured this Call Log: A log of calls to the C Functions in the LoRaWAN Library...
 
-https://gist.github.com/lupyuen/0871ac515b18d9d68d3aacf831fd0f5b
+```text
+init_event_queue
+TimerInit:     0x4201c76c
+SX126xIoInit: Compiled with gcc
+init_gpio
+...
+RadioSetChannel: freq=923200000
+RadioSetTxConfig: modem=1, power=13, fdev=0, bandwidth=0, datarate=10, coderate=1, preambleLen=8, fixLen=0, crcOn=1, freqHopOn=0, hopPeriod=0, iqInverted=0, timeout=4000
+RadioSetTxConfig: SpreadingFactor=10, Bandwidth=4, CodingRate=1, LowDatarateOptimize=0, PreambleLength=8, HeaderType=0, PayloadLength=255, CrcMode=1, InvertIQ=0
+RadioStandby
+RadioSetModem
+SX126xSetTxParams: power=13, rampTime=7
+SX126xSetPaConfig: paDutyCycle=4, hpMax=7, deviceSel=0, paLut=1
+```
+
+[(Source)](https://gist.github.com/lupyuen/0871ac515b18d9d68d3aacf831fd0f5b)
 
 Each line of the Call Log contains the LoRaWAN Function Name. We'll match this with the info from Zig Type Reflection to plot the Call Graph.
 
@@ -2304,7 +2319,7 @@ const call_log =
 
 [(Source)](https://github.com/lupyuen/zig-bl602-nuttx/blob/293ccb37ec6fdd6b4ac40da5410bdf4c97f12eea/reflect.zig#L916-L2409)
 
-And we'll process the Call Log line by line like so...
+Zig Compiler can process the Call Log line by line like so...
 
 ```zig
 // Show the first line of the Call Log
