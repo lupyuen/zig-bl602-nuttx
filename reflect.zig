@@ -826,8 +826,8 @@ const debug  = std.log.debug;
 fn reflect() void {
     // We run this at Compile-Time (instead of Runtime)...
     comptime {
-        // Allow Zig Compiler to loop up to 100,000 times (Default is 1,000)
-        @setEvalBranchQuota(100_000);
+        // Allow Zig Compiler to loop up to 1,000,000 times (Default is 1,000)
+        @setEvalBranchQuota(1_000_000);
 
         // Get the Type Info of the C Namespace
         const T = @typeInfo(c);
@@ -900,22 +900,35 @@ fn reflect() void {
         // | *"ThisType.Struct.decls[1].name: ", "c"
         // | *"ThisType.Struct.decls[2].name: ", "ACTIVE_REGION"        
 
-        // Show the first line of the Run Log
         var run_log_split = std.mem.split(u8, run_log, "\n");
         while (true) {
             const line = run_log_split.next().?;
             @compileLog("line:", line);
-            // Shows | *"line:", []const u8{103,112,108,104,95,101,110,97,98,108,101,58,32,87,65,82,78,73,78,71,58,32,112,105,110,57,58,32,65,108,114,101,97,100,121,32,100,101,116,97,99,104,101,100}
+
+            const s = "gplh_enable: WARNING: pin9: Already detached";
+            if (std.mem.eql(u8, s, line)) {
+                @compileLog("Found", s);
+            }
+
+            // For every C Declaration...
+            for (T.Struct.decls) |decl, i| {
+                var T2 = @typeInfo(c);
+
+                // If the C Declaration ends with "_H"...
+                if (std.mem.eql(u8, decl.name, line)) {
+                    // Dump the C Declaration
+                    var name = T2.Struct.decls[i].name;
+                    @compileLog("decl.name:", name);
+
+                    @compileLog("break for debugging");
+                    break;  //// For Debugging
+                }
+            }   // End of C Declaration
 
             @compileLog("break for debugging");
             break;  //// For Debugging
-        }
 
-        const run_log2 = "abcdef";
-        var buf3 = run_log2[0..2];
-        @compileLog("buf3:", @TypeOf("buf3"), @TypeOf(buf3), buf3);
-        @compileLog("run_log:", @TypeOf("run_log"));
-        @compileLog("run_log2:", @TypeOf("run_log2"), run_log2);
+        }  // End of Run Log
 
     }   // End of Compile-Time Code
 }
