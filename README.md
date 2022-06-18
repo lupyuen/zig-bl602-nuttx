@@ -2092,6 +2092,65 @@ https://mermaid-js.github.io/mermaid/#/./flowchart?id=flowcharts
 
 TODO: Group LoRaWAN Functions in Call Graph by LoRaWAN Module (Subgraph), so we can see the calls across LoRaWAN Modules
 
+# Heisenbug
+
+_In the code above, why did we use `T2.Struct.decls[i].name` instead of `decl.name`?_
+
+```zig
+// For every C Declaration...
+for (T.Struct.decls) |decl, i| {
+    // If the C Declaration starts with "Lm" (LoRaMAC)...
+    if (std.mem.startsWith(u8, decl.name, "Lm")) {
+        // Dump the C Declaration
+        var T2 = @typeInfo(c);
+
+        // Can't use decl.name here...
+        @compileLog("decl.name: ", T2.Struct.decls[i].name);
+    }
+}
+```
+
+We expect this code to print the name of the declaration...
+
+```zig
+@compileLog("decl.name: ", decl.name);
+```
+
+Like so...
+
+```text
+"decl.name: ", "LmnStatus_t"
+```
+
+But strangely it prints the bytes...
+
+```text
+"decl.name: ", []const u8{76,109,110,83,116,97,116,117,115,95,116}
+```
+
+Zig Compiler seems to interpret the name differently after we have referenced the name earlier...
+
+```zig
+// If the C Declaration starts with "Lm" (LoRaMAC)...
+if (std.mem.startsWith(u8, decl.name, "Lm")) { ...
+```
+
+So we use this workaround instead...
+
+```zig
+// Get a fresh reference to the Type Info
+var T2 = @typeInfo(c);
+
+// This works OK
+@compileLog("decl.name: ", T2.Struct.decls[i].name);
+```
+
+Which produces the result we need...
+
+```text
+"decl.name: ", "LmnStatus_t"
+```
+
 # Group by C Header Files
 
 Can we automatically identify the LoRaWAN Module for every LoRaWAN Function, by analysing the `HEADER_NAME_H__` C Header Macros?
