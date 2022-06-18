@@ -2221,20 +2221,47 @@ SX126xInit → __SX126x_H__
 SX126xIoInit → __SX126x_BOARD_H__
 ```
 
+# Self Type Reflection
+
+Our Zig App can do Type Reflection on itself to discover its Types, Constants, Variables and Functions...
+
+```zig
+// Show the Type Info for our Zig Namespace
+const ThisType = @typeInfo(@This());
+@compileLog("ThisType: ", ThisType);
+@compileLog("ThisType.Struct.decls.len: ", ThisType.Struct.decls.len);
+@compileLog("ThisType.Struct.decls[0].name: ", ThisType.Struct.decls[0].name);
+@compileLog("ThisType.Struct.decls[1].name: ", ThisType.Struct.decls[1].name);
+@compileLog("ThisType.Struct.decls[2].name: ", ThisType.Struct.decls[2].name);
+
+// Shows...
+// | *"ThisType: ", std.builtin.Type { .Struct = (struct std.builtin.Type.Struct constant)}
+// | *"ThisType.Struct.decls.len: ", 66
+// | *"ThisType.Struct.decls[0].name: ", "std"
+// | *"ThisType.Struct.decls[1].name: ", "c"
+// | *"ThisType.Struct.decls[2].name: ", "ACTIVE_REGION"    
+```
+
+[(Source)](https://github.com/lupyuen/zig-bl602-nuttx/blob/293ccb37ec6fdd6b4ac40da5410bdf4c97f12eea/reflect.zig#L886-L898)
+
+We'll use this to plot the Function Calls from our Zig Functions to the C Functions in the LoRaWAN Library.
+
 # Import Call Log
 
 Here's a log of calls to the LoRaWAN Functions in the LoRaWAN Library...
 
 https://gist.github.com/lupyuen/0871ac515b18d9d68d3aacf831fd0f5b
 
+Each line of the Call Log contains the LoRaWAN Function Name. We'll match this with the info from Zig Type Reflection to plot the Call Graph.
+
 To render the Call Graph, we'll import this Call Log into our Zig App.
 
 We import the Call Log like so...
 
 ```zig
-/// Run Log captured for this app. From
+/// Call Log captured for this app. From
 /// https://gist.github.com/lupyuen/0871ac515b18d9d68d3aacf831fd0f5b
-const run_log =
+const call_log =
     ...
     \\RadioSetChannel: freq=923200000
     \\RadioSetTxConfig: modem=1, power=13, fdev=0, bandwidth=0, datarate=10, coderate=1, preambleLen=8, fixLen=0, crcOn=1, freqHopOn=0, hopPeriod=0, iqInverted=0, timeout=4000
@@ -2278,9 +2305,9 @@ const run_log =
 And we'll process the Call Log line by line like so...
 
 ```zig
-// Show the first line of the Run Log
-var run_log_split = std.mem.split(u8, run_log, "\n");
-const line = run_log_split.next();
+// Show the first line of the Call Log
+var call_log_split = std.mem.split(u8, call_log, "\n");
+const line = call_log_split.next();
 @compileLog("line:", line);
 
 // Shows | *"line:", []const u8{103,112,108,104,95,101,110,97,98,108,101,58,32,87,65,82,78,73,78,71,58,32,112,105,110,57,58,32,65,108,114,101,97,100,121,32,100,101,116,97,99,104,101,100}
@@ -2288,29 +2315,52 @@ const line = run_log_split.next();
 
 [(Source)](https://github.com/lupyuen/zig-bl602-nuttx/blob/293ccb37ec6fdd6b4ac40da5410bdf4c97f12eea/reflect.zig#L900-L904)
 
-Each line of the Call Log contains the LoRaWAN Function Name. We'll match this with the info from Zig Type Reflection to plot the Call Graph.
-
-# Self Type Reflection
-
-Our Zig App can do Type Reflection on itself to discover its Types, Constants, Variables and Functions...
+To iterate through all lines of the Call Log we do this...
 
 ```zig
-// Show the Type Info for our Zig Namespace
-const ThisType = @typeInfo(@This());
-@compileLog("ThisType: ", ThisType);
-@compileLog("ThisType.Struct.decls.len: ", ThisType.Struct.decls.len);
-@compileLog("ThisType.Struct.decls[0].name: ", ThisType.Struct.decls[0].name);
-@compileLog("ThisType.Struct.decls[1].name: ", ThisType.Struct.decls[1].name);
-@compileLog("ThisType.Struct.decls[2].name: ", ThisType.Struct.decls[2].name);
+var call_log_split = std.mem.split(u8, call_log, "\n");
+while (true) {
+    // TODO: Check for last line
+    const line = call_log_split.next().?;
+    @compileLog("line:", line);
 
-// Shows...
-// | *"ThisType: ", std.builtin.Type { .Struct = (struct std.builtin.Type.Struct constant)}
-// | *"ThisType.Struct.decls.len: ", 66
-// | *"ThisType.Struct.decls[0].name: ", "std"
-// | *"ThisType.Struct.decls[1].name: ", "c"
-// | *"ThisType.Struct.decls[2].name: ", "ACTIVE_REGION"    
+    // TODO: Process the line
+    ...
+}  // End of Call Log
 ```
 
-[(Source)](https://github.com/lupyuen/zig-bl602-nuttx/blob/293ccb37ec6fdd6b4ac40da5410bdf4c97f12eea/reflect.zig#L886-L898)
+[(Source)](https://github.com/lupyuen/zig-bl602-nuttx/blob/0c480450bcffca353948fc24f41258316c95b8e1/reflect.zig#L906-L928)
 
-We'll use this to plot the Function Calls from our Zig Functions to the C Functions in the LoRaWAN Library.
+# Match Call Log
+
+TODO
+
+https://gist.github.com/lupyuen/e423de95105708223cf5f1b6455e07d7
+
+```zig
+var call_log_split = std.mem.split(u8, call_log, "\n");
+while (true) {
+    const line = call_log_split.next().?;
+    // @compileLog("line:", line);
+
+    // For every C Declaration...
+    for (T.Struct.decls) |decl, i| {
+        if (std.mem.eql(u8, decl.name, "Radio")) { continue; }  // Skip Radio
+        var T2 = @typeInfo(c);
+
+        // If the C Declaration matches the Call Log
+        if (std.mem.startsWith(u8, line, decl.name)) {
+            // Dump the C Declaration
+            var name = T2.Struct.decls[i].name;
+            @compileLog("Found call log", name);
+            break;  //// For Debugging
+        }
+    }   // End of C Declaration
+
+    // @compileLog("break for debugging");
+    // break;  //// For Debugging
+
+}  // End of Call Log
+```
+
+[(Source)](https://github.com/lupyuen/zig-bl602-nuttx/blob/0c480450bcffca353948fc24f41258316c95b8e1/reflect.zig#L906-L928)

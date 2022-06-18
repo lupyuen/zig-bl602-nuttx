@@ -903,9 +903,9 @@ fn reflect() void {
         // | *"ThisType.Struct.decls[1].name: ", "c"
         // | *"ThisType.Struct.decls[2].name: ", "ACTIVE_REGION"        
 
-        var run_log_split = std.mem.split(u8, run_log, "\n");
+        var call_log_split = std.mem.split(u8, call_log, "\n");
         while (true) {
-            const line = run_log_split.next().?;
+            const line = call_log_split.next().?;
             // @compileLog("line:", line);
 
             // For every C Declaration...
@@ -913,11 +913,11 @@ fn reflect() void {
                 if (std.mem.eql(u8, decl.name, "Radio")) { continue; }  // Skip Radio
                 var T2 = @typeInfo(c);
 
-                // If the C Declaration matches the Run Log
+                // If the C Declaration matches the Call Log
                 if (std.mem.startsWith(u8, line, decl.name)) {
                     // Dump the C Declaration
                     var name = T2.Struct.decls[i].name;
-                    @compileLog("Found run log", name);
+                    @compileLog("Found call log", name);
                     break;  //// For Debugging
                 }
             }   // End of C Declaration
@@ -925,7 +925,7 @@ fn reflect() void {
             // @compileLog("break for debugging");
             // break;  //// For Debugging
 
-        }  // End of Run Log
+        }  // End of Call Log
 
     }   // End of Compile-Time Code
 }
@@ -937,9 +937,9 @@ fn reflect() void {
 //     }
 // }
 
-/// Run Log captured for this app. From
+/// Call Log captured for this app. From
 /// https://gist.github.com/lupyuen/0871ac515b18d9d68d3aacf831fd0f5b
-const run_log =
+const call_log =
     \\gplh_enable: WARNING: pin9: Already detached
     \\gplh_enable: WARNING: pin12: Already detached
     \\gplh_enable: WARNING: pin19: Already detached
