@@ -2407,7 +2407,17 @@ One step closer to rendering our Structured Call Graph!
 
 # Draw The Graph
 
-Let's extend the code above and render a Naive Call Graph, like this...
+Let's extend the code above and render a Naive Call Graph...
+
+-   For every LoRaWAN Function that we identify in the Call Log...
+
+-   We plot a line between the LoRaWAN Function and the next LoRaWAN Function in the Call Log
+
+-   So we're just plotting the connected sequence of Function Calls
+
+(Yep it's super naive!)
+
+We do it like this...
 
 ```zig
 // Draw the graph for all functions in the Call Log
@@ -2823,3 +2833,44 @@ flowchart TD;
     TimerStart-->TimerStop;
     TimerStop-->TimerStart;
 ```
+
+# Super Naive Call Graph
+
+_What's wrong with the super-naive Call Graph that we have produced?_
+
+```text
+flowchart TD;
+    Start-->LoRaMacInitialization;
+    LoRaMacInitialization-->TimerInit;
+    TimerInit-->TimerInit;
+    TimerInit-->SX126xIoInit;
+    SX126xIoInit-->SX126xSetTx;
+    SX126xSetTx-->SX126xSetPaConfig;
+    SX126xSetPaConfig-->TimerInit;
+    TimerInit-->RadioSetModem;
+    ...
+```
+
+[(Source)](https://gist.github.com/lupyuen/056340b299495682c0c2fbc61b30f203)
+
+Remember we're only plotting the sequence of Function Calls. Our Call Graph lacks __Structure__...
+
+-   `TimerInit → TimerInit` doesn't make sense (because we don't have recursive functions)
+
+-   `TimerInit → RadioSetModem` is totally wrong because `TimerInit` is a Low-Level Function (NimBLE Multithreading Library), whereas `RadioSetModem` is an High-Level Function (SX1262 Library)
+
+_Can we add some Structure to improve the Call Graph?_
+
+To produce a Structured Call Graph we'll group the functions into Modules, from High-Level to Low-Level...
+
+1.  LoRaWAN App (Highest Level)
+
+1.  LoRaWAN Library
+
+1.  SX1262 Library
+
+1.  NimBLE Multithreading Library (Lowest Level)
+
+And we'll ensure that we never draw a line from a Low-Level Function to a High-Level Function.
+
+TODO
