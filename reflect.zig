@@ -903,26 +903,33 @@ fn reflect() void {
         // | *"ThisType.Struct.decls[1].name: ", "c"
         // | *"ThisType.Struct.decls[2].name: ", "ACTIVE_REGION"        
 
+        // Draw the graph for all functions in the Call Log
         var call_log_split = std.mem.split(u8, call_log, "\n");
+        var prev_name: []const u8 = "Start";
+        @compileLog("flowchart A");
+
+        // For every line in the Call Log...
         while (true) {
+            // Get the line
             const line = call_log_split.next().?;
-            // @compileLog("line:", line);
 
             // For every C Declaration...
             for (T.Struct.decls) |decl, i| {
                 if (std.mem.eql(u8, decl.name, "Radio")) { continue; }  // Skip Radio
                 var T2 = @typeInfo(c);
 
-                // If the C Declaration matches the Call Log
+                // If the C Declaration matches the Call Log...
                 if (std.mem.startsWith(u8, line, decl.name)) {
-                    // Dump the C Declaration
+                    // Draw the graph: node1-->node2
                     var name = T2.Struct.decls[i].name;
-                    @compileLog("Found call log", name);
+                    @compileLog("    ", prev_name, "-->", name);
+                    prev_name = name;
                     break;
                 }
             }   // End of C Declaration
 
         }  // End of Call Log
+        @compileLog("    ", prev_name, "-->", "End");
 
     }   // End of Compile-Time Code
 }
