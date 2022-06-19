@@ -2419,3 +2419,13 @@ graph A;
     TimerInit-->TimerInit;
     TimerInit-->SX126xIoInit;
 ```
+
+TODO
+
+```mermaid
+graph TD;
+    A-->B;
+    A-->C;
+    B-->D;
+    C-->D;
+```
