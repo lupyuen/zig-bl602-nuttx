@@ -2407,7 +2407,7 @@ One step closer to rendering our Structured Call Graph!
 TODO
 
 ```mermaid
-graph A;
+flowchart TD;
     Start-->LoRaMacInitialization;
     LoRaMacInitialization-->TimerInit;
     TimerInit-->TimerInit;
@@ -2423,7 +2423,7 @@ graph A;
 TODO
 
 ```mermaid
-graph TD;
+flowchart TD;
     A-->B;
     A-->C;
     B-->D;
