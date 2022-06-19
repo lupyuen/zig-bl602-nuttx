@@ -906,7 +906,7 @@ fn reflect() void {
         // Draw the graph for all functions in the Call Log
         var call_log_split = std.mem.split(u8, call_log, "\n");
         var prev_name: []const u8 = "Start";
-        @compileLog("flowchart A;");
+        @compileLog("flowchart TD;");  // Top-Down Flowchart
 
         // For every line in the Call Log...
         while (true) {
