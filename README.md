@@ -2401,3 +2401,21 @@ The code above produces this result...
 Which is a list of LoRaWAN Functions and the sequence they were called.
 
 One step closer to rendering our Structured Call Graph!
+
+# Draw The Graph
+
+TODO
+
+```mermaid
+flowchart A;
+    Start-->LoRaMacInitialization;
+    LoRaMacInitialization-->TimerInit;
+    TimerInit-->TimerInit;
+    TimerInit-->TimerInit;
+    TimerInit-->TimerInit;
+    TimerInit-->TimerInit;
+    TimerInit-->TimerInit;
+    TimerInit-->TimerInit;
+    TimerInit-->TimerInit;
+    TimerInit-->SX126xIoInit;
+```

@@ -906,7 +906,7 @@ fn reflect() void {
         // Draw the graph for all functions in the Call Log
         var call_log_split = std.mem.split(u8, call_log, "\n");
         var prev_name: []const u8 = "Start";
-        @compileLog("flowchart A");
+        @compileLog("flowchart A;");
 
         // For every line in the Call Log...
         while (true) {
@@ -920,16 +920,16 @@ fn reflect() void {
 
                 // If the C Declaration matches the Call Log...
                 if (std.mem.startsWith(u8, line, decl.name)) {
-                    // Draw the graph: node1-->node2
+                    // Draw the graph: [previous function]-->[current function]
                     var name = T2.Struct.decls[i].name;
-                    @compileLog("    ", prev_name, "-->", name);
+                    @compileLog("    ", prev_name, "-->", name, ";");
                     prev_name = name;
                     break;
                 }
             }   // End of C Declaration
 
         }  // End of Call Log
-        @compileLog("    ", prev_name, "-->", "End");
+        @compileLog("    ", prev_name, "-->", "End", ";");
 
     }   // End of Compile-Time Code
 }
