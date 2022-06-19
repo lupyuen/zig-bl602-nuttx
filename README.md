@@ -2335,8 +2335,10 @@ const line = call_log_split.next();
 To iterate through all lines of the Call Log we do this...
 
 ```zig
+// For every line in the Call Log...
 var call_log_split = std.mem.split(u8, call_log, "\n");
 while (true) {
+    // Get the line
     // TODO: Check for last line
     const line = call_log_split.next().?;
     @compileLog("line:", line);
@@ -2353,17 +2355,18 @@ while (true) {
 Let's match the Call Log with the Function Names from our LoRaWAN Library...
 
 ```zig
+// For every line in the Call Log...
 var call_log_split = std.mem.split(u8, call_log, "\n");
 while (true) {
+    // Get the line
     const line = call_log_split.next().?;
-    // @compileLog("line:", line);
 
     // For every C Declaration...
     for (T.Struct.decls) |decl, i| {
         if (std.mem.eql(u8, decl.name, "Radio")) { continue; }  // Skip Radio
         var T2 = @typeInfo(c);
 
-        // If the C Declaration matches the Call Log
+        // If the C Declaration matches the Call Log...
         if (std.mem.startsWith(u8, line, decl.name)) {
             // Dump the C Declaration
             var name = T2.Struct.decls[i].name;
@@ -2404,9 +2407,87 @@ One step closer to rendering our Structured Call Graph!
 
 # Draw The Graph
 
-TODO
+Let's extend the code above and render a Naive Call Graph, like this...
 
-https://gist.github.com/lupyuen/056340b299495682c0c2fbc61b30f203
+```zig
+// Draw the graph for all functions in the Call Log
+var call_log_split = std.mem.split(u8, call_log, "\n");
+var prev_name: []const u8 = "Start";
+@compileLog("flowchart TD;");  // Top-Down Flowchart
+
+// For every line in the Call Log...
+while (true) {
+    // Get the line
+    const line = call_log_split.next().?;
+
+    // For every C Declaration...
+    for (T.Struct.decls) |decl, i| {
+        if (std.mem.eql(u8, decl.name, "Radio")) { continue; }  // Skip Radio
+        var T2 = @typeInfo(c);
+
+        // If the C Declaration matches the Call Log...
+        if (std.mem.startsWith(u8, line, decl.name)) {
+            // Draw the graph: [previous function]-->[current function]
+            var name = T2.Struct.decls[i].name;
+            @compileLog("    ", prev_name, "-->", name, ";");
+            prev_name = name;
+            break;
+        }
+    }   // End of C Declaration
+
+}  // End of Call Log
+@compileLog("    ", prev_name, "-->", "End", ";");
+```
+
+[(Source)](https://github.com/lupyuen/zig-bl602-nuttx/blob/5c7989894566cdc0d1852789bc68621c531e459e/reflect.zig#L906-L932)
+
+We get this result...
+
+```text
+| *"flowchart TD;"
+| *"    ", "Start", *"-->", "LoRaMacInitialization", *";"
+| *"    ", "LoRaMacInitialization", *"-->", "TimerInit", *";"
+| *"    ", "TimerInit", *"-->", "TimerInit", *";"
+| *"    ", "TimerInit", *"-->", "TimerInit", *";"
+| *"    ", "TimerInit", *"-->", "TimerInit", *";"
+| *"    ", "TimerInit", *"-->", "TimerInit", *";"
+| *"    ", "TimerInit", *"-->", "TimerInit", *";"
+| *"    ", "TimerInit", *"-->", "TimerInit", *";"
+| *"    ", "TimerInit", *"-->", "TimerInit", *";"
+| *"    ", "TimerInit", *"-->", "SX126xIoInit", *";"
+| *"    ", "SX126xIoInit", *"-->", "SX126xSetTx", *";"
+| *"    ", "SX126xSetTx", *"-->", "SX126xSetPaConfig", *";"
+| *"    ", "SX126xSetPaConfig", *"-->", "TimerInit", *";"
+| *"    ", "TimerInit", *"-->", "TimerInit", *";"
+| *"    ", "TimerInit", *"-->", "RadioSetModem", *";"
+...
+```
+
+[(Source)](https://gist.github.com/lupyuen/056340b299495682c0c2fbc61b30f203)
+
+We remove the delimiters from the text above like this...
+
+```text
+flowchart TD;
+    Start-->LoRaMacInitialization;
+    LoRaMacInitialization-->TimerInit;
+    TimerInit-->TimerInit;
+    TimerInit-->TimerInit;
+    TimerInit-->TimerInit;
+    TimerInit-->TimerInit;
+    TimerInit-->TimerInit;
+    TimerInit-->TimerInit;
+    TimerInit-->TimerInit;
+    TimerInit-->SX126xIoInit;
+    SX126xIoInit-->SX126xSetTx;
+    SX126xSetTx-->SX126xSetPaConfig;
+    SX126xSetPaConfig-->TimerInit;
+    TimerInit-->TimerInit;
+    TimerInit-->RadioSetModem;
+    ...
+```
+
+To get this [Mermaid.js Flowchart](https://mermaid-js.github.io/mermaid/#/./flowchart?id=flowcharts)...
 
 ```mermaid
 flowchart TD;
