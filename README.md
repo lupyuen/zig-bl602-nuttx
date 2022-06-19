@@ -2451,7 +2451,7 @@ while (true) {
 
 [(Source)](https://github.com/lupyuen/zig-bl602-nuttx/blob/5c7989894566cdc0d1852789bc68621c531e459e/reflect.zig#L906-L932)
 
-We get this result...
+Zig Compiler produces this result at Compile-Time...
 
 ```text
 | *"flowchart TD;"
@@ -2475,7 +2475,7 @@ We get this result...
 
 [(Source)](https://gist.github.com/lupyuen/056340b299495682c0c2fbc61b30f203)
 
-We remove the delimiters from the text above like this...
+We manually remove the delimiters from the Zig Compiler Log above like this...
 
 ```text
 flowchart TD;
@@ -2853,7 +2853,7 @@ flowchart TD;
 
 [(Source)](https://gist.github.com/lupyuen/056340b299495682c0c2fbc61b30f203)
 
-Remember we're only plotting the sequence of Function Calls. Our Call Graph lacks __Structure__...
+Our Call Graph lacks __Structure__. Remember we're only plotting the sequence of Function Calls...
 
 -   `TimerInit → TimerInit` doesn't make sense (because we don't have recursive functions)
 
