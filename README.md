@@ -2877,6 +2877,19 @@ And we'll ensure that we never draw a line from a Low-Level Function to a High-L
 
 ```mermaid
 flowchart TD;
+    subgraph LoRaWAN;
+        Start;
+        LoRaWANInitialization;
+    end;
+    subgraph SX1262;
+        RadioSetModem;
+        SX126xIoInit;
+        SX126xSetTx;
+        SX126xSetPaConfig;
+    end;
+    subgraph NimBLE;
+        TimerInit;
+    end;
     Start-->LoRaMacInitialization;
     LoRaMacInitialization-->TimerInit;
     TimerInit-->TimerInit;
