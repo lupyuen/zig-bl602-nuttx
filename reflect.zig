@@ -903,47 +903,52 @@ fn reflect() void {
         // | *"ThisType.Struct.decls[1].name: ", "c"
         // | *"ThisType.Struct.decls[2].name: ", "ACTIVE_REGION"        
 
-        // Map Function Names to Module Names. Only the first Function Name needs to be specified per Module.
-        var function_module_map = [_]FunctionModuleMap {
-            FunctionModuleMap {
-                .function = "LoRaMacInitialization",
-                .module   = "LoRaWAN",
-                .index    = undefined,
+        // Define the Modules
+        var all_modules = [_]Module {
+            Module {
+                .name           = "LoRaWAN",
+                .first_function = "LoRaMacInitialization",
+                .index          = undefined,
             },
-            FunctionModuleMap {
-                .function = "SX126xIoInita",
-                .module   = "SX1262",
-                .index    = undefined,
+            Module {
+                .name           = "SX1262",
+                .first_function = "SX126xIoInit",
+                .index          = undefined,
             },
-            FunctionModuleMap {
-                .function = "TimerInit",
-                .module   = "NimBLE",
-                .index    = undefined,
+            Module {
+                .name           = "NimBLE",
+                .first_function = "TimerInit",
+                .index          = undefined,
             },
         };
 
         // Set the C Declaration Index in the Function-To-Module Map
-        // For every Function-To-Module Map...
-        for (function_module_map) |map, m| {
+        // For every Module...
+        for (all_modules) |map, m| {
 
             // For every C Declaration...
             for (T.Struct.decls) |decl, i| {
 
-                // If the C Declaration matches the Function-To-Module Map...
-                if (std.mem.eql(u8, decl.name, map.function)) {
+                // If the C Declaration matches the Module Name...
+                if (std.mem.eql(u8, decl.name, map.first_function)) {
 
                     //  Set the index
-                    function_module_map[m].index = i;
-                    @compileLog("index_modules: ", map.function, map.module, i);
+                    all_modules[m].index = i;
+                    @compileLog("index_modules: ", map.first_function, map.name, i);
                     break;
                 }
             }  // End of C Declaration
-        }  // End of Function-To-Module Map
+        }  // End of Module
+
+        // Start Top-Down Flowchart
+        @compileLog("flowchart TD;");
+
+        // Render all Modules and their Functions as Subgraphs
+        render_modules(&all_modules);
 
         // Draw the graph for all functions in the Call Log
         var call_log_split = std.mem.split(u8, call_log, "\n");
         var prev_name: []const u8 = "Start";
-        @compileLog("flowchart TD;");  // Top-Down Flowchart
 
         // For every line in the Call Log...
         while (true) {
@@ -973,20 +978,46 @@ fn reflect() void {
 }
 
 /// Render all Modules and their Functions as Subgraphs
-fn render_modules() void {
+fn render_modules(all_modules: []Module) void {
     comptime {
-        var T = @typeInfo(c);
-        var i = 0;
-        @compileLog("decl.name: ", i, T.Struct.decls[i].name);
+        for (all_modules) |module, m| {
+            var T = @typeInfo(c);
+
+            // For every C Declaration...
+            for (T.Struct.decls) |decl, i| {
+
+                // Get the Module Index for the C Declaration
+                var m2 = get_module_by_decl(all_modules, i);
+
+                // If the C Declaration matches our Module Index...
+                if (m == m2) {
+
+                    // Print the Function Name
+                    @compileLog("    ", module.name, decl.name, ";");
+                }
+            }   // End of C Declaration
+        }  // End of Module
     }
 }
 
-/// Map Function Names to Module Names. Only the first Function Name needs to be specified per Module.
-const FunctionModuleMap = struct {
-    /// Function Name, like "LoRaMacInitialization"
-    function: []const u8,
+/// Get the Module Index for the C Declaration Index
+fn get_module_by_decl(all_modules: []Module, decl_index: usize) usize {
+    comptime {
+        for (all_modules) |module| {
+            _ = module;
+            _ = decl_index;
+            // var T = @typeInfo(c);
+        }
+        return 0;
+    }
+}
+
+/// Module Definition
+const Module = struct {
     /// Module Name, like "LoRaWAN"
-    module: []const u8,
+    name: []const u8,
+    /// Name of First Function in the Module, like "LoRaMacInitialization"
+    first_function: []const u8,
     /// Index of the Function Name in C Declarations
     index: usize,
 };
