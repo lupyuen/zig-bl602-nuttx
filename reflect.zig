@@ -951,12 +951,12 @@ fn reflect() void {
 
         // For every line in the Call Log...
         while (call_log_split.next()) |line| {
+            var T2 = @typeInfo(c);
 
             // If the C Declaration matches the Call Log...
             if (get_decl_by_name(line)) |decl_index| {
 
                 // Skip calls to self
-                var T2 = @typeInfo(c);
                 var name = T2.Struct.decls[decl_index].name;
                 if (std.mem.eql(u8, name, prev_name)) {
                     continue;
@@ -979,24 +979,26 @@ fn render_modules(all_modules: []Module) void {
         for (all_modules) |module, m| {
             var T = @typeInfo(c);
 
-            // For every C Declaration...
-            for (T.Struct.decls) |decl, i| {
+            // For every line in the Call Log...
+            var call_log_split = std.mem.split(u8, call_log, "\n");
+            while (call_log_split.next()) |line| {
 
-                // If Call Log contains the C Declaration...
-                if (std.mem.containsAtLeast(u8, call_log, 1, decl.name)) {
+                // If the C Declaration matches the Call Log...
+                if (get_decl_by_name(line)) |decl_index| {
 
                     // Get the Module Index for the C Declaration
-                    if (get_module_by_decl(all_modules, i)) |m2| {
+                    if (get_module_by_decl(all_modules, decl_index)) |m2| {
 
                         // If the C Declaration matches our Module Index...
                         if (m == m2) {
 
                             // Print the Function Name
-                            @compileLog("    ", module.name, decl.name, ";");
+                            var name = T.Struct.decls[decl_index].name;
+                            @compileLog("    ", module.name, name, ";");
                         }
                     }
                 }
-            }   // End of C Declaration
+            }  // End of Call Log
         }  // End of Module
     }
 }
@@ -1005,7 +1007,7 @@ fn render_modules(all_modules: []Module) void {
 fn get_module_by_decl(all_modules: []Module, decl_index: usize) ?usize {
     comptime {
         var m: ?usize = null;
-        var diff = undefined;
+        var diff: usize = undefined;
 
         // Find the Module that best matches the C Declaration Index
         for (all_modules) |module, m2| {
@@ -1013,11 +1015,18 @@ fn get_module_by_decl(all_modules: []Module, decl_index: usize) ?usize {
             // Overshot the C Declaration Index, skip it
             if (decl_index <= module.first_index) { continue; }
 
-            // If this Module is closer than the last one...
-            if (!m or decl_index - module.first_index < diff) {
-                // Remember this Module
-                diff = decl_index - module.first_index;
+            var diff2 = decl_index - module.first_index;
+            if (m) |_| {
+                // If this Module is closer than the last one...
+                if (decl_index - module.first_index < diff) {
+                    // Remember this Module
+                    diff = decl_index - module.first_index;
+                    m = m2;
+                }
+            } else {
+                // First matching Module
                 m = m2;
+                diff = diff2;
             }
         }
         return m;
