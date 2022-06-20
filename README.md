@@ -2863,7 +2863,7 @@ _Can we add some Structure to improve the Call Graph?_
 
 To produce a Structured Call Graph we'll group the functions into Modules, from High-Level to Low-Level...
 
-1.  LoRaWAN App (Highest Level)
+1.  Zig App (Highest Level)
 
 1.  LoRaWAN Library
 
