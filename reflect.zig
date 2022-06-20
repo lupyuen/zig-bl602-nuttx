@@ -885,6 +885,7 @@ fn render_modules(all_modules: []Module) void {
     comptime {
         // Render every Module
         for (all_modules) |module, m| {
+            @compileLog("    subgraph ", module.name, ";");
 
             // For every line in the Call Log...
             var call_log_split = std.mem.split(u8, call_log, "\n");
@@ -902,11 +903,13 @@ fn render_modules(all_modules: []Module) void {
 
                             // Print the Function Name
                             var name = T.Struct.decls[decl_index].name;
-                            @compileLog("    ", module.name, name, ";");
+                            @compileLog("        ", name, ";");
                         }
                     }
                 }
-            }  // End of Call Log
+            }  // End of Call Log            
+
+            @compileLog("    end;");
         }  // End of Module
     }
 }
