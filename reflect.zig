@@ -911,7 +911,7 @@ fn reflect() void {
                 .index    = undefined,
             },
             FunctionModuleMap {
-                .function = "SX126xIoInit",
+                .function = "SX126xIoInita",
                 .module   = "SX1262",
                 .index    = undefined,
             },
