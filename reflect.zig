@@ -872,7 +872,7 @@ fn reflect() void {
         @compileLog("flowchart TD;");
 
         // Render all Modules and their Functions as Subgraphs
-        render_modules(&all_modules);
+        // render_modules(&all_modules);
 
         // Render the Call Graph for all functions in the Call Log
         render_call_graph(&all_modules);
@@ -915,7 +915,7 @@ fn render_modules(all_modules: []Module) void {
 fn render_call_graph(all_modules: []Module) void {
     comptime {
         _ = all_modules;
-        var prev_name: []const u8 = "Start";
+        var prev_index: usize = 0;
 
         // For every line in the Call Log...
         var call_log_split = std.mem.split(u8, call_log, "\n");
@@ -925,17 +925,22 @@ fn render_call_graph(all_modules: []Module) void {
             // If the the Call Log matches a C Declaration...
             if (get_decl_by_name(line)) |decl_index| {
 
+                // Skip calls to self
+                if (decl_index == prev_index) { continue; }
+
                 // Get the C Function Name
                 var name = T2.Struct.decls[decl_index].name;
-
-                // Skip calls to self
-                if (std.mem.eql(u8, name, prev_name)) { continue; }
+                var prev_name = 
+                    if (prev_index == 0) "Start"
+                    else T2.Struct.decls[prev_index].name;
 
                 // Draw the graph: [previous function]-->[current function]
                 @compileLog("    ", prev_name, "-->", name, ";");
-                prev_name = name;
+                prev_index = decl_index;
             }
         }  // End of Call Log
+        var T2 = @typeInfo(c);
+        var prev_name = T2.Struct.decls[prev_index].name;
         @compileLog("    ", prev_name, "-->", "End", ";");
     }
 }
