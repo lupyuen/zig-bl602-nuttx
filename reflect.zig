@@ -945,31 +945,8 @@ fn reflect() void {
         // Render all Modules and their Functions as Subgraphs
         render_modules(&all_modules);
 
-        // Draw the graph for all functions in the Call Log
-        var call_log_split = std.mem.split(u8, call_log, "\n");
-        var prev_name: []const u8 = "Start";
-
-        // For every line in the Call Log...
-        while (call_log_split.next()) |line| {
-            var T2 = @typeInfo(c);
-
-            // If the the Call Log matches a C Declaration...
-            if (get_decl_by_name(line)) |decl_index| {
-
-                // Get the C Function Name
-                var name = T2.Struct.decls[decl_index].name;
-
-                // Skip calls to self
-                if (std.mem.eql(u8, name, prev_name)) {
-                    continue;
-                }
-
-                // Draw the graph: [previous function]-->[current function]
-                @compileLog("    ", prev_name, "-->", name, ";");
-                prev_name = name;
-            }
-        }  // End of Call Log
-        @compileLog("    ", prev_name, "-->", "End", ";");
+        // Render the Call Graph for all functions in the Call Log
+        render_call_graph(&all_modules);
 
     }   // End of Compile-Time Code
 }
@@ -1002,6 +979,35 @@ fn render_modules(all_modules: []Module) void {
                 }
             }  // End of Call Log
         }  // End of Module
+    }
+}
+
+/// Render the Call Graph for all functions in the Call Log
+fn render_call_graph(all_modules: []Module) void {
+    comptime {
+        _ = all_modules;
+        var prev_name: []const u8 = "Start";
+
+        // For every line in the Call Log...
+        var call_log_split = std.mem.split(u8, call_log, "\n");
+        while (call_log_split.next()) |line| {
+            var T2 = @typeInfo(c);
+
+            // If the the Call Log matches a C Declaration...
+            if (get_decl_by_name(line)) |decl_index| {
+
+                // Get the C Function Name
+                var name = T2.Struct.decls[decl_index].name;
+
+                // Skip calls to self
+                if (std.mem.eql(u8, name, prev_name)) { continue; }
+
+                // Draw the graph: [previous function]-->[current function]
+                @compileLog("    ", prev_name, "-->", name, ";");
+                prev_name = name;
+            }
+        }  // End of Call Log
+        @compileLog("    ", prev_name, "-->", "End", ";");
     }
 }
 
