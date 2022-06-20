@@ -832,76 +832,8 @@ fn reflect() void {
         // Allow Zig Compiler to loop up to 10,000,000 times (Default is 1,000)
         @setEvalBranchQuota(10_000_000);
 
-        // Get the Type Info of the C Namespace
-        const T = @typeInfo(c);
-
-        // Show the Type Info of the C Namespace (Struct)
-        @compileLog("@typeInfo(c): ", T);
-        // Shows | *"@typeInfo(c): ", std.builtin.Type { .Struct = (struct std.builtin.Type.Struct constant)}
-
-        // Show the number of Fields in the C Namespace (0)
-        @compileLog("T.Struct.fields.len: ", T.Struct.fields.len);
-        // Shows | *"T.Struct.fields.len: ", 0
-
-        // Show the number of Declarations in the C Namespace (4743)
-        @compileLog("T.Struct.decls.len: ", T.Struct.decls.len);
-        // Shows | *"T.Struct.decls.len: ", 4743
-
-        // Show the first Declaration in the C Namespace (__builtin_bswap16)
-        @compileLog("T.Struct.decls[0].name: ", T.Struct.decls[0].name);
-        // Shows | *"T.Struct.decls[0].name: ", "__builtin_bswap16"
-
-        // Remember the C Header
-        var header: []const u8 = "";
-
-        // For every C Declaration...
-        for (T.Struct.decls) |decl, i| {
-            var T2 = @typeInfo(c);
-
-            // If the C Declaration ends with "_H"...
-            if (
-                std.mem.endsWith(u8, decl.name, "_H") or
-                std.mem.endsWith(u8, decl.name, "_H_") or
-                std.mem.endsWith(u8, decl.name, "_H__")
-            ) {
-                // Dump the C Header and remember it
-                var name = T2.Struct.decls[i].name;
-                @compileLog("-----", name);
-                header = name;
-
-            // Else if we have seen a header...
-            //} else if (!std.mem.eql(u8, header, "")) {                
-            //} else if (std.mem.startsWith(u8, decl.name, "Lm")) {
-
-            } else {
-                // Dump the C Declaration
-                var name = T2.Struct.decls[i].name;
-                @compileLog("decl.name:", name);
-            }
-
-            // Strangely we can't do this...
-            //   @compileLog("decl.name:", decl.name);
-            // Because it shows...
-            //   *"decl.name:", []const u8{76,109,110,83,116,97,116,117,115,95,116}
-
-            @compileLog("break for debugging");
-            break;  //// For Debugging
-
-        }   // End of C Declaration
-
-        // Show the Type Info for our Zig Namespace
-        const ThisType = @typeInfo(@This());
-        @compileLog("ThisType: ", ThisType);
-        @compileLog("ThisType.Struct.decls.len: ", ThisType.Struct.decls.len);
-        @compileLog("ThisType.Struct.decls[0].name: ", ThisType.Struct.decls[0].name);
-        @compileLog("ThisType.Struct.decls[1].name: ", ThisType.Struct.decls[1].name);
-        @compileLog("ThisType.Struct.decls[2].name: ", ThisType.Struct.decls[2].name);
-        // Shows...
-        // | *"ThisType: ", std.builtin.Type { .Struct = (struct std.builtin.Type.Struct constant)}
-        // | *"ThisType.Struct.decls.len: ", 66
-        // | *"ThisType.Struct.decls[0].name: ", "std"
-        // | *"ThisType.Struct.decls[1].name: ", "c"
-        // | *"ThisType.Struct.decls[2].name: ", "ACTIVE_REGION"        
+        // Test Zig Reflection
+        test_reflection();
 
         // Define the Modules and the First Function in each Module
         var all_modules = [_]Module {
@@ -925,18 +857,15 @@ fn reflect() void {
         // Set the C Declaration Index for every Module
         for (all_modules) |map, m| {
 
-            // For every C Declaration...
-            for (T.Struct.decls) |decl, i| {
-
-                // If the C Declaration matches the Module Name...
-                if (std.mem.eql(u8, decl.name, map.first_function)) {
-
-                    //  Set the index
-                    all_modules[m].first_index = i;
-                    @compileLog("index_modules: ", all_modules[m].first_function, map.name, i);
-                    break;
-                }
-            }  // End of C Declaration
+            // Find the C Declaration Index for the Module's First Function
+            if (get_decl_by_name(map.first_function)) |decl_index| {
+                //  Set the index
+                all_modules[m].first_index = decl_index;
+                @compileLog("Found module function: ", all_modules[m].first_function, map.name, decl_index);
+            } else {
+                // Missing Declaration
+                @compileLog("C Declaration not found for module: ", map.name, map.first_function);
+            }
         }  // End of Module
 
         // Start Top-Down Flowchart
@@ -1058,6 +987,82 @@ fn get_decl_by_name(name: []const u8) ?usize {
         }
     }   // End of C Declaration
     return null;  // Not found
+}
+
+/// Test Zig Reflection
+fn test_reflection() void {
+    comptime {
+        // Get the Type Info of the C Namespace
+        const T = @typeInfo(c);
+
+        // Show the Type Info of the C Namespace (Struct)
+        @compileLog("@typeInfo(c): ", T);
+        // Shows | *"@typeInfo(c): ", std.builtin.Type { .Struct = (struct std.builtin.Type.Struct constant)}
+
+        // Show the number of Fields in the C Namespace (0)
+        @compileLog("T.Struct.fields.len: ", T.Struct.fields.len);
+        // Shows | *"T.Struct.fields.len: ", 0
+
+        // Show the number of Declarations in the C Namespace (4743)
+        @compileLog("T.Struct.decls.len: ", T.Struct.decls.len);
+        // Shows | *"T.Struct.decls.len: ", 4743
+
+        // Show the first Declaration in the C Namespace (__builtin_bswap16)
+        @compileLog("T.Struct.decls[0].name: ", T.Struct.decls[0].name);
+        // Shows | *"T.Struct.decls[0].name: ", "__builtin_bswap16"
+
+        // Remember the C Header
+        var header: []const u8 = "";
+
+        // For every C Declaration...
+        for (T.Struct.decls) |decl, i| {
+            var T2 = @typeInfo(c);
+
+            // If the C Declaration ends with "_H"...
+            if (
+                std.mem.endsWith(u8, decl.name, "_H") or
+                std.mem.endsWith(u8, decl.name, "_H_") or
+                std.mem.endsWith(u8, decl.name, "_H__")
+            ) {
+                // Dump the C Header and remember it
+                var name = T2.Struct.decls[i].name;
+                @compileLog("-----", name);
+                header = name;
+
+            // Else if we have seen a header...
+            //} else if (!std.mem.eql(u8, header, "")) {                
+            //} else if (std.mem.startsWith(u8, decl.name, "Lm")) {
+
+            } else {
+                // Dump the C Declaration
+                var name = T2.Struct.decls[i].name;
+                @compileLog("decl.name:", name);
+            }
+
+            // Strangely we can't do this...
+            //   @compileLog("decl.name:", decl.name);
+            // Because it shows...
+            //   *"decl.name:", []const u8{76,109,110,83,116,97,116,117,115,95,116}
+
+            @compileLog("break for debugging");
+            break;  //// For Debugging
+
+        }   // End of C Declaration
+
+        // Show the Type Info for our Zig Namespace
+        const ThisType = @typeInfo(@This());
+        @compileLog("ThisType: ", ThisType);
+        @compileLog("ThisType.Struct.decls.len: ", ThisType.Struct.decls.len);
+        @compileLog("ThisType.Struct.decls[0].name: ", ThisType.Struct.decls[0].name);
+        @compileLog("ThisType.Struct.decls[1].name: ", ThisType.Struct.decls[1].name);
+        @compileLog("ThisType.Struct.decls[2].name: ", ThisType.Struct.decls[2].name);
+        // Shows...
+        // | *"ThisType: ", std.builtin.Type { .Struct = (struct std.builtin.Type.Struct constant)}
+        // | *"ThisType.Struct.decls.len: ", 66
+        // | *"ThisType.Struct.decls[0].name: ", "std"
+        // | *"ThisType.Struct.decls[1].name: ", "c"
+        // | *"ThisType.Struct.decls[2].name: ", "ACTIVE_REGION"                
+    }
 }
 
 /// Module Definition
