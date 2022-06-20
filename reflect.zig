@@ -943,7 +943,7 @@ fn reflect() void {
         @compileLog("flowchart TD;");
 
         // Render all Modules and their Functions as Subgraphs
-        // render_modules(&all_modules);
+        render_modules(&all_modules);
 
         // Draw the graph for all functions in the Call Log
         var call_log_split = std.mem.split(u8, call_log, "\n");
@@ -986,26 +986,26 @@ fn render_modules(all_modules: []Module) void {
                 if (std.mem.containsAtLeast(u8, call_log, 1, decl.name)) {
 
                     // Get the Module Index for the C Declaration
-                    var m2 = get_module_by_decl(all_modules, i);
+                    if (get_module_by_decl(all_modules, i)) |m2| {
 
-                    // If the C Declaration matches our Module Index...
-                    if (m == m2) {
+                        // If the C Declaration matches our Module Index...
+                        if (m == m2) {
 
-                        // Print the Function Name
-                        @compileLog("    ", module.name, decl.name, ";");
+                            // Print the Function Name
+                            @compileLog("    ", module.name, decl.name, ";");
+                        }
                     }
-
                 }
             }   // End of C Declaration
         }  // End of Module
     }
 }
 
-/// Get the Module Index for the C Declaration Index
-fn get_module_by_decl(all_modules: []Module, decl_index: usize) usize {
+/// Get the index of the Module that contains the C Declaration Index
+fn get_module_by_decl(all_modules: []Module, decl_index: usize) ?usize {
     comptime {
-        var m = all_modules.len - 1;
-        var diff = 1_000_000;
+        var m: ?usize = null;
+        var diff = undefined;
 
         // Find the Module that best matches the C Declaration Index
         for (all_modules) |module, m2| {
@@ -1014,7 +1014,7 @@ fn get_module_by_decl(all_modules: []Module, decl_index: usize) usize {
             if (decl_index <= module.first_index) { continue; }
 
             // If this Module is closer than the last one...
-            if (decl_index - module.first_index < diff) {
+            if (!m or decl_index - module.first_index < diff) {
                 // Remember this Module
                 diff = decl_index - module.first_index;
                 m = m2;
