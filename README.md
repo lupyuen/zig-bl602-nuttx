@@ -2888,6 +2888,7 @@ flowchart TD;
     end;
     subgraph NimBLE;
         TimerInit;
+        TimerInit;
     end;
     Start-->LoRaMacInitialization;
     LoRaMacInitialization-->TimerInit;

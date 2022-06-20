@@ -931,8 +931,39 @@ fn reflect() void {
         }  // End of Call Log
         @compileLog("    ", prev_name, "-->", "End", ";");
 
+        _ = FunctionModuleMap;  ////
+
     }   // End of Compile-Time Code
 }
+
+/// Map Function Names to Module Names. Only the first Function Name needs to be specified per Module.
+var map_function_to_module = [_]FunctionModuleMap {
+    FunctionModuleMap {
+        .fn_name     = "LoRaMacInitialization",
+        .module_name = "LoRaWAN",
+        .decl_index  = undefined,
+    },
+    FunctionModuleMap {
+        .fn_name     = "SX126xIoInit",
+        .module_name = "SX1262",
+        .decl_index  = undefined,
+    },
+    FunctionModuleMap {
+        .fn_name     = "TimerInit",
+        .module_name = "NimBLE",
+        .decl_index  = undefined,
+    },
+};
+
+/// Map Function Names to Module Names. Only the first Function Name needs to be specified per Module.
+const FunctionModuleMap = struct {
+    /// Function Name, like "LoRaMacInitialization"
+    fn_name: []const u8,
+    /// Module Name, like "LoRaWAN"
+    module_name: []const u8,
+    /// Index of the Function Name in C Declarations
+    decl_index: usize,
+};
 
 // fn process_decl(i: u32) void {
 //     comptime {
