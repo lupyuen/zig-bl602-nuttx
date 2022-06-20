@@ -2879,10 +2879,9 @@ And we'll ensure that we never draw a line from a Low-Level Function to a High-L
 flowchart TD;
     subgraph LoRaWAN;
         Start;
-        LoRaWANInitialization;
+        LoRaMacInitialization;
     end;
     subgraph SX1262;
-        RadioSetModem;
         SX126xIoInit;
         SX126xSetTx;
         SX126xSetPaConfig;
@@ -2892,10 +2891,7 @@ flowchart TD;
     end;
     Start-->LoRaMacInitialization;
     LoRaMacInitialization-->TimerInit;
-    TimerInit-->TimerInit;
-    TimerInit-->SX126xIoInit;
     SX126xIoInit-->SX126xSetTx;
     SX126xSetTx-->SX126xSetPaConfig;
     SX126xSetPaConfig-->TimerInit;
-    TimerInit-->RadioSetModem;
 ```
