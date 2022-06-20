@@ -903,6 +903,43 @@ fn reflect() void {
         // | *"ThisType.Struct.decls[1].name: ", "c"
         // | *"ThisType.Struct.decls[2].name: ", "ACTIVE_REGION"        
 
+        // Map Function Names to Module Names. Only the first Function Name needs to be specified per Module.
+        var function_module_map = [_]FunctionModuleMap {
+            FunctionModuleMap {
+                .function = "LoRaMacInitialization",
+                .module   = "LoRaWAN",
+                .index    = undefined,
+            },
+            FunctionModuleMap {
+                .function = "SX126xIoInit",
+                .module   = "SX1262",
+                .index    = undefined,
+            },
+            FunctionModuleMap {
+                .function = "TimerInit",
+                .module   = "NimBLE",
+                .index    = undefined,
+            },
+        };
+
+        // Set the C Declaration Index in the Function-To-Module Map
+        // For every Function-To-Module Map...
+        for (function_module_map) |map, m| {
+
+            // For every C Declaration...
+            for (T.Struct.decls) |decl, i| {
+
+                // If the C Declaration matches the Function-To-Module Map...
+                if (std.mem.eql(u8, decl.name, map.function)) {
+
+                    //  Set the index
+                    function_module_map[m].index = i;
+                    @compileLog("index_modules: ", map.function, map.module, i);
+                    break;
+                }
+            }  // End of C Declaration
+        }  // End of Function-To-Module Map
+
         // Draw the graph for all functions in the Call Log
         var call_log_split = std.mem.split(u8, call_log, "\n");
         var prev_name: []const u8 = "Start";
@@ -920,6 +957,7 @@ fn reflect() void {
 
                 // If the C Declaration matches the Call Log...
                 if (std.mem.startsWith(u8, line, decl.name)) {
+
                     // Draw the graph: [previous function]-->[current function]
                     var name = T2.Struct.decls[i].name;
                     @compileLog("    ", prev_name, "-->", name, ";");
@@ -931,46 +969,27 @@ fn reflect() void {
         }  // End of Call Log
         @compileLog("    ", prev_name, "-->", "End", ";");
 
-        _ = FunctionModuleMap;  ////
-
     }   // End of Compile-Time Code
 }
 
-/// Map Function Names to Module Names. Only the first Function Name needs to be specified per Module.
-var map_function_to_module = [_]FunctionModuleMap {
-    FunctionModuleMap {
-        .fn_name     = "LoRaMacInitialization",
-        .module_name = "LoRaWAN",
-        .decl_index  = undefined,
-    },
-    FunctionModuleMap {
-        .fn_name     = "SX126xIoInit",
-        .module_name = "SX1262",
-        .decl_index  = undefined,
-    },
-    FunctionModuleMap {
-        .fn_name     = "TimerInit",
-        .module_name = "NimBLE",
-        .decl_index  = undefined,
-    },
-};
+/// Render all Modules and their Functions as Subgraphs
+fn render_modules() void {
+    comptime {
+        var T = @typeInfo(c);
+        var i = 0;
+        @compileLog("decl.name: ", i, T.Struct.decls[i].name);
+    }
+}
 
 /// Map Function Names to Module Names. Only the first Function Name needs to be specified per Module.
 const FunctionModuleMap = struct {
     /// Function Name, like "LoRaMacInitialization"
-    fn_name: []const u8,
+    function: []const u8,
     /// Module Name, like "LoRaWAN"
-    module_name: []const u8,
+    module: []const u8,
     /// Index of the Function Name in C Declarations
-    decl_index: usize,
+    index: usize,
 };
-
-// fn process_decl(i: u32) void {
-//     comptime {
-//         var T = @typeInfo(c);
-//         @compileLog("decl.name: ", i, T.Struct.decls[i].name);
-//     }
-// }
 
 /// Call Log captured for this app. From
 /// https://gist.github.com/lupyuen/0871ac515b18d9d68d3aacf831fd0f5b
