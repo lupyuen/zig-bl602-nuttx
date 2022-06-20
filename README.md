@@ -2337,13 +2337,10 @@ To iterate through all lines of the Call Log we do this...
 ```zig
 // For every line in the Call Log...
 var call_log_split = std.mem.split(u8, call_log, "\n");
-while (true) {
-    // Get the line
-    // TODO: Check for last line
-    const line = call_log_split.next().?;
-    @compileLog("line:", line);
+while (call_log_split.next()) |line| {
 
     // TODO: Process the line
+    @compileLog("line:", line);
     ...
 }  // End of Call Log
 ```
@@ -2357,9 +2354,7 @@ Let's match the Call Log with the Function Names from our LoRaWAN Library...
 ```zig
 // For every line in the Call Log...
 var call_log_split = std.mem.split(u8, call_log, "\n");
-while (true) {
-    // Get the line
-    const line = call_log_split.next().?;
+while (call_log_split.next()) |line| {
 
     // For every C Declaration...
     for (T.Struct.decls) |decl, i| {
@@ -2426,9 +2421,7 @@ var prev_name: []const u8 = "Start";
 @compileLog("flowchart TD;");  // Top-Down Flowchart
 
 // For every line in the Call Log...
-while (true) {
-    // Get the line
-    const line = call_log_split.next().?;
+while (call_log_split.next()) |line| {
 
     // For every C Declaration...
     for (T.Struct.decls) |decl, i| {

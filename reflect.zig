@@ -950,26 +950,22 @@ fn reflect() void {
         var prev_name: []const u8 = "Start";
 
         // For every line in the Call Log...
-        while (true) {
-            // Get the line
-            const line = call_log_split.next().?;
+        while (call_log_split.next()) |line| {
 
-            // For every C Declaration...
-            for (T.Struct.decls) |decl, i| {
-                if (std.mem.eql(u8, decl.name, "Radio")) { continue; }  // Skip Radio
+            // If the C Declaration matches the Call Log...
+            if (get_decl_by_name(line)) |decl_index| {
+
+                // Skip calls to self
                 var T2 = @typeInfo(c);
-
-                // If the C Declaration matches the Call Log...
-                if (std.mem.startsWith(u8, line, decl.name)) {
-
-                    // Draw the graph: [previous function]-->[current function]
-                    var name = T2.Struct.decls[i].name;
-                    @compileLog("    ", prev_name, "-->", name, ";");
-                    prev_name = name;
-                    break;
+                var name = T2.Struct.decls[decl_index].name;
+                if (std.mem.eql(u8, name, prev_name)) {
+                    continue;
                 }
-            }   // End of C Declaration
 
+                // Draw the graph: [previous function]-->[current function]
+                @compileLog("    ", prev_name, "-->", name, ";");
+                prev_name = name;
+            }
         }  // End of Call Log
         @compileLog("    ", prev_name, "-->", "End", ";");
 
@@ -1026,6 +1022,25 @@ fn get_module_by_decl(all_modules: []Module, decl_index: usize) usize {
         }
         return m;
     }
+}
+
+/// Return the C Declaration Index for the Function Name.
+/// We match the C Declaration Name against the start of the Function Name.
+fn get_decl_by_name(name: []const u8) ?usize {
+    const T = @typeInfo(c);
+
+    // For every C Declaration...
+    for (T.Struct.decls) |decl, i| {
+        if (std.mem.eql(u8, decl.name, "Radio")) { continue; }  // Skip Radio
+
+        // If the C Declaration matches the Call Log...
+        if (std.mem.startsWith(u8, name, decl.name)) {
+
+            // Return the C Declaration Index
+            return i;
+        }
+    }   // End of C Declaration
+    return null;  // Not found
 }
 
 /// Module Definition
