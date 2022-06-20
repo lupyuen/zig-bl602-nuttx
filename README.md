@@ -2084,13 +2084,13 @@ info(compilation): C import output: zig-cache/o/e979b806463a36dcecc2ef773bd2d2ad
 
 Which is a list of C Types and Functions from the LoRaWAN Library.
 
-TODO: Use this to visualise the Call Graph (by module) for the LoRaWAN Library.
+Let's use this to visualise the Call Graph (by module) for the LoRaWAN Library.
 
-TODO: Render Call Graph with Mermaid.js
+We'll render the Call Graph with Mermaid.js...
 
 https://mermaid-js.github.io/mermaid/#/./flowchart?id=flowcharts
 
-TODO: Group LoRaWAN Functions in Call Graph by LoRaWAN Module (Subgraph), so we can see the calls across LoRaWAN Modules
+And we'll group LoRaWAN Functions in Call Graph by LoRaWAN Module (Subgraph), so we can see the calls across LoRaWAN Modules.
 
 # Heisenbug
 
@@ -2873,4 +2873,16 @@ To produce a Structured Call Graph we'll group the functions into Modules, from 
 
 And we'll ensure that we never draw a line from a Low-Level Function to a High-Level Function.
 
-TODO
+# TODO
+
+```mermaid
+flowchart TD;
+    Start-->LoRaMacInitialization;
+    LoRaMacInitialization-->TimerInit;
+    TimerInit-->TimerInit;
+    TimerInit-->SX126xIoInit;
+    SX126xIoInit-->SX126xSetTx;
+    SX126xSetTx-->SX126xSetPaConfig;
+    SX126xSetPaConfig-->TimerInit;
+    TimerInit-->RadioSetModem;
+```
