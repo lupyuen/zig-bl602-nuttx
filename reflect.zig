@@ -953,11 +953,13 @@ fn reflect() void {
         while (call_log_split.next()) |line| {
             var T2 = @typeInfo(c);
 
-            // If the C Declaration matches the Call Log...
+            // If the the Call Log matches a C Declaration...
             if (get_decl_by_name(line)) |decl_index| {
 
-                // Skip calls to self
+                // Get the C Function Name
                 var name = T2.Struct.decls[decl_index].name;
+
+                // Skip calls to self
                 if (std.mem.eql(u8, name, prev_name)) {
                     continue;
                 }
@@ -983,7 +985,7 @@ fn render_modules(all_modules: []Module) void {
             var call_log_split = std.mem.split(u8, call_log, "\n");
             while (call_log_split.next()) |line| {
 
-                // If the C Declaration matches the Call Log...
+                // If the the Call Log matches a C Declaration...
                 if (get_decl_by_name(line)) |decl_index| {
 
                     // Get the Module Index for the C Declaration
