@@ -933,7 +933,7 @@ fn reflect() void {
 
                     //  Set the index
                     all_modules[m].first_index = i;
-                    @compileLog("index_modules: ", map.first_function, map.name, i);
+                    @compileLog("index_modules: ", all_modules[m].first_function, map.name, i);
                     break;
                 }
             }  // End of C Declaration
@@ -943,7 +943,7 @@ fn reflect() void {
         @compileLog("flowchart TD;");
 
         // Render all Modules and their Functions as Subgraphs
-        render_modules(&all_modules);
+        // render_modules(&all_modules);
 
         // Draw the graph for all functions in the Call Log
         var call_log_split = std.mem.split(u8, call_log, "\n");
