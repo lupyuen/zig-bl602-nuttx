@@ -872,7 +872,7 @@ fn reflect() void {
         @compileLog("flowchart TD;");
 
         // Render all Modules and their Functions as Subgraphs
-        // render_modules(&all_modules);
+        render_modules(&all_modules);
 
         // Render the Call Graph for all functions in the Call Log
         render_call_graph(&all_modules);
@@ -885,11 +885,11 @@ fn render_modules(all_modules: []Module) void {
     comptime {
         // Render every Module
         for (all_modules) |module, m| {
-            var T = @typeInfo(c);
 
             // For every line in the Call Log...
             var call_log_split = std.mem.split(u8, call_log, "\n");
             while (call_log_split.next()) |line| {
+                var T = @typeInfo(c);
 
                 // If the the Call Log matches a C Declaration...
                 if (get_decl_by_name(line)) |decl_index| {
@@ -978,20 +978,22 @@ fn get_module_by_decl(all_modules: []Module, decl_index: usize) ?usize {
 /// Return the C Declaration Index for the Function Name.
 /// We match the C Declaration Name against the start of the Function Name.
 fn get_decl_by_name(name: []const u8) ?usize {
-    const T = @typeInfo(c);
+    comptime {
+        const T = @typeInfo(c);
 
-    // For every C Declaration...
-    for (T.Struct.decls) |decl, i| {
-        if (std.mem.eql(u8, decl.name, "Radio")) { continue; }  // Skip Radio
+        // For every C Declaration...
+        for (T.Struct.decls) |decl, i| {
+            if (std.mem.eql(u8, decl.name, "Radio")) { continue; }  // Skip Radio
 
-        // If the C Declaration matches the Call Log...
-        if (std.mem.startsWith(u8, name, decl.name)) {
+            // If the C Declaration matches the Call Log...
+            if (std.mem.startsWith(u8, name, decl.name)) {
 
-            // Return the C Declaration Index
-            return i;
-        }
-    }   // End of C Declaration
-    return null;  // Not found
+                // Return the C Declaration Index
+                return i;
+            }
+        }   // End of C Declaration
+        return null;  // Not found
+    }
 }
 
 /// Test Zig Reflection
