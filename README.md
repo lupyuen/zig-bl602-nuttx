@@ -2873,7 +2873,7 @@ To produce a Structured Call Graph we'll group the functions into Modules, from 
 
 And we'll ensure that we never draw a line from a Low-Level Function to a High-Level Function.
 
-# TODO
+This is a snippet of what we want to achieve...
 
 ```mermaid
 flowchart TD;
@@ -2895,3 +2895,5 @@ flowchart TD;
     SX126xSetTx-->SX126xSetPaConfig;
     SX126xSetPaConfig-->TimerInit;
 ```
+
+# TODO
