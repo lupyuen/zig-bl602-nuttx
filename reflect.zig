@@ -829,8 +829,8 @@ const debug  = std.log.debug;
 fn reflect() void {
     // We run this at Compile-Time (instead of Runtime)...
     comptime {
-        // Allow Zig Compiler to loop up to 10,000,000 times (Default is 1,000)
-        @setEvalBranchQuota(10_000_000);
+        // Allow Zig Compiler to loop up to 100,000,000 times (Default is 1,000)
+        @setEvalBranchQuota(100_000_000);
 
         // Test Zig Reflection
         test_reflection();
