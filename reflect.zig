@@ -903,27 +903,26 @@ fn reflect() void {
         // | *"ThisType.Struct.decls[1].name: ", "c"
         // | *"ThisType.Struct.decls[2].name: ", "ACTIVE_REGION"        
 
-        // Define the Modules
+        // Define the Modules and the First Function in each Module
         var all_modules = [_]Module {
             Module {
                 .name           = "LoRaWAN",
                 .first_function = "LoRaMacInitialization",
-                .index          = undefined,
+                .decl_index     = undefined,
             },
             Module {
                 .name           = "SX1262",
                 .first_function = "SX126xIoInit",
-                .index          = undefined,
+                .decl_index     = undefined,
             },
             Module {
                 .name           = "NimBLE",
                 .first_function = "TimerInit",
-                .index          = undefined,
+                .decl_index     = undefined,
             },
         };
 
-        // Set the C Declaration Index in the Function-To-Module Map
-        // For every Module...
+        // Set the C Declaration Index for every Module
         for (all_modules) |map, m| {
 
             // For every C Declaration...
@@ -933,7 +932,7 @@ fn reflect() void {
                 if (std.mem.eql(u8, decl.name, map.first_function)) {
 
                     //  Set the index
-                    all_modules[m].index = i;
+                    all_modules[m].decl_index = i;
                     @compileLog("index_modules: ", map.first_function, map.name, i);
                     break;
                 }
@@ -980,6 +979,7 @@ fn reflect() void {
 /// Render all Modules and their Functions as Subgraphs
 fn render_modules(all_modules: []Module) void {
     comptime {
+        // Render every Module
         for (all_modules) |module, m| {
             var T = @typeInfo(c);
 
@@ -1003,12 +1003,23 @@ fn render_modules(all_modules: []Module) void {
 /// Get the Module Index for the C Declaration Index
 fn get_module_by_decl(all_modules: []Module, decl_index: usize) usize {
     comptime {
-        for (all_modules) |module| {
-            _ = module;
-            _ = decl_index;
-            // var T = @typeInfo(c);
+        var m = all_modules.len - 1;
+        var diff = 1_000_000;
+
+        // Find the Module that best matches the C Declaration Index
+        for (all_modules) |module, m2| {
+
+            // Overshot the C Declaration Index, skip it
+            if (decl_index <= module.decl_index) { continue; }
+
+            // If this Module is closer than the last one...
+            if (decl_index - module.decl_index < diff) {
+                // Remember this Module
+                diff = decl_index - module.decl_index;
+                m = m2;
+            }
         }
-        return 0;
+        return m;
     }
 }
 
@@ -1019,7 +1030,7 @@ const Module = struct {
     /// Name of First Function in the Module, like "LoRaMacInitialization"
     first_function: []const u8,
     /// Index of the Function Name in C Declarations
-    index: usize,
+    decl_index: usize,
 };
 
 /// Call Log captured for this app. From
