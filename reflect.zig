@@ -908,17 +908,17 @@ fn reflect() void {
             Module {
                 .name           = "LoRaWAN",
                 .first_function = "LoRaMacInitialization",
-                .decl_index     = undefined,
+                .first_index     = undefined,
             },
             Module {
                 .name           = "SX1262",
                 .first_function = "SX126xIoInit",
-                .decl_index     = undefined,
+                .first_index     = undefined,
             },
             Module {
                 .name           = "NimBLE",
                 .first_function = "TimerInit",
-                .decl_index     = undefined,
+                .first_index     = undefined,
             },
         };
 
@@ -932,7 +932,7 @@ fn reflect() void {
                 if (std.mem.eql(u8, decl.name, map.first_function)) {
 
                     //  Set the index
-                    all_modules[m].decl_index = i;
+                    all_modules[m].first_index = i;
                     @compileLog("index_modules: ", map.first_function, map.name, i);
                     break;
                 }
@@ -986,14 +986,19 @@ fn render_modules(all_modules: []Module) void {
             // For every C Declaration...
             for (T.Struct.decls) |decl, i| {
 
-                // Get the Module Index for the C Declaration
-                var m2 = get_module_by_decl(all_modules, i);
+                // If Call Log contains the C Declaration...
+                if (std.mem.containsAtLeast(u8, call_log, 1, decl.name)) {
 
-                // If the C Declaration matches our Module Index...
-                if (m == m2) {
+                    // Get the Module Index for the C Declaration
+                    var m2 = get_module_by_decl(all_modules, i);
 
-                    // Print the Function Name
-                    @compileLog("    ", module.name, decl.name, ";");
+                    // If the C Declaration matches our Module Index...
+                    if (m == m2) {
+
+                        // Print the Function Name
+                        @compileLog("    ", module.name, decl.name, ";");
+                    }
+
                 }
             }   // End of C Declaration
         }  // End of Module
@@ -1010,12 +1015,12 @@ fn get_module_by_decl(all_modules: []Module, decl_index: usize) usize {
         for (all_modules) |module, m2| {
 
             // Overshot the C Declaration Index, skip it
-            if (decl_index <= module.decl_index) { continue; }
+            if (decl_index <= module.first_index) { continue; }
 
             // If this Module is closer than the last one...
-            if (decl_index - module.decl_index < diff) {
+            if (decl_index - module.first_index < diff) {
                 // Remember this Module
-                diff = decl_index - module.decl_index;
+                diff = decl_index - module.first_index;
                 m = m2;
             }
         }
@@ -1029,8 +1034,8 @@ const Module = struct {
     name: []const u8,
     /// Name of First Function in the Module, like "LoRaMacInitialization"
     first_function: []const u8,
-    /// Index of the Function Name in C Declarations
-    decl_index: usize,
+    /// Index of the First Function in C Declarations
+    first_index: usize,
 };
 
 /// Call Log captured for this app. From
