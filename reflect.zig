@@ -922,13 +922,11 @@ fn render_modules(all_modules: []Module) void {
             var call_log_split = std.mem.split(u8, call_log, "\n");
             while (call_log_split.next()) |line| {
                 var T = @typeInfo(c);
-
-                @compileLog("get_decl_by_name", line); ////
+                //@compileLog("get_decl_by_name", line); ////
 
                 // If the Call Log matches a C Declaration...
-                if (get_decl_by_name(line)) |decl_index| {
-
-                    @compileLog("get_module_by_decl", T.Struct.decls[decl_index].name); ////
+                if (get_decl_by_name_filtered(all_modules, line)) |decl_index| {
+                    //@compileLog("get_module_by_decl", T.Struct.decls[decl_index].name); ////
 
                     // Get the Module Index for the C Declaration
                     if (get_module_by_decl(all_modules, decl_index)) |m2| {
@@ -940,6 +938,10 @@ fn render_modules(all_modules: []Module) void {
                             var name = T.Struct.decls[decl_index].name;
                             @compileLog("        ", name, ";");
                         }
+                    } else {
+                        // Missing Declaration
+                        var name = T.Struct.decls[decl_index].name;
+                        @compileLog("Missing Decl:", name);
                     }
                 }
             }  // End of Call Log            
@@ -961,7 +963,7 @@ fn render_call_graph(all_modules: []Module) void {
             var T2 = @typeInfo(c);
 
             // If the the Call Log matches a C Declaration...
-            if (get_decl_by_name(line)) |decl_index| {
+            if (get_decl_by_name_filtered(all_modules, line)) |decl_index| {
 
                 // Skip calls to self
                 if (decl_index == prev_index) { continue; }
@@ -1018,6 +1020,7 @@ fn get_module_by_decl(all_modules: []Module, decl_index: usize) ?usize {
 
 /// Return the C Declaration Index for the Function Name.
 /// We match the C Declaration Name against the start of the Function Name.
+/// This is the slower, unfiltered version that searches all C Declarations.
 fn get_decl_by_name(name: []const u8) ?usize {
     comptime {
         const T = @typeInfo(c);
@@ -1026,13 +1029,44 @@ fn get_decl_by_name(name: []const u8) ?usize {
         for (T.Struct.decls) |decl, i| {
             if (std.mem.eql(u8, decl.name, "Radio")) { continue; }  // Skip Radio
 
-            // If the C Declaration matches the Call Log...
+            // If the C Declaration starts with the Function Name...
             if (std.mem.startsWith(u8, name, decl.name)) {
 
                 // Return the C Declaration Index
                 return i;
             }
         }   // End of C Declaration
+        return null;  // Not found
+    }
+}
+
+/// Return the C Declaration Index for the Function Name.
+/// We match the C Declaration Name against the start of the Function Name.
+/// This is the faster, filtered version that searches C Declarations by Modules.
+fn get_decl_by_name_filtered(all_modules: []Module, name: []const u8) ?usize {
+    comptime {
+        const T = @typeInfo(c);
+
+        // Search all Modules for the Function Name
+        for (all_modules) |module| {
+
+            // For every C Declaration in the Module...
+            var decl_index = module.first_index;
+            while (decl_index <= module.last_index) {
+
+                // Get the C Declaration
+                var decl = T.Struct.decls[decl_index];
+                if (std.mem.eql(u8, decl.name, "Radio")) { continue; }  // Skip Radio
+
+                // If the C Declaration starts with the Function Name...
+                if (std.mem.startsWith(u8, name, decl.name)) {
+
+                    // Return the C Declaration Index
+                    return decl_index;
+                }
+                decl_index += 1;
+            }  // End of C Declaration
+        }  // End of Module
         return null;  // Not found
     }
 }
