@@ -2890,4 +2890,12 @@ flowchart TD;
     SX126xSetPaConfig-->TimerInit;
 ```
 
+# Too Much Memory
+
+TODO
+
+https://github.com/lupyuen/zig-bl602-nuttx/blob/f5a5c824e07e5fc984136069a1769edda4967c77/reflect.zig#L825-L1086
+
+![Too Much Memory](https://lupyuen.github.io/images/Screenshot%202022-06-21%20at%208.03.46%20AM.png)
+
 # TODO
