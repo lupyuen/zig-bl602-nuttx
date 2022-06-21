@@ -835,22 +835,43 @@ fn reflect() void {
         // Test Zig Reflection
         test_reflection();
 
-        // Define the Modules and the First Function in each Module
+        // Define the Modules and the First / Last Functions in each Module.
+        // We order the Modules from High-Level to Low-Level.
         var all_modules = [_]Module {
             Module {
-                .name           = "LoRaWAN",
+                .name           = "LMHandler",
+                .first_function = "LmHandlerInit",
+                .last_function  = "DisplayAppInfo",
+                .first_index    = undefined,
+                .last_index     = undefined,
+            },
+            Module {
+                .name           = "LoRaMAC",
                 .first_function = "LoRaMacInitialization",
-                .first_index     = undefined,
+                .last_function  = "LoRaMacDeInitialization",
+                .first_index    = undefined,
+                .last_index     = undefined,
+            },
+            Module {
+                .name           = "Radio",
+                .first_function = "RadioInit",
+                .last_function  = "RadioAddRegisterToRetentionList",
+                .first_index    = undefined,
+                .last_index     = undefined,
             },
             Module {
                 .name           = "SX1262",
-                .first_function = "SX126xIoInit",
-                .first_index     = undefined,
+                .first_function = "SX126xInit",
+                .last_function  = "SX126xSetOperatingMode",
+                .first_index    = undefined,
+                .last_index     = undefined,
             },
             Module {
                 .name           = "NimBLE",
                 .first_function = "TimerInit",
-                .first_index     = undefined,
+                .last_function  = "TimerGetElapsedTime",
+                .first_index    = undefined,
+                .last_index     = undefined,
             },
         };
 
@@ -862,6 +883,16 @@ fn reflect() void {
                 //  Set the index
                 all_modules[m].first_index = decl_index;
                 @compileLog("Found module function: ", all_modules[m].first_function, map.name, decl_index);
+            } else {
+                // Missing Declaration
+                @compileLog("C Declaration not found for module: ", map.name, map.first_function);
+            }
+
+            // Find the C Declaration Index for the Module's Last Function
+            if (get_decl_by_name(map.last_function)) |decl_index| {
+                //  Set the index
+                all_modules[m].last_index = decl_index;
+                @compileLog("Found module function: ", all_modules[m].last_function, map.name, decl_index);
             } else {
                 // Missing Declaration
                 @compileLog("C Declaration not found for module: ", map.name, map.first_function);
@@ -892,8 +923,12 @@ fn render_modules(all_modules: []Module) void {
             while (call_log_split.next()) |line| {
                 var T = @typeInfo(c);
 
-                // If the the Call Log matches a C Declaration...
+                @compileLog("get_decl_by_name", line); ////
+
+                // If the Call Log matches a C Declaration...
                 if (get_decl_by_name(line)) |decl_index| {
+
+                    @compileLog("get_module_by_decl", T.Struct.decls[decl_index].name); ////
 
                     // Get the Module Index for the C Declaration
                     if (get_module_by_decl(all_modules, decl_index)) |m2| {
@@ -958,7 +993,10 @@ fn get_module_by_decl(all_modules: []Module, decl_index: usize) ?usize {
         for (all_modules) |module, m2| {
 
             // Overshot the C Declaration Index, skip it
-            if (decl_index <= module.first_index) { continue; }
+            if (
+                decl_index < module.first_index or
+                decl_index > module.last_index
+            ) { continue; }
 
             var diff2 = decl_index - module.first_index;
             if (m) |_| {
@@ -1077,12 +1115,16 @@ fn test_reflection() void {
 
 /// Module Definition
 const Module = struct {
-    /// Module Name, like "LoRaWAN"
+    /// Module Name, like "LoRaMAC"
     name: []const u8,
     /// Name of First Function in the Module, like "LoRaMacInitialization"
     first_function: []const u8,
+    /// Name of Last Function in the Module, like "LoRaMacDeInitialization"
+    last_function: []const u8,
     /// Index of the First Function in C Declarations
     first_index: usize,
+    /// Index of the Last Function in C Declarations
+    last_index: usize,
 };
 
 /// Call Log captured for this app. From
