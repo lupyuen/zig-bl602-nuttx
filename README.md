@@ -3027,27 +3027,7 @@ flowchart TD;
 
 [(Source)](https://gist.github.com/lupyuen/a7fa7b9973ade3c4565f21e20ef7f88b)
 
-# Out Of Memory
-
-Zig Compiler crashes when we run this code to group the C Functions by Module...
-
-https://github.com/lupyuen/zig-bl602-nuttx/blob/f5a5c824e07e5fc984136069a1769edda4967c77/reflect.zig#L825-L1086
-
-Here is the Output Log...
-
-https://gist.github.com/lupyuen/5738abefa9d4c138e9d731e22d01500f
-
-On macOS, Zig Compiler consumes over 34 GB of memory and crashes...
-
-![Too Much Memory](https://lupyuen.github.io/images/Screenshot%202022-06-21%20at%208.03.46%20AM.png)
-
-(On WSL, Zig Compiler hangs the WSL process when it consumes over 4 GB of memory)
-
-This happens because our code is looping repeatedly over 4,700 C Declarations while processing 1,500 lines of Raw Call Logs.
-
-Let's optimise our code.
-
-# TODO
+TODO
 
 ```mermaid
 flowchart TD;
@@ -4246,3 +4226,26 @@ flowchart TD;
     RadioSleep-->TimerStop;
     TimerStop-->End;
 ```
+
+# Out Of Memory
+
+Zig Compiler crashes when we run this code to group the C Functions by Module...
+
+https://github.com/lupyuen/zig-bl602-nuttx/blob/f5a5c824e07e5fc984136069a1769edda4967c77/reflect.zig#L825-L1086
+
+Here is the Output Log...
+
+https://gist.github.com/lupyuen/5738abefa9d4c138e9d731e22d01500f
+
+On macOS, Zig Compiler consumes over 34 GB of memory and crashes...
+
+![Too Much Memory](https://lupyuen.github.io/images/Screenshot%202022-06-21%20at%208.03.46%20AM.png)
+
+(On WSL, Zig Compiler hangs the WSL process when it consumes over 4 GB of memory)
+
+This happens because our code is looping repeatedly over 4,700 C Declarations while processing 1,500 lines of Raw Call Logs.
+
+Let's optimise our code.
+
+# TODO
+
