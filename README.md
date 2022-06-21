@@ -2890,12 +2890,18 @@ flowchart TD;
     SX126xSetPaConfig-->TimerInit;
 ```
 
-# Too Much Memory
+# Out Of Memory
 
-TODO
+Zig Compiler crashes when we run this code to group the C Functions by Module...
 
 https://github.com/lupyuen/zig-bl602-nuttx/blob/f5a5c824e07e5fc984136069a1769edda4967c77/reflect.zig#L825-L1086
 
+On macOS, Zig Compiler consumes over 34 GB of memory and crashes...
+
 ![Too Much Memory](https://lupyuen.github.io/images/Screenshot%202022-06-21%20at%208.03.46%20AM.png)
+
+(On WSL, Zig Compiler hangs the WSL process when it consumes over 4 GB of memory)
+
+Let's optimise our code.
 
 # TODO
