@@ -2896,6 +2896,10 @@ Zig Compiler crashes when we run this code to group the C Functions by Module...
 
 https://github.com/lupyuen/zig-bl602-nuttx/blob/f5a5c824e07e5fc984136069a1769edda4967c77/reflect.zig#L825-L1086
 
+Output Log:
+
+https://gist.github.com/lupyuen/5738abefa9d4c138e9d731e22d01500f
+
 On macOS, Zig Compiler consumes over 34 GB of memory and crashes...
 
 ![Too Much Memory](https://lupyuen.github.io/images/Screenshot%202022-06-21%20at%208.03.46%20AM.png)
