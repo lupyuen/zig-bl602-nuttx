@@ -4253,13 +4253,25 @@ On macOS, Zig Compiler consumes over 34 GB of memory and crashes...
 
 (On WSL, Zig Compiler hangs the WSL process when it consumes over 4 GB of memory)
 
-This happens because our code is looping repeatedly over 4,700 C Declarations while processing 1,500 lines of Raw Call Logs.
+This happens because our code loops repeatedly over __4,700 C Declarations__ while processing __1,500 lines of Raw Call Logs__.
 
 Let's optimise our code.
 
 # Fix Out Of Memory
 
-TODO
+Our code loops repeatedly over __4,700 C Declarations__ like so...
+
+https://github.com/lupyuen/zig-bl602-nuttx/blob/6d428422bf83b45ffe33e4ea9ce2919f812ad3bb/reflect.zig#L1024-L1044
+
+Which causes Zig Compiler to crash with Out Of Memory. But we don't actually need to loop through all the C Declarations!
+
+According to our list of Modules, we call only __173 Functions__. Let's fix the above function so that we loop over the 173 Functions instead...
+
+https://github.com/lupyuen/zig-bl602-nuttx/blob/6d428422bf83b45ffe33e4ea9ce2919f812ad3bb/reflect.zig#L1046-L1075
+
+And our code runs OK with Zig Compiler!
+
+(macOS, not WSL though)
 
 # Wishlist for Zig Compiler
 
