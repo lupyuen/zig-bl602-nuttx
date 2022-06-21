@@ -2898,6 +2898,7 @@ TODO
 // Define the Modules and the First / Last Functions in each Module.
 // We order the Modules from High-Level to Low-Level.
 var all_modules = [_]Module {
+    // LoRaMAC Handler is the Top Level Module that drives the LoRaWAN Stack
     Module {
         .name           = "LMHandler",
         .first_function = "LmHandlerInit",
@@ -2905,6 +2906,7 @@ var all_modules = [_]Module {
         .first_index    = undefined,
         .last_index     = undefined,
     },
+    // LoRaMAC Module is the implementation of the LoRaWAN Driver
     Module {
         .name           = "LoRaMAC",
         .first_function = "LoRaMacInitialization",
@@ -2912,6 +2914,7 @@ var all_modules = [_]Module {
         .first_index    = undefined,
         .last_index     = undefined,
     },
+    // Radio Module is the abstract interface for LoRa Radio Transceivers
     Module {
         .name           = "Radio",
         .first_function = "RadioInit",
@@ -2919,6 +2922,7 @@ var all_modules = [_]Module {
         .first_index    = undefined,
         .last_index     = undefined,
     },
+    // SX1262 Module is the LoRa Driver for Semtech SX1262 Radio Transceiver
     Module {
         .name           = "SX1262",
         .first_function = "SX126xInit",
@@ -2926,6 +2930,7 @@ var all_modules = [_]Module {
         .first_index    = undefined,
         .last_index     = undefined,
     },
+    // NimBLE is the Bottom Level Module that contains Multithreading Functions like Timers and Event Queues
     Module {
         .name           = "NimBLE",
         .first_function = "TimerInit",
