@@ -4259,15 +4259,72 @@ Let's optimise our code.
 
 # Fix Out Of Memory
 
-Our code loops repeatedly over __4,700 C Declarations__ like so...
+Our code searches for a C Declaration by looping repeatedly over __4,700 C Declarations__ like so...
 
-https://github.com/lupyuen/zig-bl602-nuttx/blob/6d428422bf83b45ffe33e4ea9ce2919f812ad3bb/reflect.zig#L1024-L1044
+```zig
+/// Return the C Declaration Index for the Function Name.
+/// We match the C Declaration Name against the start of the Function Name.
+/// This is the slower, unfiltered version that searches all C Declarations.
+fn get_decl_by_name(name: []const u8) ?usize {
+    comptime {
+        const T = @typeInfo(c);
+
+        // For every C Declaration...
+        for (T.Struct.decls) |decl, i| {
+            if (std.mem.eql(u8, decl.name, "Radio")) { continue; }  // Skip Radio
+
+            // If the C Declaration starts with the Function Name...
+            if (std.mem.startsWith(u8, name, decl.name)) {
+
+                // Return the C Declaration Index
+                return i;
+            }
+        }   // End of C Declaration
+        return null;  // Not found
+    }
+}
+```
+
+[(Source)](https://github.com/lupyuen/zig-bl602-nuttx/blob/6d428422bf83b45ffe33e4ea9ce2919f812ad3bb/reflect.zig#L1024-L1044)
 
 Which causes Zig Compiler to crash with Out Of Memory. But we don't actually need to loop through all the C Declarations!
 
 According to our list of Modules, we call only __173 Functions__. Let's fix the above function so that we loop over the 173 Functions instead...
 
-https://github.com/lupyuen/zig-bl602-nuttx/blob/6d428422bf83b45ffe33e4ea9ce2919f812ad3bb/reflect.zig#L1046-L1075
+```zig
+/// Return the C Declaration Index for the Function Name.
+/// We match the C Declaration Name against the start of the Function Name.
+/// This is the faster, filtered version that searches C Declarations by Modules.
+fn get_decl_by_name_filtered(all_modules: []Module, name: []const u8) ?usize {
+    comptime {
+        const T = @typeInfo(c);
+
+        // Search all Modules for the Function Name
+        for (all_modules) |module| {
+
+            // For every C Declaration in the Module...
+            var decl_index = module.first_index;
+            while (decl_index <= module.last_index) {
+
+                // Get the C Declaration
+                var decl = T.Struct.decls[decl_index];
+                if (std.mem.eql(u8, decl.name, "Radio")) { continue; }  // Skip Radio
+
+                // If the C Declaration starts with the Function Name...
+                if (std.mem.startsWith(u8, name, decl.name)) {
+
+                    // Return the C Declaration Index
+                    return decl_index;
+                }
+                decl_index += 1;
+            }  // End of C Declaration
+        }  // End of Module
+        return null;  // Not found
+    }
+}
+```
+
+[(Source)](https://github.com/lupyuen/zig-bl602-nuttx/blob/6d428422bf83b45ffe33e4ea9ce2919f812ad3bb/reflect.zig#L1046-L1075)
 
 And our code runs OK with Zig Compiler!
 
