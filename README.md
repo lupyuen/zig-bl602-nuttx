@@ -2892,7 +2892,9 @@ flowchart TD;
 
 # Group Functions by Modules
 
-TODO
+Let's add some Structure to our Call Graph by grouping the C Functions into Modules.
+
+This is how we define the Modules, from High Level to Low Level...
 
 ```zig
 // Define the Modules and the First / Last Functions in each Module.
@@ -2943,7 +2945,11 @@ var all_modules = [_]Module {
 
 [(Source)](https://github.com/lupyuen/zig-bl602-nuttx/blob/69565443d4b9afb5a2153473b831d7188ff266ef/reflect.zig#L838-L876)
 
-TODO
+Note that we specify only the First and Last Functions for each Module.
+
+That's because functions from the same Module are clustered together in the Zig Type Reflection.
+
+Then we render each Module as a Mermaid.js Subgraph...
 
 ```zig
 /// Render all Modules and their Functions as Subgraphs
@@ -2987,7 +2993,7 @@ fn render_modules(all_modules: []Module) void {
 
 [(Source)](https://github.com/lupyuen/zig-bl602-nuttx/blob/69565443d4b9afb5a2153473b831d7188ff266ef/reflect.zig#L914-L952)
 
-TODO
+Each Subgraph contains a list of Functions that belong to the Module...
 
 ```text
 flowchart TD;
@@ -3027,7 +3033,7 @@ flowchart TD;
 
 [(Source)](https://gist.github.com/lupyuen/a7fa7b9973ade3c4565f21e20ef7f88b)
 
-TODO
+When we render the output with Mermaid.js, we get a Structured Call Graph that looks more meaningful...
 
 ```mermaid
 flowchart TD;
@@ -4227,6 +4233,10 @@ flowchart TD;
     TimerStop-->End;
 ```
 
+# Constrain the Call Graph
+
+TODO
+
 # Out Of Memory
 
 Zig Compiler crashes when we run this code to group the C Functions by Module...
@@ -4247,5 +4257,12 @@ This happens because our code is looping repeatedly over 4,700 C Declarations wh
 
 Let's optimise our code.
 
-# TODO
+# Fix Out Of Memory
 
+TODO
+
+# Wishlist for Zig Compiler
+
+TODO: Type Reflection should include full path of source file
+
+TODO: @compileLog should emit any kind of strings
