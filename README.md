@@ -2890,6 +2890,138 @@ flowchart TD;
     SX126xSetPaConfig-->TimerInit;
 ```
 
+# Group Functions by Modules
+
+TODO
+
+```zig
+// Define the Modules and the First / Last Functions in each Module.
+// We order the Modules from High-Level to Low-Level.
+var all_modules = [_]Module {
+    Module {
+        .name           = "LMHandler",
+        .first_function = "LmHandlerInit",
+        .last_function  = "DisplayAppInfo",
+        .first_index    = undefined,
+        .last_index     = undefined,
+    },
+    Module {
+        .name           = "LoRaMAC",
+        .first_function = "LoRaMacInitialization",
+        .last_function  = "LoRaMacDeInitialization",
+        .first_index    = undefined,
+        .last_index     = undefined,
+    },
+    Module {
+        .name           = "Radio",
+        .first_function = "RadioInit",
+        .last_function  = "RadioAddRegisterToRetentionList",
+        .first_index    = undefined,
+        .last_index     = undefined,
+    },
+    Module {
+        .name           = "SX1262",
+        .first_function = "SX126xInit",
+        .last_function  = "SX126xSetOperatingMode",
+        .first_index    = undefined,
+        .last_index     = undefined,
+    },
+    Module {
+        .name           = "NimBLE",
+        .first_function = "TimerInit",
+        .last_function  = "TimerGetElapsedTime",
+        .first_index    = undefined,
+        .last_index     = undefined,
+    },
+};
+```
+
+[(Source)](https://github.com/lupyuen/zig-bl602-nuttx/blob/69565443d4b9afb5a2153473b831d7188ff266ef/reflect.zig#L838-L876)
+
+TODO
+
+```zig
+/// Render all Modules and their Functions as Subgraphs
+fn render_modules(all_modules: []Module) void {
+    comptime {
+        // Render every Module
+        for (all_modules) |module, m| {
+            @compileLog("    subgraph ", module.name, ";");
+
+            // For every line in the Call Log...
+            var call_log_split = std.mem.split(u8, call_log, "\n");
+            while (call_log_split.next()) |line| {
+                var T = @typeInfo(c);
+
+                // If the Call Log matches a C Declaration...
+                if (get_decl_by_name_filtered(all_modules, line)) |decl_index| {
+
+                    // Get the Module Index for the C Declaration
+                    if (get_module_by_decl(all_modules, decl_index)) |m2| {
+
+                        // If the C Declaration matches our Module Index...
+                        if (m == m2) {
+
+                            // Print the Function Name
+                            var name = T.Struct.decls[decl_index].name;
+                            @compileLog("        ", name, ";");
+                        }
+                    } else {
+                        // Missing Declaration
+                        var name = T.Struct.decls[decl_index].name;
+                        @compileLog("Missing Decl:", name);
+                    }
+                }
+            }  // End of Call Log            
+
+            @compileLog("    end;");
+        }  // End of Module
+    }
+}
+```
+
+[(Source)](https://github.com/lupyuen/zig-bl602-nuttx/blob/69565443d4b9afb5a2153473b831d7188ff266ef/reflect.zig#L914-L952)
+
+TODO
+
+```text
+flowchart TD;
+    subgraph LMHandler;
+        LmHandlerSend;
+    end;
+    subgraph LoRaMAC;
+        LoRaMacInitialization;
+    end;
+    subgraph Radio;
+        RadioSetModem;
+        RadioSetPublicNetwork;
+        RadioSleep;
+        RadioSetChannel;
+        RadioSetTxConfig;
+        RadioStandby;
+        RadioSend;
+        RadioIrqProcess;
+        ...
+    end;
+    subgraph SX1262;
+        SX126xIoInit;
+        SX126xSetTx;
+        SX126xSetPaConfig;
+    end;
+    subgraph NimBLE;
+        TimerInit;
+        TimerStop;
+        TimerStart;
+        TimerSetValue;
+    end;
+    Start-->LoRaMacInitialization;
+    LoRaMacInitialization-->TimerInit;
+    TimerInit-->SX126xIoInit;
+    ...
+```
+
+[(Source)](https://gist.github.com/lupyuen/a7fa7b9973ade3c4565f21e20ef7f88b)
+
 # Out Of Memory
 
 Zig Compiler crashes when we run this code to group the C Functions by Module...
