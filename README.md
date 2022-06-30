@@ -4332,6 +4332,14 @@ And our code runs OK with Zig Compiler!
 
 # Wishlist for Zig Compiler
 
-TODO: Type Reflection should include full path of source file
+Building a Call Graph at Compile-Time with Zig Compiler looks pretty challenging.
 
-TODO: @compileLog should emit any kind of strings
+I hope that future versions of the Zig Compiler will support the following...
+
+-   Type Reflection for C Declarations will provide the full path of source files
+
+    (Makes it easier to identify the module for each declaration)
+
+-   `@compileLog` will emit any kind of strings
+
+    (So that `@compileLog` can generate proper Mermaid.js strings like "`Start-->LoRaMacInitialization;`")
