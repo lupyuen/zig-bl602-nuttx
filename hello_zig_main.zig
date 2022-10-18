@@ -43,16 +43,3 @@ pub export fn hello_zig_main(
     _ = printf("Hello, Zig!\n");
     return 0;
 }
-
-//****************************************************************************
-//* hello_main
-//****************************************************************************
-pub export fn hello_main(
-    _argc: c_int, 
-    _argv: [*]const [*]const u8
-) c_int {
-    _ = _argc;
-    _ = _argv;
-    _ = printf("Hello, Zig!\n");
-    return 0;
-}
